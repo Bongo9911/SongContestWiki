@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "site": "songcontestwiki",
+    "public": "dist/FanSongContestWiki",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
