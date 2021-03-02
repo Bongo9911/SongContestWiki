@@ -1,3 +1,41 @@
 .container {
+	margin: 2vw;
+}
 
+th, td {
+	padding: .25vw .5vw .25vw .5vw;
+}
+
+th {
+	background-color: #dadada;
+}
+
+table, th, td {
+	border: 1px solid gray;
+	border-collapse: collapse;
+	font-family: "Verdana", "Trebuchet MS";
+	font-size: .95vw;
+}
+
+.infobox {
+	width: 325px;
+	border: 1px solid gray;
+	float: right;
+	background-color: #f5f5f5;
+	height: 300px;
+}
+
+.infoboxheader {
+	background-color: lightblue;
+	text-align: center;
+	font-weight: bold;
+	margin: .3vw;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
 }

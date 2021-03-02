@@ -5,10 +5,10 @@ import { ContestScreenComponent } from './pages/contest-screen/contest-screen.co
 import { EditionScreenComponent } from './pages/edition-screen/edition-screen.component';
 
 const routes: Routes = [
-  { path: "start-screen", component: StartScreenComponent },
+  { path: "", component: StartScreenComponent },
   { path: "contest/:id", component: ContestScreenComponent },
   { path: "contest/:id/ed/:num", component: EditionScreenComponent },
-  { path: "**", redirectTo: 'start-screen'}
+  { path: "**", redirectTo: ''}
 ];
 
 @NgModule({

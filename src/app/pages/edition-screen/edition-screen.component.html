@@ -2,10 +2,109 @@
 
 <div class="container">
 
+  <h1>{{con.name}} {{num}}</h1>
+  <hr/>
+
+  <div class="infobox">
+    <div class="infoboxheader">
+      {{con.name}} {{num}}
+      <br/>
+      "{{edition.slogan}}"
+    </div>
+    <table style="width: 100%;">
+
+    </table>
+    test
+  </div>
+
   <span>
-    <a routerLink="/start-screen">
+    <a routerLink="/">
       test
     </a>
   </span>
+
+  <div class="sectionheader">
+    <h2>Semi-finals</h2>
+    <hr/>
+  </div>
+
+  <h3>Semi-final 1</h3>
+
+  <table id="sf1table">
+    <tr>
+      <th (click)="sortTable(0,'sf1table')">Draw</th>
+      <th (click)="sortTable(1,'sf1table')">Country</th>
+      <th (click)="sortTable(2,'sf1table')">User</th>
+      <th (click)="sortTable(3,'sf1table')">Language</th>
+      <th (click)="sortTable(4,'sf1table')">Artist</th>
+      <th (click)="sortTable(5,'sf1table')">Song</th>
+      <th (click)="sortTable(6,'sf1table')">Place</th>
+      <th (click)="sortTable(7,'sf1table')">Points</th>
+    </tr>
+    <tr *ngFor="let song of filterSongs('1')">
+      <td>{{song.sfro}}</td>
+      <td><a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
+      <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
+      <td>{{song.language}}</td>
+      <td>{{song.artist}}</td>
+      <td>"{{song.song}}"</td>
+      <td>{{song.sfplace}}</td>
+      <td>{{song.sfpoints}}</td>
+    </tr>
+  </table>
+
+  <h3>Semi-final 2</h3>
+
+  <table id="sf2table">
+    <tr>
+      <th (click)="sortTable(0,'sf2table')">Draw</th>
+      <th (click)="sortTable(1,'sf2table')">Country</th>
+      <th (click)="sortTable(2,'sf2table')">User</th>
+      <th (click)="sortTable(3,'sf2table')">Language</th>
+      <th (click)="sortTable(4,'sf2table')">Artist</th>
+      <th (click)="sortTable(5,'sf2table')">Song</th>
+      <th (click)="sortTable(6,'sf2table')">Place</th>
+      <th (click)="sortTable(7,'sf2table')">Points</th>
+    </tr>
+    <tr *ngFor="let song of filterSongs('2')">
+      <td>{{song.sfro}}</td>
+      <td><a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
+      <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
+      <td>{{song.language}}</td>
+      <td>{{song.artist}}</td>
+      <td>"{{song.song}}"</td>
+      <td>{{song.sfplace}}</td>
+      <td>{{song.sfpoints}}</td>
+    </tr>
+  </table>
+
+  <h3>Semi-final 3</h3>
+
+  <table id="sf3table">
+    <tr>
+      <th (click)="sortTable(0,'sf3table')">Draw</th>
+      <th (click)="sortTable(1,'sf3table')">Country</th>
+      <th (click)="sortTable(2,'sf3table')">User</th>
+      <th (click)="sortTable(3,'sf3table')">Language</th>
+      <th (click)="sortTable(4,'sf3table')">Artist</th>
+      <th (click)="sortTable(5,'sf3table')">Song</th>
+      <th (click)="sortTable(6,'sf3table')">Place</th>
+      <th (click)="sortTable(7,'sf3table')">Points</th>
+    </tr>
+    <ng-container *ngFor="let song of filterSongs('3')">
+      <tr 
+      [ngStyle]="{'background-color': (song.qualifier) ? '#ffdead' : null}">
+        <td>{{song.sfro}}</td>
+        <td><a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
+        <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
+        <td>{{song.language}}</td>
+        <td>{{song.artist}}</td>
+        <td>"{{song.song}}"</td>
+        <td>{{song.sfplace}}</td>
+        <td>{{song.sfpoints}}</td>
+      </tr>
+    </ng-container>
+  </table>
+
 
 </div>
