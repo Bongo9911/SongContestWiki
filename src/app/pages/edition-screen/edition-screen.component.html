@@ -11,11 +11,24 @@
       <br/>
       <i>"{{edition.slogan}}"</i>
     </div>
-    <img class="edlogo" src="./assets/logos/{{num}}.png">
-    <table style="width: 100%;">
 
-    </table>
-    test
+    <img class="edlogo" src="./assets/logos/{{num}}.png">
+
+    <div class="infoboxheader">Host</div>
+    <div class="infoboxsection">
+      <div><b>Host country</b></div>
+      <div><img class="flag" src="./assets/flags/{{edition.hostcountry}} Flag.png"> <a routerLink="/contest/{{id}}/country/{{edition.hostcountry}}">{{edition.hostcountry}}</a></div>
+    </div>
+    <div class="infoboxsection">
+      <div><b>Host</b></div>
+      <div><a routerLink="/contest/{{id}}/user/{{edition.hostuser}}">{{edition.hostuser}}</a></div>
+    </div>
+
+    <div class="infoboxheader">Participants</div>
+    <div class="infoboxsection">
+      <div><b>Number of entries</b></div>
+      <div>{{edition.entries}}</div>
+    </div>
   </div>
 
   <span>
@@ -31,22 +44,22 @@
 
   <h3>Semi-final 1</h3>
 
-  <table id="sf1table">
+  <table matSort (matSortChange)="sortData($event, '1')">
     <tr>
-      <th (click)="sortTable(0,'sf1table')">Draw</th>
-      <th (click)="sortTable(1,'sf1table')">Country</th>
-      <th (click)="sortTable(2,'sf1table')">User</th>
-      <th (click)="sortTable(3,'sf1table')">Language</th>
-      <th (click)="sortTable(4,'sf1table')">Artist</th>
-      <th (click)="sortTable(5,'sf1table')">Song</th>
-      <th (click)="sortTable(6,'sf1table')">Place</th>
-      <th (click)="sortTable(7,'sf1table')">Points</th>
+      <th mat-sort-header="draw">Draw</th>
+      <th mat-sort-header="country">Country</th>
+      <th mat-sort-header="user">User</th>
+      <th mat-sort-header="language">Language</th>
+      <th mat-sort-header="artist">Artist</th>
+      <th mat-sort-header="song">Song</th>
+      <th mat-sort-header="place">Place</th>
+      <th mat-sort-header="points">Points</th>
     </tr>
-    <ng-container *ngFor="let song of filterSongs('1')">
+    <ng-container *ngFor="let song of sf1songs">
       <tr 
-      [ngStyle]="(song.qualifier == 'Q') ? {'background-color': '#ffdead', 'font-weight': 'bold' } : {}">
+      [ngStyle]="(song.qualifier == 'Q') ? {'background-color': '#ffdead', 'font-weight': 'bold' } : { 'background-color': 'ghostwhite' }">
         <td>{{song.sfro}}</td>
-        <td><img class="flag" src="./assets/flags/{{song.country}}Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
+        <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
         <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
         <td>{{song.language}}</td>
         <td>{{song.artist}}</td>
@@ -59,22 +72,22 @@
 
   <h3>Semi-final 2</h3>
 
-  <table id="sf2table">
+  <table matSort (matSortChange)="sortData($event, '2')">
     <tr>
-      <th (click)="sortTable(0,'sf2table')">Draw</th>
-      <th (click)="sortTable(1,'sf2table')">Country</th>
-      <th (click)="sortTable(2,'sf2table')">User</th>
-      <th (click)="sortTable(3,'sf2table')">Language</th>
-      <th (click)="sortTable(4,'sf2table')">Artist</th>
-      <th (click)="sortTable(5,'sf2table')">Song</th>
-      <th (click)="sortTable(6,'sf2table')">Place</th>
-      <th (click)="sortTable(7,'sf2table')">Points</th>
+      <th mat-sort-header="draw">Draw</th>
+      <th mat-sort-header="country">Country</th>
+      <th mat-sort-header="user">User</th>
+      <th mat-sort-header="language">Language</th>
+      <th mat-sort-header="artist">Artist</th>
+      <th mat-sort-header="song">Song</th>
+      <th mat-sort-header="place">Place</th>
+      <th mat-sort-header="points">Points</th>
     </tr>
-    <ng-container *ngFor="let song of filterSongs('2')">
+    <ng-container *ngFor="let song of sf2songs">
       <tr 
-      [ngStyle]="(song.qualifier == 'Q') ? {'background-color': '#ffdead', 'font-weight': 'bold' } : {}">
+      [ngStyle]="(song.qualifier == 'Q') ? {'background-color': '#ffdead', 'font-weight': 'bold' } : { 'background-color': 'ghostwhite' }">
         <td>{{song.sfro}}</td>
-        <td><img class="flag" src="./assets/flags/{{song.country}}Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
+        <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
         <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
         <td>{{song.language}}</td>
         <td>{{song.artist}}</td>
@@ -87,28 +100,60 @@
 
   <h3>Semi-final 3</h3>
 
-  <table id="sf3table">
+  <table matSort (matSortChange)="sortData($event, '3')">
     <tr>
-      <th (click)="sortTable(0,'sf3table')">Draw</th>
-      <th (click)="sortTable(1,'sf3table')">Country</th>
-      <th (click)="sortTable(2,'sf3table')">User</th>
-      <th (click)="sortTable(3,'sf3table')">Language</th>
-      <th (click)="sortTable(4,'sf3table')">Artist</th>
-      <th (click)="sortTable(5,'sf3table')">Song</th>
-      <th (click)="sortTable(6,'sf3table')">Place</th>
-      <th (click)="sortTable(7,'sf3table')">Points</th>
+      <th mat-sort-header="draw">Draw</th>
+      <th mat-sort-header="country">Country</th>
+      <th mat-sort-header="user">User</th>
+      <th mat-sort-header="language">Language</th>
+      <th mat-sort-header="artist">Artist</th>
+      <th mat-sort-header="song">Song</th>
+      <th mat-sort-header="place">Place</th>
+      <th mat-sort-header="points">Points</th>
     </tr>
-    <ng-container *ngFor="let song of filterSongs('3')">
+    <ng-container *ngFor="let song of sf3songs">
       <tr 
-      [ngStyle]="(song.qualifier == 'Q') ? {'background-color': '#ffdead', 'font-weight': 'bold' } : {}">
+      [ngStyle]="(song.qualifier == 'Q') ? {'background-color': '#ffdead', 'font-weight': 'bold' } : { 'background-color': 'ghostwhite' }">
         <td>{{song.sfro}}</td>
-        <td><img class="flag" src="./assets/flags/{{song.country}}Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
+        <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
         <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
         <td>{{song.language}}</td>
         <td>{{song.artist}}</td>
         <td>"{{song.song}}"</td>
         <td>{{song.sfplace}}</td>
         <td>{{song.sfpoints}}</td>
+      </tr>
+    </ng-container>
+  </table>
+
+  
+  <div class="sectionheader">
+    <h2>Grand final</h2>
+    <hr/>
+  </div>
+
+  <table matSort (matSortChange)="sortData($event, 'f')">
+    <tr>
+      <th mat-sort-header="draw">Draw</th>
+      <th mat-sort-header="country">Country</th>
+      <th mat-sort-header="user">User</th>
+      <th mat-sort-header="language">Language</th>
+      <th mat-sort-header="artist">Artist</th>
+      <th mat-sort-header="song">Song</th>
+      <th mat-sort-header="place">Place</th>
+      <th mat-sort-header="points">Points</th>
+    </tr>
+    <ng-container *ngFor="let song of gfsongs">
+      <tr 
+      [ngStyle]="getFStyle(song.fplace)">
+        <td>{{song.fro}}</td>
+        <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
+        <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
+        <td>{{song.language}}</td>
+        <td>{{song.artist}}</td>
+        <td>"{{song.song}}"</td>
+        <td>{{song.fplace}}</td>
+        <td>{{song.fpoints}}</td>
       </tr>
     </ng-container>
   </table>

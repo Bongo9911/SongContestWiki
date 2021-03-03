@@ -8,6 +8,9 @@ import { AppComponent } from './app.component';
 import { firebaseConfig } from './credentials';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatSortModule } from '@angular/material/sort';
+
 import { ContestScreenComponent } from './pages/contest-screen/contest-screen.component';
 import { StartScreenComponent } from './pages/start-screen/start-screen.component';
 import { EditionScreenComponent } from './pages/edition-screen/edition-screen.component';
@@ -25,6 +28,8 @@ import { EditionScreenComponent } from './pages/edition-screen/edition-screen.co
     AngularFireModule.initializeApp(firebaseConfig),
     FormsModule,
     CommonModule,
+    BrowserAnimationsModule,
+    MatSortModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

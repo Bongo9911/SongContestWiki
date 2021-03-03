@@ -9,28 +9,43 @@ th, td {
 th {
 	background-color: #dadada;
 	cursor: pointer;
+	text-align: center;
 }
 
 table, th, td {
 	border: 1px solid gray;
 	border-collapse: collapse;
-	font-family: "Verdana", "Trebuchet MS";
-	font-size: 13px;
+	/* font-family: "Verdana", "Trebuchet MS"; */
+	font-size: 14px;
 }
 
 .infobox {
-	width: 325px;
+	width: 315px;
 	border: 1px solid gray;
 	float: right;
 	background-color: #f5f5f5;
 	margin-left: 15px;
+	padding: 5px 5px 5px 5px
 }
 
 .infoboxheader {
 	background-color: lightblue;
 	text-align: center;
 	font-weight: bold;
-	margin: 4px;
+	margin-bottom: 5px;
+}
+
+.infoboxheader i {
+	font-size: 13px;
+}
+
+.infoboxsection {
+	display: flex;
+	flex-wrap: nowrap;
+}
+
+.infoboxsection> div {
+  min-width: 45%;
 }
 
 a {
@@ -52,13 +67,13 @@ a:hover {
 .edlogo {
 	width: 315px;
 	height: auto;
-	margin-left: 5px;
-}
-
-.infoboxheader i {
-	font-size: 13px;
 }
 
 h2 {
 	margin-bottom: -8px;
+}
+
+::ng-deep .mat-sort-header-container {
+	display:flex;
+	justify-content:center;
 }
