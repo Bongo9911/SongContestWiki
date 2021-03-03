@@ -3,18 +3,19 @@
 }
 
 th, td {
-	padding: .25vw .5vw .25vw .5vw;
+	padding: 3px 7px 3px 7px;
 }
 
 th {
 	background-color: #dadada;
+	cursor: pointer;
 }
 
 table, th, td {
 	border: 1px solid gray;
 	border-collapse: collapse;
 	font-family: "Verdana", "Trebuchet MS";
-	font-size: .95vw;
+	font-size: 13px;
 }
 
 .infobox {
@@ -22,14 +23,14 @@ table, th, td {
 	border: 1px solid gray;
 	float: right;
 	background-color: #f5f5f5;
-	height: 300px;
+	margin-left: 15px;
 }
 
 .infoboxheader {
 	background-color: lightblue;
 	text-align: center;
 	font-weight: bold;
-	margin: .3vw;
+	margin: 4px;
 }
 
 a {
@@ -38,4 +39,26 @@ a {
 
 a:hover {
 	text-decoration: underline;
+}
+
+.flag {
+	width: 23px;
+	height: auto;
+	border: 1px solid white;
+	margin-right: 3px;
+	vertical-align: bottom;
+}
+
+.edlogo {
+	width: 315px;
+	height: auto;
+	margin-left: 5px;
+}
+
+.infoboxheader i {
+	font-size: 13px;
+}
+
+h2 {
+	margin-bottom: -8px;
 }

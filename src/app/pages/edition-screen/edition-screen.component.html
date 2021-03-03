@@ -9,8 +9,9 @@
     <div class="infoboxheader">
       {{con.name}} {{num}}
       <br/>
-      "{{edition.slogan}}"
+      <i>"{{edition.slogan}}"</i>
     </div>
+    <img class="edlogo" src="./assets/logos/{{num}}.png">
     <table style="width: 100%;">
 
     </table>
@@ -41,16 +42,19 @@
       <th (click)="sortTable(6,'sf1table')">Place</th>
       <th (click)="sortTable(7,'sf1table')">Points</th>
     </tr>
-    <tr *ngFor="let song of filterSongs('1')">
-      <td>{{song.sfro}}</td>
-      <td><a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
-      <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
-      <td>{{song.language}}</td>
-      <td>{{song.artist}}</td>
-      <td>"{{song.song}}"</td>
-      <td>{{song.sfplace}}</td>
-      <td>{{song.sfpoints}}</td>
-    </tr>
+    <ng-container *ngFor="let song of filterSongs('1')">
+      <tr 
+      [ngStyle]="(song.qualifier == 'Q') ? {'background-color': '#ffdead', 'font-weight': 'bold' } : {}">
+        <td>{{song.sfro}}</td>
+        <td><img class="flag" src="./assets/flags/{{song.country}}Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
+        <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
+        <td>{{song.language}}</td>
+        <td>{{song.artist}}</td>
+        <td>"{{song.song}}"</td>
+        <td>{{song.sfplace}}</td>
+        <td>{{song.sfpoints}}</td>
+      </tr>
+    </ng-container>
   </table>
 
   <h3>Semi-final 2</h3>
@@ -66,16 +70,19 @@
       <th (click)="sortTable(6,'sf2table')">Place</th>
       <th (click)="sortTable(7,'sf2table')">Points</th>
     </tr>
-    <tr *ngFor="let song of filterSongs('2')">
-      <td>{{song.sfro}}</td>
-      <td><a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
-      <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
-      <td>{{song.language}}</td>
-      <td>{{song.artist}}</td>
-      <td>"{{song.song}}"</td>
-      <td>{{song.sfplace}}</td>
-      <td>{{song.sfpoints}}</td>
-    </tr>
+    <ng-container *ngFor="let song of filterSongs('2')">
+      <tr 
+      [ngStyle]="(song.qualifier == 'Q') ? {'background-color': '#ffdead', 'font-weight': 'bold' } : {}">
+        <td>{{song.sfro}}</td>
+        <td><img class="flag" src="./assets/flags/{{song.country}}Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
+        <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
+        <td>{{song.language}}</td>
+        <td>{{song.artist}}</td>
+        <td>"{{song.song}}"</td>
+        <td>{{song.sfplace}}</td>
+        <td>{{song.sfpoints}}</td>
+      </tr>
+    </ng-container>
   </table>
 
   <h3>Semi-final 3</h3>
@@ -93,9 +100,9 @@
     </tr>
     <ng-container *ngFor="let song of filterSongs('3')">
       <tr 
-      [ngStyle]="{'background-color': (song.qualifier) ? '#ffdead' : null}">
+      [ngStyle]="(song.qualifier == 'Q') ? {'background-color': '#ffdead', 'font-weight': 'bold' } : {}">
         <td>{{song.sfro}}</td>
-        <td><a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
+        <td><img class="flag" src="./assets/flags/{{song.country}}Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
         <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
         <td>{{song.language}}</td>
         <td>{{song.artist}}</td>
@@ -105,6 +112,10 @@
       </tr>
     </ng-container>
   </table>
+
+  <textarea #song></textarea>
+
+  <button (click)="uploadSong(song.value)">Click me</button>
 
 
 </div>

@@ -58,5 +58,5 @@ interface Edition {
   entries: number;
   hostcountry: string;
   hostuser: string;
-  id: string;
+  edition: string;
 }

@@ -18,7 +18,17 @@ export class EditionScreenComponent implements OnInit {
   num : string;
 
   songs : Song[] = [];
-  edition : Edition;
+  edition : Edition = { 
+    edition: '0',
+    entries: 0,
+    hostcountry: '',
+    hostuser: '',
+    slogan: '',
+  };
+
+  fakeArray = new Array(3);
+
+  sfnums : number[] = [1,2,3]
 
   constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) { 
     this.route.params.subscribe(params => {
@@ -59,12 +69,39 @@ export class EditionScreenComponent implements OnInit {
       });
     });
   }
-
-  filterSongs(sfnum : string) : Song[] {
-    return this.songs.filter(x => x.sfnum == sfnum);
+  
+  ngOnInit(): void {
   }
 
-  ngOnInit(): void {
+  filterSongs(sfnum : string) : Song[] {
+    return this.songs.filter(x => x.sfnum == sfnum).sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
+  }
+
+  uploadSong(song : string) : void {
+    console.log(song);
+    const parsedString = song.split('\n').map((line) => line.split('\t'))
+    console.log(parsedString);
+    parsedString.forEach(song => {
+      this.database
+      .collection<Contest>('contests', ref => ref.where('id', '==', this.id)).doc(this.id)
+      .collection('songs').add({
+        edition: song[0],
+        qualifier: song[1],
+        disqualified: song[2],
+        sfnum: song[3],
+        user: song[4],
+        country: song[5],
+        language: song[6],
+        artist: song[7],
+        song: song[8],
+        fro: parseInt(song[9]),
+        fplace: parseInt(song[10]),
+        fpoints: parseInt(song[11]),
+        sfro: parseInt(song[12]),
+        sfplace: parseInt(song[13]),
+        sfpoints: parseInt(song[14])
+      })
+    })
   }
 
   //https://www.w3schools.com/howto/howto_js_sort_table.asp
@@ -131,10 +168,10 @@ interface Contest {
 }
 
 interface Edition {
+  edition: string;
   entries: number;
   hostcountry: string;
   hostuser: string;
-  id: string;
   slogan: string;
 }
 
