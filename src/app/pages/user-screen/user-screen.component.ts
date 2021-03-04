@@ -4,11 +4,11 @@ import { Router, ActivatedRoute } from '@angular/router';
 import {Sort} from '@angular/material/sort';
 
 @Component({
-  selector: 'app-edition-screen',
-  templateUrl: './edition-screen.component.html',
-  styleUrls: ['./edition-screen.component.css']
+  selector: 'app-user-screen',
+  templateUrl: './user-screen.component.html',
+  styleUrls: ['./user-screen.component.css']
 })
-export class EditionScreenComponent implements OnInit {
+export class UserScreenComponent implements OnInit {
 
   con: Contest = {
     name: '',
@@ -22,7 +22,7 @@ export class EditionScreenComponent implements OnInit {
     slogan: '',
   };
   id: string;
-  num: string;
+  user: string;
 
   songs: Song[] = [];
   sf1songs: Song[] = [];
@@ -35,7 +35,7 @@ export class EditionScreenComponent implements OnInit {
   constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
       this.id = params.id;
-      this.num = params.num;
+      this.user = params.user;
     });
 
     this.database
@@ -51,7 +51,7 @@ export class EditionScreenComponent implements OnInit {
     //gets the info on the edition
     this.database
       .collection<Contest>('contests', ref => ref.where('id', '==', this.id)).doc(this.id)
-      .collection<Edition>('editions', ref => ref.where('edition', '==', this.num))
+      .collection<Edition>('users', ref => ref.where('user', '==', this.user))
       .get()
       .subscribe(async res => {
         await res.docs.forEach((doc) => {
@@ -62,19 +62,13 @@ export class EditionScreenComponent implements OnInit {
     //get all the songs sent to that edition
     this.database
       .collection<Contest>('contests', ref => ref.where('id', '==', this.id)).doc(this.id)
-      .collection<Song>('songs', ref => ref.where('edition', '==', this.num)/*.orderBy('sfro')*/)
+      .collection<Song>('songs', ref => ref.where('user', '==', this.user))
       .get()
       .subscribe(async res => {
         await res.docs.forEach((doc) => {
           this.songs.push(doc.data());
           console.log(doc.data());
-          this.sf1songs = this.songs.filter(x => x.sfnum == '1').filter(x => x.qualifier !== 'AQ')
-          .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
-          this.sf2songs = this.songs.filter(x => x.sfnum == '2').filter(x => x.qualifier !== 'AQ')
-          .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
-          this.sf3songs = this.songs.filter(x => x.sfnum == '3').filter(x => x.qualifier !== 'AQ')
-          .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
-          this.gfsongs = this.songs.filter(x => x.fro !== -1).sort((a, b) => (a.fro > b.fro) ? 1 : -1);
+          this.songs = this.songs.sort((a, b) => (a.edition > b.edition) ? 1 : -1);
         });
       });
   }
@@ -82,18 +76,7 @@ export class EditionScreenComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  getSFStyle(dq: string, qualifier: string): object {
-    switch (dq) {
-      case 'SFDQ':
-      case 'SFWD':
-        return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
-      default:
-        if(qualifier === 'Q') return { 'background-color': '#ffdead', 'font-weight': 'bold' };
-        else return { 'background-color': 'ghostwhite' };      
-    }
-  }
-
-  getFStyle(place: number, dq: string): object {
+  getStyle(dq: string, place: number): object {
     switch (place) {
       case 1:
         return { 'background-color': '#ffd700', 'font-weight': 'bold' };
@@ -108,6 +91,19 @@ export class EditionScreenComponent implements OnInit {
       default:
         if(dq === 'FWD' || dq == 'FDQ') return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
         else return { 'background-color': 'ghostwhite' };
+    }
+  }
+
+  getSFStyle(place: number): object {
+    switch (place) {
+      case 1:
+        return { 'background-color': '#ffd700' };
+      case 2:
+        return { 'background-color': '#c0c0c0' };
+      case 3:
+        return { 'background-color': '#cc9966' };
+      default:
+        return { 'background-color': 'ghostwhite' };
     }
   }
 
@@ -139,19 +135,7 @@ export class EditionScreenComponent implements OnInit {
   }
 
   sortData(sort: Sort, sf: string) {
-    let data = []; 
-    if(sf === '1') {
-      data = this.sf1songs.slice();
-    }
-    else if(sf === '2') {
-      data = this.sf2songs.slice();
-    }
-    else if(sf === '3') {
-      data = this.sf3songs.slice();
-    }
-    else {
-      data = this.gfsongs.slice();
-    }
+    let data = this.songs;
 
     if (!sort.active || sort.direction === '') {
       this.sortedData = data;
@@ -168,41 +152,20 @@ export class EditionScreenComponent implements OnInit {
           else {
             return compare(a.sfro, b.sfro, isAsc);
           }
+        case 'edition': return compare(a.edition, b.edition, isAsc);
         case 'country': return compare(a.country, b.country, isAsc);
-        case 'user': return compare(a.user, b.user, isAsc);
         case 'language': return compare(a.language, b.language, isAsc);
         case 'artist': return compare(a.artist.toLowerCase(), b.artist.toLowerCase(), isAsc);
         case 'song': return compare(a.song.toLowerCase(), b.song.toLowerCase(), isAsc);
-        case 'place': 
-          if(sf == 'f') {
-            return compare(a.fplace, b.fplace, isAsc);
-          }
-          else {
-            return compare(a.sfplace, b.sfplace, isAsc);
-          }
-        case 'points': 
-          if(sf == 'f') {
-            return compare(a.fpoints, b.fpoints, isAsc);
-          }
-          else {
-            return compare(a.sfpoints, b.sfpoints, isAsc);
-          }
+        case 'fplace': return compare(a.fplace, b.fplace, isAsc);
+        case 'fpoints': return compare(a.fpoints, b.fpoints, isAsc);
+        case 'sfplace': return compare(a.sfplace, b.sfplace, isAsc);
+        case 'sfpoints': return compare(a.sfpoints, b.sfpoints, isAsc);
         default: return 0;
       }
     });
 
-    if(sf === '1') {
-      this.sf1songs = this.sortedData;
-    }
-    else if(sf === '2') {
-      this.sf2songs = this.sortedData;
-    }
-    else if(sf === '3') {
-      this.sf3songs = this.sortedData;
-    }
-    else {
-      this.gfsongs = this.sortedData;
-    }
+    this.songs = this.sortedData;
   }
 }
 

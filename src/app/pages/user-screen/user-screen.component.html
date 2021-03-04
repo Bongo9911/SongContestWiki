@@ -1,0 +1,68 @@
+<!-- Start Screen html file -->
+
+<div class="container">
+
+  <h1>{{user}}</h1>
+  <hr/>
+
+  <div class="infobox">
+    <div class="infoboxheader">
+      {{user}}
+    </div>
+  </div>
+
+  <span>
+    <a routerLink="/">
+      test
+    </a>
+  </span>
+
+  <div class="sectionheader">
+    <h2>Entries</h2>
+    <hr/>
+  </div>
+
+  <table matSort (matSortChange)="sortData($event, '1')">
+    <tr>
+      <th mat-sort-header="edition">Edition</th>
+      <th mat-sort-header="country">Country</th>
+      <th mat-sort-header="language">Language</th>
+      <th mat-sort-header="artist">Artist</th>
+      <th mat-sort-header="song">Song</th>
+      <th mat-sort-header="fplace">Final</th>
+      <th mat-sort-header="fpoints">Points</th>
+      <th mat-sort-header="sfplace">Semi</th>
+      <th mat-sort-header="sfpoints">Points</th>
+    </tr>
+    <ng-container *ngFor="let song of songs">
+      <tr [ngStyle]="getStyle(song.disqualified, song.fplace)">
+        <td><a routerLink="/contest/{{id}}/ed/{{song.edition}}">{{song.edition}}</a></td>
+        <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
+        <td>{{song.language}}</td>
+        <td>{{song.artist}}</td>
+        <td>"{{song.song}}"</td>
+        <ng-container *ngIf="song.disqualified == 'N'">
+          <td>{{song.fplace}}</td>
+          <td>{{song.fpoints}}</td>
+        </ng-container>
+        <ng-container *ngIf="song.disqualified == 'FDQ'">
+          <td class="dqrow" colspan="2">Disqualified</td>
+        </ng-container>
+        <ng-container *ngIf="song.disqualified == 'FWD'">
+          <td class="dqrow" colspan="2">Withdrawn</td>
+        </ng-container>
+        <ng-container *ngIf="song.disqualified == 'N'">
+          <td [ngStyle]="getSFStyle(song.sfplace)">{{song.sfplace}}</td>
+          <td [ngStyle]="getSFStyle(song.sfplace)">{{song.sfpoints}}</td>
+        </ng-container>
+        <ng-container *ngIf="song.disqualified == 'SFDQ'">
+          <td class="dqrow" colspan="2">Disqualified</td>
+        </ng-container>
+        <ng-container *ngIf="song.disqualified == 'SFWD'">
+          <td class="dqrow" colspan="2">Withdrawn</td>
+        </ng-container>
+      </tr>
+    </ng-container>
+  </table>
+
+</div>

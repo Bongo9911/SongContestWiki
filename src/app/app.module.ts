@@ -14,13 +14,15 @@ import { MatSortModule } from '@angular/material/sort';
 import { ContestScreenComponent } from './pages/contest-screen/contest-screen.component';
 import { StartScreenComponent } from './pages/start-screen/start-screen.component';
 import { EditionScreenComponent } from './pages/edition-screen/edition-screen.component';
+import { UserScreenComponent } from './pages/user-screen/user-screen.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ContestScreenComponent,
     StartScreenComponent,
-    EditionScreenComponent
+    EditionScreenComponent,
+    UserScreenComponent,
   ],
   imports: [
     BrowserModule,
