@@ -77,3 +77,8 @@ h2 {
 	display:flex;
 	justify-content:center;
 }
+
+.dqrow {
+	background-color: #dedede;
+	text-align: center;
+}

@@ -56,16 +56,23 @@
       <th mat-sort-header="points">Points</th>
     </tr>
     <ng-container *ngFor="let song of sf1songs">
-      <tr 
-      [ngStyle]="(song.qualifier == 'Q') ? {'background-color': '#ffdead', 'font-weight': 'bold' } : { 'background-color': 'ghostwhite' }">
+      <tr [ngStyle]="getSFStyle(song.disqualified, song.qualifier)">
         <td>{{song.sfro}}</td>
         <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
         <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
         <td>{{song.language}}</td>
         <td>{{song.artist}}</td>
         <td>"{{song.song}}"</td>
-        <td>{{song.sfplace}}</td>
-        <td>{{song.sfpoints}}</td>
+        <ng-container *ngIf="song.disqualified == 'N'">
+          <td>{{song.sfplace}}</td>
+          <td>{{song.sfpoints}}</td>
+        </ng-container>
+        <ng-container *ngIf="song.disqualified == 'SFDQ'">
+          <td class="dqrow" colspan="2">Disqualified</td>
+        </ng-container>
+        <ng-container *ngIf="song.disqualified == 'SFWD'">
+          <td class="dqrow" colspan="2">Withdrawn</td>
+        </ng-container>
       </tr>
     </ng-container>
   </table>
@@ -84,16 +91,23 @@
       <th mat-sort-header="points">Points</th>
     </tr>
     <ng-container *ngFor="let song of sf2songs">
-      <tr 
-      [ngStyle]="(song.qualifier == 'Q') ? {'background-color': '#ffdead', 'font-weight': 'bold' } : { 'background-color': 'ghostwhite' }">
+      <tr [ngStyle]="getSFStyle(song.disqualified, song.qualifier)">
         <td>{{song.sfro}}</td>
         <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
         <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
         <td>{{song.language}}</td>
         <td>{{song.artist}}</td>
         <td>"{{song.song}}"</td>
-        <td>{{song.sfplace}}</td>
-        <td>{{song.sfpoints}}</td>
+        <ng-container *ngIf="song.disqualified == 'N'">
+          <td>{{song.sfplace}}</td>
+          <td>{{song.sfpoints}}</td>
+        </ng-container>
+        <ng-container *ngIf="song.disqualified == 'SFDQ'">
+          <td class="dqrow" colspan="2">Disqualified</td>
+        </ng-container>
+        <ng-container *ngIf="song.disqualified == 'SFWD'">
+          <td class="dqrow" colspan="2">Withdrawn</td>
+        </ng-container>
       </tr>
     </ng-container>
   </table>
@@ -112,16 +126,23 @@
       <th mat-sort-header="points">Points</th>
     </tr>
     <ng-container *ngFor="let song of sf3songs">
-      <tr 
-      [ngStyle]="(song.qualifier == 'Q') ? {'background-color': '#ffdead', 'font-weight': 'bold' } : { 'background-color': 'ghostwhite' }">
+      <tr [ngStyle]="getSFStyle(song.disqualified, song.qualifier)">
         <td>{{song.sfro}}</td>
         <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
         <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
         <td>{{song.language}}</td>
         <td>{{song.artist}}</td>
         <td>"{{song.song}}"</td>
-        <td>{{song.sfplace}}</td>
-        <td>{{song.sfpoints}}</td>
+        <ng-container *ngIf="song.disqualified == 'N'">
+          <td>{{song.sfplace}}</td>
+          <td>{{song.sfpoints}}</td>
+        </ng-container>
+        <ng-container *ngIf="song.disqualified == 'SFDQ'">
+          <td class="dqrow" colspan="2">Disqualified</td>
+        </ng-container>
+        <ng-container *ngIf="song.disqualified == 'SFWD'">
+          <td class="dqrow" colspan="2">Withdrawn</td>
+        </ng-container>
       </tr>
     </ng-container>
   </table>
@@ -144,16 +165,23 @@
       <th mat-sort-header="points">Points</th>
     </tr>
     <ng-container *ngFor="let song of gfsongs">
-      <tr 
-      [ngStyle]="getFStyle(song.fplace)">
+      <tr [ngStyle]="getFStyle(song.fplace, song.disqualified)">
         <td>{{song.fro}}</td>
         <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
         <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
         <td>{{song.language}}</td>
         <td>{{song.artist}}</td>
         <td>"{{song.song}}"</td>
-        <td>{{song.fplace}}</td>
-        <td>{{song.fpoints}}</td>
+        <ng-container *ngIf="song.disqualified == 'N'">
+          <td>{{song.fplace}}</td>
+          <td>{{song.fpoints}}</td>
+        </ng-container>
+        <ng-container *ngIf="song.disqualified == 'FDQ'">
+          <td class="dqrow" colspan="2">Disqualified</td>
+        </ng-container>
+        <ng-container *ngIf="song.disqualified == 'FWD'">
+          <td class="dqrow" colspan="2">Withdrawn</td>
+        </ng-container>
       </tr>
     </ng-container>
   </table>
