@@ -1,5 +1,5 @@
 .container {
-	margin: 2vw;
+	margin: 0px 30px 0px 30px;
 }
 
 th, td {
@@ -64,6 +64,11 @@ a:hover {
 	vertical-align: bottom;
 }
 
+.smallflag {
+	width: 20px;
+	height: auto;
+}
+
 .edlogo {
 	width: 315px;
 	height: auto;
@@ -81,4 +86,8 @@ h2 {
 .dqrow {
 	background-color: #dedede;
 	text-align: center;
+}
+
+.pointtable td {
+	font-size: 12px;
 }

@@ -9,6 +9,13 @@
     <div class="infoboxheader">
       {{user}}
     </div>
+    <div class="infoboxheader">
+      Appearances
+    </div>
+    <div class="infoboxsection">
+      <div><b>Appearances</b></div>
+      <div>{{numEntries}} ({{numQualifiers}} finals)</div>
+    </div>
   </div>
 
   <span>
@@ -71,4 +78,7 @@
     </ng-container>
   </table>
 
+  <textarea #points></textarea>
+
+  <button (click)="uploadPoints(points.value)">Upload</button>
 </div>

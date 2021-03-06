@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewContainerRef } from '@angular/core';
 import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import {Sort} from '@angular/material/sort';
@@ -9,6 +9,7 @@ import {Sort} from '@angular/material/sort';
   styleUrls: ['./edition-screen.component.css']
 })
 export class EditionScreenComponent implements OnInit {
+  readonly pointset : string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
 
   con: Contest = {
     name: '',
@@ -29,6 +30,8 @@ export class EditionScreenComponent implements OnInit {
   sf2songs: Song[] = [];
   sf3songs: Song[] = [];
   gfsongs: Song[] = [];
+
+  nonDQ: Song[] = [];
 
   sortedData: Song[];
 
@@ -75,6 +78,7 @@ export class EditionScreenComponent implements OnInit {
           this.sf3songs = this.songs.filter(x => x.sfnum == '3').filter(x => x.qualifier !== 'AQ')
           .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
           this.gfsongs = this.songs.filter(x => x.fro !== -1).sort((a, b) => (a.fro > b.fro) ? 1 : -1);
+          this.nonDQ = this.songs.filter(x => x.disqualified == 'N')
         });
       });
   }
@@ -136,6 +140,30 @@ export class EditionScreenComponent implements OnInit {
           sfpoints: parseInt(song[14])
         })
     })
+  }
+
+  getFPoints(voter: Song, receiver: string) {
+    let pointval = ''
+    this.pointset.some(point => {
+      if(voter['f' + point] == receiver) {
+        pointval = point;
+        return voter['f' + point] == receiver;
+      }
+    })
+    return pointval;
+  }
+
+  getFPointStyle(song: Song) {
+    switch(song.fplace) {
+      case 1:
+        return { 'background-color': '#ffd700' }
+      case 2:
+        return { 'background-color': '#c0c0c0' };
+      case 3:
+        return { 'background-color': '#cc9966' };
+      default:
+        return {};
+    }
   }
 
   sortData(sort: Sort, sf: string) {
@@ -226,6 +254,7 @@ interface Edition {
 interface Song {
   artist: string;
   country: string;
+  disqualified: string;
   edition: string;
   f1: string;
   f2: string;

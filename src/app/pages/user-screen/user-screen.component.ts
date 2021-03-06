@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from "@angular/fire/firestore";
+import { AngularFirestore, AngularFirestoreCollection } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
-import {Sort} from '@angular/material/sort';
+import { Sort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-user-screen',
@@ -25,12 +25,12 @@ export class UserScreenComponent implements OnInit {
   user: string;
 
   songs: Song[] = [];
-  sf1songs: Song[] = [];
-  sf2songs: Song[] = [];
-  sf3songs: Song[] = [];
-  gfsongs: Song[] = [];
-
   sortedData: Song[];
+
+  numEntries: number = 0;
+  numQualifiers: number = 0;
+
+  songlist: any[] = []
 
   constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
@@ -48,7 +48,7 @@ export class UserScreenComponent implements OnInit {
         });
       });
 
-    //gets the info on the edition
+    //gets the info on the user
     this.database
       .collection<Contest>('contests', ref => ref.where('id', '==', this.id)).doc(this.id)
       .collection<Edition>('users', ref => ref.where('user', '==', this.user))
@@ -59,7 +59,7 @@ export class UserScreenComponent implements OnInit {
         });
       });
 
-    //get all the songs sent to that edition
+    //get all the songs sent for that user
     this.database
       .collection<Contest>('contests', ref => ref.where('id', '==', this.id)).doc(this.id)
       .collection<Song>('songs', ref => ref.where('user', '==', this.user))
@@ -69,6 +69,18 @@ export class UserScreenComponent implements OnInit {
           this.songs.push(doc.data());
           console.log(doc.data());
           this.songs = this.songs.sort((a, b) => (a.edition > b.edition) ? 1 : -1);
+          this.numEntries = this.songs.length;
+          this.numQualifiers = this.songs.filter(function (song) {
+            return song.qualifier !== 'NQ';
+          }).length;
+        });
+      });
+
+    this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
+      .doc(this.id).collection<Song>('songs').get().subscribe(async res => {
+        await res.docs.forEach((doc) => {
+          this.songlist.push({ id: doc.id, ...doc.data() });
+          console.log(this.songlist);
         });
       });
   }
@@ -79,7 +91,7 @@ export class UserScreenComponent implements OnInit {
   getStyle(dq: string, place: number): object {
     switch (place) {
       case 1:
-        return { 'background-color': '#ffd700', 'font-weight': 'bold' };
+        return { 'background-color': '#ffd700' };
       case 2:
         return { 'background-color': '#c0c0c0' };
       case 3:
@@ -89,7 +101,7 @@ export class UserScreenComponent implements OnInit {
       case 6:
         return { 'background-color': '#bae8ff' };
       default:
-        if(dq === 'FWD' || dq == 'FDQ') return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
+        if (dq === 'FWD' || dq == 'FDQ') return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
         else return { 'background-color': 'ghostwhite' };
     }
   }
@@ -145,8 +157,8 @@ export class UserScreenComponent implements OnInit {
     this.sortedData = data.sort((a, b) => {
       const isAsc = sort.direction === 'asc';
       switch (sort.active) {
-        case 'draw': 
-          if(sf === 'f') {
+        case 'draw':
+          if (sf === 'f') {
             return compare(a.fro, b.fro, isAsc);
           }
           else {
@@ -166,6 +178,27 @@ export class UserScreenComponent implements OnInit {
     });
 
     this.songs = this.sortedData;
+  }
+
+  async uploadPoints(points: string) {
+    const parsedString = points.split('\n').map((line) => line.split('\t'))
+
+    parsedString.forEach(point => {
+      let data = {};
+
+      if(point[1] === 'F' && point[7] !== '0') {
+        data['f' + point[7]] = point[5]
+      }
+      else if (point[7] !== '0'){
+        data['sf' + point[7]] = point[5]
+      }
+      this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
+      .doc(this.id).collection<Song>('songs').doc(this.songlist.filter(function (song) {
+        return song.edition === point[0];
+      }).filter(function (song) {
+        return song.country === point[3];
+      })[0].id).update(data)
+    })
   }
 }
 
