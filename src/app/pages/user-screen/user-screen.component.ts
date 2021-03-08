@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from "@angular/fire/firestore";
+import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
 
@@ -9,6 +9,7 @@ import { Sort } from '@angular/material/sort';
   styleUrls: ['./user-screen.component.css']
 })
 export class UserScreenComponent implements OnInit {
+  readonly pointset: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
 
   con: Contest = {
     name: '',
@@ -119,33 +120,6 @@ export class UserScreenComponent implements OnInit {
     }
   }
 
-  uploadSong(song: string): void {
-    console.log(song);
-    const parsedString = song.split('\n').map((line) => line.split('\t'))
-    console.log(parsedString);
-    parsedString.forEach(song => {
-      this.database
-        .collection<Contest>('contests', ref => ref.where('id', '==', this.id)).doc(this.id)
-        .collection('songs').add({
-          edition: song[0],
-          qualifier: song[1],
-          disqualified: song[2],
-          sfnum: song[3],
-          user: song[4],
-          country: song[5],
-          language: song[6],
-          artist: song[7],
-          song: song[8],
-          fro: parseInt(song[9]),
-          fplace: parseInt(song[10]),
-          fpoints: parseInt(song[11]),
-          sfro: parseInt(song[12]),
-          sfplace: parseInt(song[13]),
-          sfpoints: parseInt(song[14])
-        })
-    })
-  }
-
   sortData(sort: Sort, sf: string) {
     let data = this.songs;
 
@@ -183,22 +157,39 @@ export class UserScreenComponent implements OnInit {
   async uploadPoints(points: string) {
     const parsedString = points.split('\n').map((line) => line.split('\t'))
 
-    parsedString.forEach(point => {
-      let data = {};
+    let pointsarray = new Array<string>(10);
+    let data = { }
 
-      if(point[1] === 'F' && point[7] !== '0') {
-        data['f' + point[7]] = point[5]
+    for(let i = 0; i < parsedString.length; ++i){
+
+      pointsarray[this.pointset.indexOf(parsedString[i][7])] = parsedString[i][5];
+      console.log('foo');
+      if(i + 1 === parsedString.length || parsedString[i][4] != parsedString[i+1][4]) {
+        data[parsedString[i][1].toLowerCase()+'pointset'] = {};
+        data[parsedString[i][1].toLowerCase()+'pointset']['points'] = [...pointsarray];
+
+        if(parsedString[i][1] != 'F') {
+          data[parsedString[i][1].toLowerCase()+'pointset']['cv'] = false;
+        }
+
+        this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
+          .doc(this.id).collection<Song>('songs').doc(this.songlist.filter(function (song) {
+            return song.edition === parsedString[i][0];
+          }).filter(function (song) {
+            return song.country === parsedString[i][3];
+          })[0].id).update(data)
+
+        data = {}
+        pointsarray = new Array<string>(10); //destroy the old array and make a new empty one
       }
-      else if (point[7] !== '0'){
-        data['sf' + point[7]] = point[5]
-      }
-      this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
-      .doc(this.id).collection<Song>('songs').doc(this.songlist.filter(function (song) {
-        return song.edition === point[0];
-      }).filter(function (song) {
-        return song.country === point[3];
-      })[0].id).update(data)
-    })
+    }
+  }
+
+  deleteSongs() {
+      this.songlist.filter(song => { return song.edition === '14' }).forEach(toDelete => {
+        this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
+       .doc(this.id).collection<Song>('songs').doc(toDelete.id).delete();
+      })
   }
 }
 
@@ -222,32 +213,28 @@ interface Edition {
 interface Song {
   artist: string;
   country: string;
+  disqualified: string;
   edition: string;
-  f1: string;
-  f2: string;
-  f3: string;
-  f4: string;
-  f5: string;
-  f6: string;
-  f7: string;
-  f8: string;
-  f10: string;
-  f12: string;
+  fpointset: {
+    points: string[10];
+  };
   fplace: number;
   fpoints: number;
   fro: number;
   language: string;
   qualifier: string;
-  sf1: string;
-  sf2: string;
-  sf3: string;
-  sf4: string;
-  sf5: string;
-  sf6: string;
-  sf7: string;
-  sf8: string;
-  sf10: string;
-  sf12: string;
+  sf1pointset: {
+    cv: boolean;
+    points: string[10];
+  };
+  sf2pointset: {
+    cv: boolean;
+    points: string[10];
+  };
+  sf3pointset: {
+    cv: boolean;
+    points: string[10];
+  };
   sfnum: string;
   sfplace: number;
   sfpoints: number;

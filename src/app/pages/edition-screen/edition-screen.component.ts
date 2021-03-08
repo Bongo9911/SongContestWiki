@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewContainerRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
-import {Sort} from '@angular/material/sort';
+import { Sort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-edition-screen',
@@ -9,7 +9,7 @@ import {Sort} from '@angular/material/sort';
   styleUrls: ['./edition-screen.component.css']
 })
 export class EditionScreenComponent implements OnInit {
-  readonly pointset : string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
+  readonly pointset: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
 
   con: Contest = {
     name: '',
@@ -30,6 +30,8 @@ export class EditionScreenComponent implements OnInit {
   sf2songs: Song[] = [];
   sf3songs: Song[] = [];
   gfsongs: Song[] = [];
+
+  sbgfsongs: Song[] = [];
 
   nonDQ: Song[] = [];
 
@@ -72,13 +74,16 @@ export class EditionScreenComponent implements OnInit {
           this.songs.push(doc.data());
           console.log(doc.data());
           this.sf1songs = this.songs.filter(x => x.sfnum == '1').filter(x => x.qualifier !== 'AQ')
-          .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
+            .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
           this.sf2songs = this.songs.filter(x => x.sfnum == '2').filter(x => x.qualifier !== 'AQ')
-          .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
+            .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
           this.sf3songs = this.songs.filter(x => x.sfnum == '3').filter(x => x.qualifier !== 'AQ')
-          .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
+            .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
           this.gfsongs = this.songs.filter(x => x.fro !== -1).sort((a, b) => (a.fro > b.fro) ? 1 : -1);
           this.nonDQ = this.songs.filter(x => x.disqualified == 'N')
+            .sort((a, b) => (a.country > b.country) ? 1 : -1);
+
+          this.sbgfsongs = this.gfsongs;
         });
       });
   }
@@ -92,8 +97,8 @@ export class EditionScreenComponent implements OnInit {
       case 'SFWD':
         return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
       default:
-        if(qualifier === 'Q') return { 'background-color': '#ffdead', 'font-weight': 'bold' };
-        else return { 'background-color': 'ghostwhite' };      
+        if (qualifier === 'Q') return { 'background-color': '#ffdead', 'font-weight': 'bold' };
+        else return { 'background-color': 'ghostwhite' };
     }
   }
 
@@ -110,7 +115,7 @@ export class EditionScreenComponent implements OnInit {
       case 6:
         return { 'background-color': '#bae8ff' };
       default:
-        if(dq === 'FWD' || dq == 'FDQ') return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
+        if (dq === 'FWD' || dq == 'FDQ') return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
         else return { 'background-color': 'ghostwhite' };
     }
   }
@@ -143,18 +148,19 @@ export class EditionScreenComponent implements OnInit {
   }
 
   getFPoints(voter: Song, receiver: string) {
-    let pointval = ''
-    this.pointset.some(point => {
-      if(voter['f' + point] == receiver) {
-        pointval = point;
-        return voter['f' + point] == receiver;
+    let index = voter.fpointset.points.indexOf(receiver);
+    if(index != -1) {
+      if(index < 8) {
+        return (index + 1).toString();
       }
-    })
-    return pointval;
+      else {
+        return ((index - 8) * 2 + 10).toString();
+      }
+    }
   }
 
   getFPointStyle(song: Song) {
-    switch(song.fplace) {
+    switch (song.fplace) {
       case 1:
         return { 'background-color': '#ffd700' }
       case 2:
@@ -162,19 +168,20 @@ export class EditionScreenComponent implements OnInit {
       case 3:
         return { 'background-color': '#cc9966' };
       default:
-        return {};
+        if (song.disqualified != 'N') return { 'background-color': '#cdb8d8' };
+        else return {};
     }
   }
 
   sortData(sort: Sort, sf: string) {
-    let data = []; 
-    if(sf === '1') {
+    let data = [];
+    if (sf === '1') {
       data = this.sf1songs.slice();
     }
-    else if(sf === '2') {
+    else if (sf === '2') {
       data = this.sf2songs.slice();
     }
-    else if(sf === '3') {
+    else if (sf === '3') {
       data = this.sf3songs.slice();
     }
     else {
@@ -189,8 +196,8 @@ export class EditionScreenComponent implements OnInit {
     this.sortedData = data.sort((a, b) => {
       const isAsc = sort.direction === 'asc';
       switch (sort.active) {
-        case 'draw': 
-          if(sf === 'f') {
+        case 'draw':
+          if (sf === 'f') {
             return compare(a.fro, b.fro, isAsc);
           }
           else {
@@ -201,15 +208,15 @@ export class EditionScreenComponent implements OnInit {
         case 'language': return compare(a.language, b.language, isAsc);
         case 'artist': return compare(a.artist.toLowerCase(), b.artist.toLowerCase(), isAsc);
         case 'song': return compare(a.song.toLowerCase(), b.song.toLowerCase(), isAsc);
-        case 'place': 
-          if(sf == 'f') {
+        case 'place':
+          if (sf == 'f') {
             return compare(a.fplace, b.fplace, isAsc);
           }
           else {
             return compare(a.sfplace, b.sfplace, isAsc);
           }
-        case 'points': 
-          if(sf == 'f') {
+        case 'points':
+          if (sf == 'f') {
             return compare(a.fpoints, b.fpoints, isAsc);
           }
           else {
@@ -219,13 +226,13 @@ export class EditionScreenComponent implements OnInit {
       }
     });
 
-    if(sf === '1') {
+    if (sf === '1') {
       this.sf1songs = this.sortedData;
     }
-    else if(sf === '2') {
+    else if (sf === '2') {
       this.sf2songs = this.sortedData;
     }
-    else if(sf === '3') {
+    else if (sf === '3') {
       this.sf3songs = this.sortedData;
     }
     else {
@@ -256,31 +263,26 @@ interface Song {
   country: string;
   disqualified: string;
   edition: string;
-  f1: string;
-  f2: string;
-  f3: string;
-  f4: string;
-  f5: string;
-  f6: string;
-  f7: string;
-  f8: string;
-  f10: string;
-  f12: string;
+  fpointset: {
+    points: string[];
+  };
   fplace: number;
   fpoints: number;
   fro: number;
   language: string;
   qualifier: string;
-  sf1: string;
-  sf2: string;
-  sf3: string;
-  sf4: string;
-  sf5: string;
-  sf6: string;
-  sf7: string;
-  sf8: string;
-  sf10: string;
-  sf12: string;
+  sf1pointset: {
+    cv: boolean;
+    points: string[];
+  };
+  sf2pointset: {
+    cv: boolean;
+    points: string[];
+  };
+  sf3pointset: {
+    cv: boolean;
+    points: string[];
+  };
   sfnum: string;
   sfplace: number;
   sfpoints: number;
