@@ -20,12 +20,22 @@ table, th, td {
 }
 
 .infobox {
-	width: 315px;
 	border: 1px solid gray;
-	float: right;
 	background-color: #f5f5f5;
-	margin-left: 15px;
 	padding: 5px 5px 5px 5px
+}
+
+@media (min-width: 500px) {
+	.infobox {
+		float: right;
+		margin-left: 15px;
+		width: 315px;
+	}
+}
+@media (max-width: 500px) {
+	.infobox {
+		width: 100%;
+	}
 }
 
 .infoboxheader {
