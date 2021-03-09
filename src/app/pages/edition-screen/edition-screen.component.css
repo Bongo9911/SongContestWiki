@@ -91,3 +91,26 @@ h2 {
 .pointtable td {
 	font-size: 12px;
 }
+
+.pointtable td:not(:first-of-type) {
+	text-align: center;
+}
+
+tr th div, .vertical {
+    writing-mode: vertical-rl;
+	transform: rotate(180deg);
+	margin: 0px -5px 0px -5px;
+}
+
+.sfpointtable td {
+	font-size: 11px;
+}
+
+.sfpointtable th {
+	font-size: 11px;
+	vertical-align: bottom;
+}
+
+.sfpointtable td:not(:first-of-type) {
+	text-align: center;
+}

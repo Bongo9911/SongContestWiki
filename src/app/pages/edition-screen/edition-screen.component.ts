@@ -31,9 +31,15 @@ export class EditionScreenComponent implements OnInit {
   sf3songs: Song[] = [];
   gfsongs: Song[] = [];
 
+  sbsf1songs: Song[] = [];
+  sbsf2songs: Song[] = [];
+  sbsf3songs: Song[] = [];
   sbgfsongs: Song[] = [];
 
-  nonDQ: Song[] = [];
+  sf1voters: Song[] = [];
+  sf2voters: Song[] = [];
+  sf3voters: Song[] = [];
+  fvoters: Song[] = [];
 
   sortedData: Song[];
 
@@ -80,10 +86,23 @@ export class EditionScreenComponent implements OnInit {
           this.sf3songs = this.songs.filter(x => x.sfnum == '3').filter(x => x.qualifier !== 'AQ')
             .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
           this.gfsongs = this.songs.filter(x => x.fro !== -1).sort((a, b) => (a.fro > b.fro) ? 1 : -1);
-          this.nonDQ = this.songs.filter(x => x.disqualified == 'N')
+
+          this.sf1voters = this.songs.filter(x => x.sfnum == '1')
+            .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD')
+            .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
+          this.sf2voters = this.songs.filter(x => x.sfnum == '2')
+            .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD')
+            .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
+          this.sf3voters = this.songs.filter(x => x.sfnum == '3')
+            .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD')
+            .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
+          this.fvoters = this.songs.filter(x => x.disqualified == 'N')
             .sort((a, b) => (a.country > b.country) ? 1 : -1);
 
           this.sbgfsongs = this.gfsongs;
+          this.sbsf1songs = this.sf1songs;
+          this.sbsf2songs = this.sf2songs;
+          this.sbsf3songs = this.sf3songs;
         });
       });
   }
@@ -147,10 +166,30 @@ export class EditionScreenComponent implements OnInit {
     })
   }
 
+  getSFPoints(voter: Song, receiver: string, sfnum: string) {
+    let index = voter['sf' + sfnum + 'pointset'].points.indexOf(receiver);
+    if (index != -1) {
+      if (index < 8) {
+        return (index + 1).toString();
+      }
+      else {
+        return ((index - 8) * 2 + 10).toString();
+      }
+    }
+  }
+
+  getSFPointStyle(song: Song) {
+    if (song.qualifier === 'Q') return { 'background-color': '#fbdead' };
+    else if (song.disqualified === 'SFDQ' || song.disqualified === 'SFWD') {
+      return { 'background-color': '#cdb8d8' };
+    }
+    else return {};
+  }
+
   getFPoints(voter: Song, receiver: string) {
     let index = voter.fpointset.points.indexOf(receiver);
-    if(index != -1) {
-      if(index < 8) {
+    if (index != -1) {
+      if (index < 8) {
         return (index + 1).toString();
       }
       else {
