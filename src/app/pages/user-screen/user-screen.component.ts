@@ -81,7 +81,6 @@ export class UserScreenComponent implements OnInit {
       .doc(this.id).collection<Song>('songs').get().subscribe(async res => {
         await res.docs.forEach((doc) => {
           this.songlist.push({ id: doc.id, ...doc.data() });
-          console.log(this.songlist);
         });
       });
   }
@@ -186,7 +185,7 @@ export class UserScreenComponent implements OnInit {
   }
 
   deleteSongs() {
-      this.songlist.filter(song => { return song.edition === '14' }).forEach(toDelete => {
+      this.songlist.filter(song => { return song.edition === '20.5' }).forEach(toDelete => {
         this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
        .doc(this.id).collection<Song>('songs').doc(toDelete.id).delete();
       })

@@ -18,8 +18,8 @@ export class EditionScreenComponent implements OnInit {
   edition: Edition = {
     edition: '0',
     entries: 0,
-    hostcountry: '',
-    hostuser: '',
+    hostcountries: [],
+    hostusers: [],
     slogan: '',
   };
   id: string;
@@ -96,8 +96,11 @@ export class EditionScreenComponent implements OnInit {
           this.sf3voters = this.songs.filter(x => x.sfnum == '3')
             .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD')
             .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
-          this.fvoters = this.songs.filter(x => x.disqualified == 'N')
-            .sort((a, b) => (a.country > b.country) ? 1 : -1);
+          this.fvoters = this.songs.filter(x => x.disqualified === 'N').filter(x => x.qualifier !== 'NQ')
+            .sort((a, b) => (a.fro > b.fro) ? 1 : -1).concat(
+              this.songs.filter(x => x.disqualified == 'N').filter(x => x.qualifier === 'NQ')
+                .sort((a, b) => (a.country > b.country) ? 1 : -1)
+            );
 
           this.sbgfsongs = this.gfsongs;
           this.sbsf1songs = this.sf1songs;
@@ -292,8 +295,8 @@ interface Contest {
 interface Edition {
   edition: string;
   entries: number;
-  hostcountry: string;
-  hostuser: string;
+  hostcountries: string[];
+  hostusers: string[];
   slogan: string;
 }
 

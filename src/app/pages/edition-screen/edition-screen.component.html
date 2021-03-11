@@ -17,12 +17,19 @@
     <div class="infoboxheader">Host</div>
     <div class="infoboxsection">
       <div><b>Host country</b></div>
-      <div><img class="flag" src="./assets/flags/{{edition.hostcountry}} Flag.png"> <a
-          routerLink="/contest/{{id}}/country/{{edition.hostcountry}}">{{edition.hostcountry}}</a></div>
+      <div>
+        <div *ngFor="let country of edition.hostcountries"><img class="flag" src="./assets/flags/{{country}} Flag.png">
+          <a routerLink="/contest/{{id}}/country/{{country}}">{{country}}</a>
+        </div>
+      </div>
     </div>
     <div class="infoboxsection">
       <div><b>Host</b></div>
-      <div><a routerLink="/contest/{{id}}/user/{{edition.hostuser}}">{{edition.hostuser}}</a></div>
+      <div>
+        <div *ngFor="let host of edition.hostusers">
+          <a routerLink="/contest/{{id}}/user/{{host}}">{{host}}</a>
+        </div>
+      </div>
     </div>
 
     <div class="infoboxheader">Participants</div>
@@ -202,9 +209,9 @@
     <tr>
       <th></th>
       <th *ngFor="let voter of sf1voters">
-        <div class="vertical">
-          {{voter.country}}
-        </div>
+        <a routerLink="/contest/{{id}}/country/{{voter.country}}">
+          <img class="smallflag" src="./assets/flags/{{voter.country}} Flag.png">
+        </a>
       </th>
       <th>Total</th>
       <th>Place</th>
@@ -232,9 +239,9 @@
     <tr>
       <th></th>
       <th *ngFor="let voter of sf2voters">
-        <div class="vertical">
-          {{voter.country}}
-        </div>
+        <a routerLink="/contest/{{id}}/country/{{voter.country}}">
+          <img class="smallflag" src="./assets/flags/{{voter.country}} Flag.png">
+        </a>
       </th>
       <th>Total</th>
       <th>Place</th>
@@ -262,9 +269,9 @@
     <tr>
       <th></th>
       <th *ngFor="let voter of sf3voters">
-        <div class="vertical">
-          {{voter.country}}
-        </div>
+        <a routerLink="/contest/{{id}}/country/{{voter.country}}">
+          <img class="smallflag" src="./assets/flags/{{voter.country}} Flag.png">
+        </a>
       </th>
       <th>Total</th>
       <th>Place</th>
