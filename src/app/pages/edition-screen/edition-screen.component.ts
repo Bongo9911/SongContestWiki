@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
+import { ThrowStmt } from '@angular/compiler';
 
 @Component({
   selector: 'app-edition-screen',
@@ -16,6 +17,7 @@ export class EditionScreenComponent implements OnInit {
     id: ''
   };
   edition: Edition = {
+    crossvoting: false,
     edition: '0',
     entries: 0,
     hostcountries: [],
@@ -40,6 +42,14 @@ export class EditionScreenComponent implements OnInit {
   sf2voters: Song[] = [];
   sf3voters: Song[] = [];
   fvoters: Song[] = [];
+
+  sf1crossvoters: Song[] = [];
+  sf2crossvoters: Song[] = [];
+  sf3crossvoters: Song[] = [];
+
+  sf1ptsongs: Song[] = [];
+  sf2ptsongs: Song[] = [];
+  sf3ptsongs: Song[] = [];
 
   sortedData: Song[];
 
@@ -89,6 +99,7 @@ export class EditionScreenComponent implements OnInit {
 
           this.sf1voters = this.songs.filter(x => x.sfnum == '1')
             .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD')
+            .filter(x => x.sf1pointset.cv === false)
             .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
           this.sf2voters = this.songs.filter(x => x.sfnum == '2')
             .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD')
@@ -102,10 +113,18 @@ export class EditionScreenComponent implements OnInit {
                 .sort((a, b) => (a.country > b.country) ? 1 : -1)
             );
 
-          this.sbgfsongs = this.gfsongs;
-          this.sbsf1songs = this.sf1songs;
-          this.sbsf2songs = this.sf2songs;
-          this.sbsf3songs = this.sf3songs;
+          this.sf1crossvoters = this.songs.filter(x => 'sf1pointset' in x)
+            .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD')
+            .filter(x => x.sf1pointset.cv === true)
+            .sort((a, b) => (a.country > b.country) ? 1 : -1);
+
+          this.sbgfsongs = [...this.gfsongs];
+          this.sbsf1songs = [...this.sf1songs];
+          this.sbsf2songs = [...this.sf2songs];
+          this.sbsf3songs = [...this.sf3songs];
+
+          this.sf1ptsongs = [...this.sf1songs];
+          this.sf1ptsongs.sort((a, b) => (a.sfplace > b.sfplace) ? 1 : -1);
         });
       });
   }
@@ -293,6 +312,7 @@ interface Contest {
 }
 
 interface Edition {
+  crossvoting: boolean;
   edition: string;
   entries: number;
   hostcountries: string[];
@@ -305,25 +325,28 @@ interface Song {
   country: string;
   disqualified: string;
   edition: string;
+  extpoints: number;
   fpointset: {
-    points: string[];
+    points: string[10];
   };
   fplace: number;
   fpoints: number;
   fro: number;
+  intpoints: number;
   language: string;
   qualifier: string;
+  rawextpoints: number;
   sf1pointset: {
     cv: boolean;
-    points: string[];
+    points: string[10];
   };
   sf2pointset: {
     cv: boolean;
-    points: string[];
+    points: string[10];
   };
   sf3pointset: {
     cv: boolean;
-    points: string[];
+    points: string[10];
   };
   sfnum: string;
   sfplace: number;

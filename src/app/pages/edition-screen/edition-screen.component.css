@@ -124,3 +124,7 @@ tr th div, .vertical {
 .sfpointtable td:not(:first-of-type) {
 	text-align: center;
 }
+
+.pointtotaltable {
+	float: right;
+}

@@ -205,6 +205,30 @@
 
   <h3>Semi-final 1</h3>
 
+  <ng-containter *ngIf="edition.crossvoting">
+    <table class="pointtotaltable">
+      <tr>
+        <th colspan="5">Semi-final 1</th>
+      </tr>
+      <tr>
+        <th>Place</th>
+        <th>Country</th>
+        <th>Internal</th>
+        <th>External</th>
+        <th>Total</th>
+      </tr>
+      <tr *ngFor="let song of sf1ptsongs" [ngStyle]="getSFPointStyle(song)">
+        <td>{{song.sfplace}}</td>
+        <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> {{song.country}}</td>
+        <td>{{song.intpoints}}</td>
+        <td>{{song.extpoints}}</td>
+        <td>{{song.sfpoints}}</td>
+      </tr>
+    </table>
+  </ng-containter>
+
+  <h4 *ngIf="edition.crossvoting">Internal Votes</h4>
+
   <table class="sfpointtable">
     <tr>
       <th></th>
@@ -223,7 +247,8 @@
           [innerHTML]="getSFPoints(voter, song.country, '1')"></td>
       </ng-container>
       <ng-container *ngIf="song.sfplace != -1; else emptyFScoreboard">
-        <td>{{song.sfpoints}}</td>
+        <td *ngIf="!edition.crossvoting">{{song.sfpoints}}</td>
+        <td *ngIf="edition.crossvoting">{{song.intpoints}}</td>
         <td>{{song.sfplace}}</td>
       </ng-container>
       <ng-template #emptyFScoreboard>
@@ -232,6 +257,42 @@
       </ng-template>
     </tr>
   </table>
+ 
+  <br/>
+
+  <ng-container *ngIf="edition.crossvoting">
+    <h4>Cross-Votes</h4>
+
+    <table class="sfpointtable">
+      <tr>
+        <th></th>
+        <th *ngFor="let voter of sf1crossvoters">
+          <a routerLink="/contest/{{id}}/country/{{voter.country}}">
+            <img class="smallflag" src="./assets/flags/{{voter.country}} Flag.png">
+          </a>
+        </th>
+        <th>Raw Total</th>
+        <th>Scaled Total</th>
+        <th>Place</th>
+      </tr>
+      <tr *ngFor="let song of sbsf1songs" [ngStyle]="getSFPointStyle(song)">
+        <td><b>{{song.country}}</b></td>
+        <ng-container *ngFor="let voter of sf1crossvoters">
+          <td [ngStyle]="(voter.country == song.country) ? { 'background-color': '#aaa' } : { }"
+            [innerHTML]="getSFPoints(voter, song.country, '1')"></td>
+        </ng-container>
+        <ng-container *ngIf="song.sfplace != -1; else emptyFScoreboard">
+          <td>{{song.rawextpoints}}</td>
+          <td>{{song.extpoints}}</td>
+          <td>{{song.sfplace}}</td>
+        </ng-container>
+        <ng-template #emptyFScoreboard>
+          <td></td>
+          <td></td>
+        </ng-template>
+      </tr>
+    </table>
+  </ng-container>
 
   <h3>Semi-final 2</h3>
 

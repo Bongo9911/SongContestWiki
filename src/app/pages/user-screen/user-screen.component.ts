@@ -157,18 +157,18 @@ export class UserScreenComponent implements OnInit {
     const parsedString = points.split('\n').map((line) => line.split('\t'))
 
     let pointsarray = new Array<string>(10);
-    let data = { }
+    let data = {}
 
-    for(let i = 0; i < parsedString.length; ++i){
+    for (let i = 0; i < parsedString.length; ++i) {
 
       pointsarray[this.pointset.indexOf(parsedString[i][7])] = parsedString[i][5];
       console.log('foo');
-      if(i + 1 === parsedString.length || parsedString[i][4] != parsedString[i+1][4]) {
-        data[parsedString[i][1].toLowerCase()+'pointset'] = {};
-        data[parsedString[i][1].toLowerCase()+'pointset']['points'] = [...pointsarray];
+      if (i + 1 === parsedString.length || parsedString[i][4] != parsedString[i + 1][4]) {
+        data[parsedString[i][1].toLowerCase() + 'pointset'] = {};
+        data[parsedString[i][1].toLowerCase() + 'pointset']['points'] = [...pointsarray];
 
-        if(parsedString[i][1] != 'F') {
-          data[parsedString[i][1].toLowerCase()+'pointset']['cv'] = false;
+        if (parsedString[i][1] != 'F') {
+          data[parsedString[i][1].toLowerCase() + 'pointset']['cv'] = false;
         }
 
         this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
@@ -184,11 +184,63 @@ export class UserScreenComponent implements OnInit {
     }
   }
 
+  async uploadTablePoints(points: string) {
+    const parsedString = points.split('\n').map((line) => line.split('\t'))
+
+    let pointsarray = new Array<string>(10);
+    let data = {}
+
+    for (let i = 1; i < parsedString.length; ++i) {
+
+      for (let j = 1; j < parsedString[i].length; ++j) {
+
+        pointsarray[this.pointset.indexOf(parsedString[i][j])] = parsedString[0][j];
+        console.log('foo');
+
+        if (j + 1 === parsedString[i].length) {
+          data['sf1pointset'] = {};
+          data['sf1pointset']['points'] = [...pointsarray];
+          data['sf1pointset']['cv'] = true;
+
+          this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
+            .doc(this.id).collection<Song>('songs').doc(this.songlist.filter(function (song) {
+              return song.edition === '23';
+            }).filter(function (song) {
+              return song.country === parsedString[i][0];
+            })[0].id).update(data)
+
+          data = {}
+          pointsarray = new Array<string>(10); //destroy the old array and make a new empty one
+        }
+
+      }
+    }
+  }
+
+  async uploadPointTotals(points: string) {
+    const parsedString = points.split('\n').map((line) => line.split('\t'))
+
+    parsedString.forEach(x => {
+      let data = {
+        rawextpoints: parseInt(x[1]),
+        extpoints: parseInt(x[2]),
+        intpoints: parseInt(x[3])
+      }
+
+      this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
+          .doc(this.id).collection('songs').doc(this.songlist.filter(function (song) {
+            return song.edition === '23';
+          }).filter(function (song) {
+            return song.country === x[0];
+          })[0].id).update(data)
+    })
+  }
+
   deleteSongs() {
-      this.songlist.filter(song => { return song.edition === '20.5' }).forEach(toDelete => {
-        this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
-       .doc(this.id).collection<Song>('songs').doc(toDelete.id).delete();
-      })
+    this.songlist.filter(song => { return song.edition === '20.5' }).forEach(toDelete => {
+      this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
+        .doc(this.id).collection<Song>('songs').doc(toDelete.id).delete();
+    })
   }
 }
 
@@ -214,14 +266,17 @@ interface Song {
   country: string;
   disqualified: string;
   edition: string;
+  extpoints: number;
   fpointset: {
     points: string[10];
   };
   fplace: number;
   fpoints: number;
   fro: number;
+  intpoints: number;
   language: string;
   qualifier: string;
+  rawextpoints: number;
   sf1pointset: {
     cv: boolean;
     points: string[10];
