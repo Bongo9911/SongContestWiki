@@ -15,6 +15,7 @@ import { ContestScreenComponent } from './pages/contest-screen/contest-screen.co
 import { StartScreenComponent } from './pages/start-screen/start-screen.component';
 import { EditionScreenComponent } from './pages/edition-screen/edition-screen.component';
 import { UserScreenComponent } from './pages/user-screen/user-screen.component';
+import { ReallocatorScreenComponent } from './pages/reallocator-screen/reallocator-screen.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { UserScreenComponent } from './pages/user-screen/user-screen.component';
     StartScreenComponent,
     EditionScreenComponent,
     UserScreenComponent,
+    ReallocatorScreenComponent,
   ],
   imports: [
     BrowserModule,

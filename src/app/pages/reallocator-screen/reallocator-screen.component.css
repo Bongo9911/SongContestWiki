@@ -1,0 +1,49 @@
+.container {
+	margin: 0px 30px 0px 30px;
+}
+
+th, td {
+	padding: 3px 7px 3px 7px;
+}
+
+th {
+	background-color: #dadada;
+	text-align: center;
+}
+
+table, th, td {
+	border: 1px solid gray;
+	border-collapse: collapse;
+	/* font-family: "Verdana", "Trebuchet MS"; */
+	font-size: 14px;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+textarea {
+	width: 15vw;
+	height: 30vh;
+}
+
+.inputarea {
+	width: 90vw;
+	height: 20vh;
+}
+
+button {
+	margin-right: 10vw;
+	height: 20vh;
+	width: 20vw;
+	font-size: 30px;
+}
+
+.right {
+	float: right;
+	display: block;
+}

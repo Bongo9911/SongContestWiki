@@ -1,0 +1,19 @@
+<!-- Reallocator Screen html file -->
+
+<div class="container">
+  <h1>Input</h1>
+
+  <textarea class="inputarea" #input></textarea>
+
+  <button class="right" (click)="reallocate(input.value, countries.value, ignore.value)">Reallocate</button>
+
+  <div>Columns without points: <input type="number" min="1" value="1" #ignore></div>
+
+  <h3>Countries to Reallocate:</h3>
+
+  <textarea #countries></textarea>
+
+  <h1>Output</h1>
+
+  <textarea class="inputarea" [(ngModel)]="output"></textarea>
+</div>

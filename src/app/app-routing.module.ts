@@ -4,12 +4,14 @@ import { StartScreenComponent } from './pages/start-screen/start-screen.componen
 import { ContestScreenComponent } from './pages/contest-screen/contest-screen.component';
 import { EditionScreenComponent } from './pages/edition-screen/edition-screen.component';
 import { UserScreenComponent } from './pages/user-screen/user-screen.component';
+import { ReallocatorScreenComponent } from './pages/reallocator-screen/reallocator-screen.component';
 
 const routes: Routes = [
   { path: "", component: StartScreenComponent },
   { path: "contest/:id", component: ContestScreenComponent },
   { path: "contest/:id/ed/:num", component: EditionScreenComponent },
   { path: "contest/:id/user/:user", component: UserScreenComponent },
+  { path: "tools/reallocator", component: ReallocatorScreenComponent },
   { path: "**", redirectTo: ''}
 ];
 
