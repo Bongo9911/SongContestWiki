@@ -79,7 +79,7 @@ export class ReallocatorScreenComponent implements OnInit {
     let outputtext = ""
 
     for(let i = 0; i < pointsArray.length; ++i) {
-      for(let j = 0; j < pointsArray.length; ++j) {
+      for(let j = ignore; j < pointsArray.length; ++j) {
         outputtext += pointsArray[i][j] + '\t';
       }
       outputtext += '\n'
