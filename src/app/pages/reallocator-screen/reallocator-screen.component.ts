@@ -11,7 +11,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 export class ReallocatorScreenComponent implements OnInit {
   readonly pointset: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
 
-  output: string = "hey";
+  output: string = "";
 
   constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
   }
