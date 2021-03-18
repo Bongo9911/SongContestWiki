@@ -184,6 +184,7 @@ export class UserScreenComponent implements OnInit {
     }
   }
 
+  //TODO: Upload points from sheet https://docs.google.com/spreadsheets/d/17goq4iFSuPCpw2EdfJ49YvNxlai5NO-vJDj8I7_iTos/edit#gid=2029422360
   async uploadTablePoints(points: string) {
     const parsedString = points.split('\n').map((line) => line.split('\t'))
 
@@ -198,9 +199,9 @@ export class UserScreenComponent implements OnInit {
         console.log('foo');
 
         if (j + 1 === parsedString[i].length) {
-          data['sf1pointset'] = {};
-          data['sf1pointset']['points'] = [...pointsarray];
-          data['sf1pointset']['cv'] = true;
+          data['sf2pointset'] = {};
+          data['sf2pointset']['points'] = [...pointsarray];
+          data['sf2pointset']['cv'] = true;
 
           this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
             .doc(this.id).collection<Song>('songs').doc(this.songlist.filter(function (song) {
