@@ -29,7 +29,7 @@ export class ReallocatorScreenComponent implements OnInit {
     countriesArray.forEach(country => {
       countryindex = -1;
       for(let i = 0; i < pointsArray.length; ++i){
-        if(pointsArray [i][0] == country[0]){
+        if(pointsArray[i][0] == country[0]){
           countryindex = i;
         }
       }
@@ -79,7 +79,7 @@ export class ReallocatorScreenComponent implements OnInit {
     let outputtext = ""
 
     for(let i = 0; i < pointsArray.length; ++i) {
-      for(let j = ignore; j < pointsArray.length; ++j) {
+      for(let j = ignore; j < pointsArray[i].length; ++j) {
         outputtext += pointsArray[i][j] + '\t';
       }
       outputtext += '\n'
