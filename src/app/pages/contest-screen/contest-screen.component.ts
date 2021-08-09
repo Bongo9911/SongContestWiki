@@ -10,38 +10,29 @@ import { Router, ActivatedRoute } from '@angular/router';
 
 export class ContestScreenComponent implements OnInit {
 
-  con : Contest = {
+  con: Contest = {
     name: '',
     id: ''
   };
-  eds : Edition[] = [];
-  id : string;
+  eds: Edition[] = [];
+  id: string;
 
-  constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) { 
+  constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => this.id = params.id);
 
-    this.database
-    .collection<Contest>('contests', ref => ref.where('id', '==', this.id))
-    .get()
-    .subscribe(async res => {
-      await res.docs.forEach((doc) => {
-        this.con = doc.data();
+    this.database.firestore.collection('contests').doc(this.id)
+      .get().then((doc) => {
+        this.con = doc.data() as Contest;
         console.log(doc.data());
       });
-    });
 
-    this.database
-    .collection<Contest>('contests', ref => ref.where('id', '==', this.id)).doc(this.id)
-    .collection<Edition>('editions')
-    .get()
-    .subscribe(async res => {
-      await res.docs.forEach((doc) => {
-        this.eds.push(doc.data());
-        console.log(doc.data());
+    this.database.firestore.collection('contests').doc(this.id).collection('editions').get()
+      .then(docs => {
+        docs.forEach((doc) => {
+          this.eds.push(doc.data() as Edition);
+          console.log(doc.data());
+        });
       });
-    });
-
-    console.log(this.con.name);
   }
 
   ngOnInit(): void {
