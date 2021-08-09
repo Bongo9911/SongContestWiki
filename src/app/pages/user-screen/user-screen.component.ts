@@ -20,6 +20,9 @@ export class UserScreenComponent implements OnInit {
   numEntries: number = 0;
   numQualifiers: number = 0;
 
+  bestPlace: string = "";
+  bestEd: string = "";
+
   songlist: any[] = []
 
   constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
@@ -33,21 +36,61 @@ export class UserScreenComponent implements OnInit {
       .collection('songs').where('user', '==', this.user).get().then(docs => {
         docs.forEach((doc) => {
           this.songs.push(doc.data() as Song);
-          console.log(doc.data());
           this.songs = this.songs.sort((a, b) => (a.edition > b.edition) ? 1 : -1);
           this.numEntries = this.songs.length;
           this.numQualifiers = this.songs.filter(function (song) {
             return song.qualifier !== 'NQ';
           }).length;
+          let songsort = [...this.songs]
+          songsort.sort((a,b) => a.fplace > b.fplace ? 1 : -1)
+          if(songsort[0].fplace !== -1) {
+            let place = songsort[0].fplace.toString();
+            switch(place[place.length - 1]) {
+              case "1":
+                place += "st";
+                break;
+              case "2":
+                place += "nd";
+                break;
+              case "3":
+                place += "rd";
+                break;
+              default:
+                place += "th";
+                break;
+            }
+            this.bestPlace = place;
+            this.bestEd = songsort[0].edition;
+          }
+          else {
+            songsort.sort((a,b) => a.sfplace > b.sfplace ? 1 : -1)
+            let place = songsort[0].sfplace.toString();
+            switch(place[place.length - 1]) {
+              case "1":
+                place += "st (SF)";
+                break;
+              case "2":
+                place += "nd (SF)";
+                break;
+              case "3":
+                place += "rd (SF)";
+                break;
+              default:
+                place += "th (SF)";
+                break;
+            }
+            this.bestPlace = place;
+            this.bestEd = songsort[0].edition;
+          }
         });
       });
 
-    this.database.firestore.collection('contests').doc(this.id)
-      .collection('songs').get().then(docs => {
-        docs.forEach((doc) => {
-          this.songlist.push({ id: doc.id, ...doc.data() });
-        });
-      });
+    // this.database.firestore.collection('contests').doc(this.id)
+    //   .collection('songs').get().then(docs => {
+    //     docs.forEach((doc) => {
+    //       this.songlist.push({ id: doc.id, ...doc.data() });
+    //     });
+    //   });
   }
 
   ngOnInit(): void {
