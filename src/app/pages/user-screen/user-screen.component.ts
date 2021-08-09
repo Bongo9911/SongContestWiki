@@ -41,9 +41,9 @@ export class UserScreenComponent implements OnInit {
           this.numQualifiers = this.songs.filter(function (song) {
             return song.qualifier !== 'NQ';
           }).length;
-          let songsort = [...this.songs]
-          songsort.sort((a,b) => a.fplace > b.fplace ? 1 : -1)
-          if(songsort[0].fplace !== -1) {
+          let songsort = [...this.songs].filter(song => song.fplace !== -1)
+          if(songsort.length) {
+            songsort.sort((a,b) => a.fplace > b.fplace ? 1 : -1)
             let place = songsort[0].fplace.toString();
             switch(place[place.length - 1]) {
               case "1":
@@ -63,6 +63,7 @@ export class UserScreenComponent implements OnInit {
             this.bestEd = songsort[0].edition;
           }
           else {
+            let songsort = [...this.songs].filter(song => song.sfplace !== -1)
             songsort.sort((a,b) => a.sfplace > b.sfplace ? 1 : -1)
             let place = songsort[0].sfplace.toString();
             switch(place[place.length - 1]) {
