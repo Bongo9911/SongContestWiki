@@ -51,36 +51,27 @@ export class EditionScreenComponent implements OnInit {
       this.num = params.num;
     });
 
-    this.database
-      .collection<Contest>('contests', ref => ref.where('id', '==', this.id))
-      .get()
-      .subscribe(async res => {
-        await res.docs.forEach((doc) => {
-          this.con = doc.data();
-          console.log(doc.data());
+    this.database.firestore.collection('contests').where('id', '==', this.id).get()
+      .then(docs => {
+        docs.forEach((doc) => {
+          this.con = doc.data() as Contest;
         });
       });
 
     //gets the info on the edition
-    this.database
-      .collection<Contest>('contests', ref => ref.where('id', '==', this.id)).doc(this.id)
-      .collection<Edition>('editions', ref => ref.where('edition', '==', this.num))
-      .get()
-      .subscribe(async res => {
-        await res.docs.forEach((doc) => {
-          this.edition = doc.data();
+    this.database.firestore.collection('contests').doc(this.id)
+      .collection('editions').where('edition', '==', this.num).get().then(docs => {
+        docs.forEach((doc) => {
+          this.edition = doc.data() as Edition;
         });
       });
 
     //get all the songs sent to that edition
-    this.database
-      .collection<Contest>('contests', ref => ref.where('id', '==', this.id)).doc(this.id)
-      .collection<Song>('songs', ref => ref.where('edition', '==', this.num)/*.orderBy('sfro')*/)
-      .get()
-      .subscribe(async res => {
-        await res.docs.forEach((doc) => {
-          this.songs.push(doc.data());
-          console.log(doc.data());
+    this.database.firestore
+      .collection('contests').doc(this.id)
+      .collection('songs').where('edition', '==', this.num).get().then(docs => {
+        docs.forEach((doc) => {
+          this.songs.push(doc.data() as Song);
         });
         //Populates the arrays for each semi-finals respective arrays
         for (let i = 1; i <= 3; ++i) {
@@ -170,9 +161,8 @@ export class EditionScreenComponent implements OnInit {
     const parsedString = song.split('\n').map((line) => line.split('\t'))
     console.log(parsedString);
     parsedString.forEach(song => {
-      this.database
-        .collection<Contest>('contests', ref => ref.where('id', '==', this.id)).doc(this.id)
-        .collection('songs').add({
+      this.database.firestore
+        .collection('contests').doc(this.id).collection('songs').add({
           edition: song[0],
           qualifier: song[1],
           disqualified: song[2],
@@ -245,8 +235,6 @@ export class EditionScreenComponent implements OnInit {
   //Sorts the data in the song list tables
   sortData(sort: Sort, sfnum: number, isSf: boolean) {
     let data = [];
-
-    console.log(sort);
 
     data = isSf ? [...this.sfsongtables[sfnum].songs] : [...this.fsongs];
 

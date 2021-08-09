@@ -16,6 +16,7 @@ import { StartScreenComponent } from './pages/start-screen/start-screen.componen
 import { EditionScreenComponent } from './pages/edition-screen/edition-screen.component';
 import { UserScreenComponent } from './pages/user-screen/user-screen.component';
 import { ReallocatorScreenComponent } from './pages/reallocator-screen/reallocator-screen.component';
+import { CountryScreenComponent } from './pages/country-screen/country-screen.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { ReallocatorScreenComponent } from './pages/reallocator-screen/reallocat
     EditionScreenComponent,
     UserScreenComponent,
     ReallocatorScreenComponent,
+    CountryScreenComponent,
   ],
   imports: [
     BrowserModule,

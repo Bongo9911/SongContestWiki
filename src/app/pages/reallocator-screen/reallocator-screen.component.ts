@@ -1,7 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from "@angular/fire/firestore";
-import { FormBuilder } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-reallocator-screen',
@@ -13,7 +10,7 @@ export class ReallocatorScreenComponent implements OnInit {
 
   output: string = "";
 
-  constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
+  constructor() {
   }
 
   ngOnInit(): void {

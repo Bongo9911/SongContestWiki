@@ -2,17 +2,26 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
+import { firestore } from 'firebase';
 
 @Component({
-  selector: 'app-user-screen',
-  templateUrl: './user-screen.component.html',
-  styleUrls: ['./user-screen.component.css']
+  selector: 'app-country-screen',
+  templateUrl: './country-screen.component.html',
+  styleUrls: ['./country-screen.component.css']
 })
-export class UserScreenComponent implements OnInit {
-  readonly pointset: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
+export class CountryScreenComponent implements OnInit {
 
+  readonly pointset: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
+  
+  edition: Edition = {
+    edition: '0',
+    entries: 0,
+    hostcountry: '',
+    hostuser: '',
+    slogan: '',
+  };
   id: string;
-  user: string;
+  country: string;
 
   songs: Song[] = [];
   sortedData: Song[];
@@ -25,15 +34,14 @@ export class UserScreenComponent implements OnInit {
   constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
       this.id = params.id;
-      this.user = params.user;
+      this.country = params.country;
     });
 
-    //get all the songs sent for that user
+    //get all the songs sent for that country
     this.database.firestore.collection('contests').doc(this.id)
-      .collection('songs').where('user', '==', this.user).get().then(docs => {
+      .collection('songs').where('country', '==', this.country).get().then(docs => {
         docs.forEach((doc) => {
           this.songs.push(doc.data() as Song);
-          console.log(doc.data());
           this.songs = this.songs.sort((a, b) => (a.edition > b.edition) ? 1 : -1);
           this.numEntries = this.songs.length;
           this.numQualifiers = this.songs.filter(function (song) {
@@ -42,12 +50,12 @@ export class UserScreenComponent implements OnInit {
         });
       });
 
-    this.database.firestore.collection('contests').doc(this.id)
-      .collection('songs').get().then(docs => {
-        docs.forEach((doc) => {
-          this.songlist.push({ id: doc.id, ...doc.data() });
-        });
-      });
+    // this.database.firestore.collection('contests')
+    //   .doc(this.id).collection('songs').get().then(docs => {
+    //     docs.forEach((doc) => {
+    //       this.songlist.push({ id: doc.id, ...doc.data() });
+    //     });
+    //   });
   }
 
   ngOnInit(): void {
@@ -103,7 +111,7 @@ export class UserScreenComponent implements OnInit {
             return compare(a.sfro, b.sfro, isAsc);
           }
         case 'edition': return compare(a.edition, b.edition, isAsc);
-        case 'country': return compare(a.country, b.country, isAsc);
+        case 'user': return compare(a.user, b.user, isAsc);
         case 'language': return compare(a.language, b.language, isAsc);
         case 'artist': return compare(a.artist.toLowerCase(), b.artist.toLowerCase(), isAsc);
         case 'song': return compare(a.song.toLowerCase(), b.song.toLowerCase(), isAsc);
@@ -136,8 +144,8 @@ export class UserScreenComponent implements OnInit {
           data[parsedString[i][1].toLowerCase() + 'pointset']['cv'] = false;
         }
 
-        this.database.firestore.collection('contests').doc(this.id)
-          .collection('songs').doc(this.songlist.filter(function (song) {
+        this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
+          .doc(this.id).collection<Song>('songs').doc(this.songlist.filter(function (song) {
             return song.edition === parsedString[i][0];
           }).filter(function (song) {
             return song.country === parsedString[i][3];
@@ -168,8 +176,8 @@ export class UserScreenComponent implements OnInit {
           data['sf2pointset']['points'] = [...pointsarray];
           data['sf2pointset']['cv'] = true;
 
-          this.database.firestore.collection('contests').doc(this.id)
-            .collection('songs').doc(this.songlist.filter(function (song) {
+          this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
+            .doc(this.id).collection<Song>('songs').doc(this.songlist.filter(function (song) {
               return song.edition === '23';
             }).filter(function (song) {
               return song.country === parsedString[i][0];
@@ -193,19 +201,19 @@ export class UserScreenComponent implements OnInit {
         intpoints: parseInt(x[3])
       }
 
-      this.database.firestore.collection('contests').doc(this.id)
-        .collection('songs').doc(this.songlist.filter(function (song) {
-            return song.edition === '23';
-          }).filter(function (song) {
-            return song.country === x[0];
-          })[0].id).update(data)
+      this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
+        .doc(this.id).collection('songs').doc(this.songlist.filter(function (song) {
+          return song.edition === '23';
+        }).filter(function (song) {
+          return song.country === x[0];
+        })[0].id).update(data)
     })
   }
 
   deleteSongs() {
     this.songlist.filter(song => { return song.edition === '20.5' }).forEach(toDelete => {
-      this.database.firestore.collection('contests').doc(this.id)
-        .collection('songs').doc(toDelete.id).delete();
+      this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
+        .doc(this.id).collection<Song>('songs').doc(toDelete.id).delete();
     })
   }
 }
