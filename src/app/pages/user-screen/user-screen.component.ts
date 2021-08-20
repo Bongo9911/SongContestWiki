@@ -44,13 +44,13 @@ export class UserScreenComponent implements OnInit {
           let songsort = [...this.songs].filter(song => song.fplace !== -1)
           if (songsort.length) {
             songsort.sort((a, b) => a.fplace > b.fplace ? 1 : -1)
-            this.bestPlace = this.numToRankString(songsort[0].fplace.toString());
+            this.bestPlace = this.numToRankString(songsort[0].fplace);
             this.bestEd = songsort[0].edition;
           }
           else {
             let songsort = [...this.songs].filter(song => song.sfplace !== -1)
             songsort.sort((a, b) => a.sfplace > b.sfplace ? 1 : -1)
-            this.bestPlace = this.numToRankString(songsort[0].sfplace.toString()) + " (SF)";
+            this.bestPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
             this.bestEd = songsort[0].edition;
           }
         });
@@ -64,7 +64,9 @@ export class UserScreenComponent implements OnInit {
     //   });
   }
 
-  numToRankString(place: string): string {
+  //Converts the number to a string in the form of "nth"
+  numToRankString(num: number): string {
+    let place = num.toString();
     if (place.length === 1 || (place.length >= 2 && place[place.length - 2] !== "1")) {
       switch (place[place.length - 1]) {
         case "1":
@@ -82,7 +84,7 @@ export class UserScreenComponent implements OnInit {
       }
     }
     else {
-      place += "th (SF)";
+      place += "th";
     }
 
     return place;
