@@ -42,45 +42,15 @@ export class UserScreenComponent implements OnInit {
             return song.qualifier !== 'NQ';
           }).length;
           let songsort = [...this.songs].filter(song => song.fplace !== -1)
-          if(songsort.length) {
-            songsort.sort((a,b) => a.fplace > b.fplace ? 1 : -1)
-            let place = songsort[0].fplace.toString();
-            switch(place[place.length - 1]) {
-              case "1":
-                place += "st";
-                break;
-              case "2":
-                place += "nd";
-                break;
-              case "3":
-                place += "rd";
-                break;
-              default:
-                place += "th";
-                break;
-            }
-            this.bestPlace = place;
+          if (songsort.length) {
+            songsort.sort((a, b) => a.fplace > b.fplace ? 1 : -1)
+            this.bestPlace = this.numToRankString(songsort[0].fplace.toString());
             this.bestEd = songsort[0].edition;
           }
           else {
             let songsort = [...this.songs].filter(song => song.sfplace !== -1)
-            songsort.sort((a,b) => a.sfplace > b.sfplace ? 1 : -1)
-            let place = songsort[0].sfplace.toString();
-            switch(place[place.length - 1]) {
-              case "1":
-                place += "st (SF)";
-                break;
-              case "2":
-                place += "nd (SF)";
-                break;
-              case "3":
-                place += "rd (SF)";
-                break;
-              default:
-                place += "th (SF)";
-                break;
-            }
-            this.bestPlace = place;
+            songsort.sort((a, b) => a.sfplace > b.sfplace ? 1 : -1)
+            this.bestPlace = this.numToRankString(songsort[0].sfplace.toString()) + " (SF)";
             this.bestEd = songsort[0].edition;
           }
         });
@@ -92,6 +62,30 @@ export class UserScreenComponent implements OnInit {
     //       this.songlist.push({ id: doc.id, ...doc.data() });
     //     });
     //   });
+  }
+
+  numToRankString(place: string): string {
+    if (place.length === 1 || (place.length >= 2 && place[place.length - 2] !== "1")) {
+      switch (place[place.length - 1]) {
+        case "1":
+          place += "st";
+          break;
+        case "2":
+          place += "nd";
+          break;
+        case "3":
+          place += "rd";
+          break;
+        default:
+          place += "th";
+          break;
+      }
+    }
+    else {
+      place += "th (SF)";
+    }
+
+    return place;
   }
 
   ngOnInit(): void {
@@ -239,10 +233,10 @@ export class UserScreenComponent implements OnInit {
 
       this.database.firestore.collection('contests').doc(this.id)
         .collection('songs').doc(this.songlist.filter(function (song) {
-            return song.edition === '23';
-          }).filter(function (song) {
-            return song.country === x[0];
-          })[0].id).update(data)
+          return song.edition === '23';
+        }).filter(function (song) {
+          return song.country === x[0];
+        })[0].id).update(data)
     })
   }
 
