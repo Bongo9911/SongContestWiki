@@ -183,6 +183,20 @@ export class EditionScreenComponent implements OnInit {
     })
   }
 
+  deleteSongs(song: string) {
+    const parsedString = song.split('\n');
+    parsedString.forEach(s => {
+      this.database.firestore.collection('contests').doc('RSC').collection('songs')
+        .where('song', '==', s).get().then(docs => {
+          docs.forEach(doc => {
+            console.log(doc.id);
+            this.database.firestore.collection('contests').doc('RSC').collection('songs')
+            .doc(doc.id).delete();
+          })
+        })
+    })
+  }
+
   //Returns the semi-final points given from voter to receiver, returns nothing if no points given.
   getSFPoints(voter: Song, receiver: string, sfnum: number) {
     let index = voter['sf' + (sfnum + 1).toString() + 'pointset'].points.indexOf(receiver);

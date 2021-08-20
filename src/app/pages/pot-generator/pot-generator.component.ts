@@ -27,7 +27,8 @@ export class PotGeneratorComponent implements OnInit {
     //     let data = doc.data() as Song;
     //     this.database.firestore.collection('contests').doc('RSC').collection('users').doc(data.user).set({
     //       username: data.user,
-    //       aliases: [data.user]
+    //       aliases: [data.user],
+    //       lower: data.user.toLowerCase(),
     //     })
     //   })
     // })
@@ -43,12 +44,18 @@ export class PotGeneratorComponent implements OnInit {
     this.invalid = [];
     this.potList = [];
 
+    for(let i = 0; i < usersArray.length; ++i) {
+      usersArray[i] = usersArray[i].trim();
+    }
+
     for (let i = 0; i < usersArray.length; ++i) {
-      let doc = await this.database.firestore.collection('contests').doc(this.id).collection('users')
-        .doc(usersArray[i]).get()
-      if (!doc.exists) {
+      let docs = await this.database.firestore.collection('contests').doc(this.id).collection('users')
+        .where('lower','==', usersArray[i].toLowerCase()).get()
+      if (!docs.docs.length) {
         this.invalid.push(usersArray[i]);
-        console.log(usersArray[i])
+      }
+      else {
+        usersArray[i] = docs.docs[0].data()['username'];
       }
     }
 

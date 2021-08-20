@@ -59,7 +59,7 @@ export class UserScreenComponent implements OnInit {
       });
 
     this.database.firestore.collection('contests').doc(this.id)
-      .collection('songs').where('edition','==','44').get().then(docs => {
+      .collection('songs').where('edition','==','43').get().then(docs => {
         docs.forEach((doc) => {
           this.songlist.push({ id: doc.id, ...doc.data() });
         });
@@ -249,7 +249,7 @@ export class UserScreenComponent implements OnInit {
 
       this.database.firestore.collection('contests').doc(this.id)
         .collection('songs').doc(this.songlist.filter(function (song) {
-          return song.edition === '44';
+          return song.edition === '43';
         }).filter(function (song) {
           return song.country === x[0];
         })[0].id).update(data)
@@ -270,7 +270,7 @@ export class UserScreenComponent implements OnInit {
 
       this.database.firestore.collection('contests').doc(this.id)
             .collection('songs').doc(this.songlist.filter(function (song) {
-              return song.edition === '44';
+              return song.edition === '43';
             }).filter(function (song) {
               return song.country === parsedString[0][j];
             })[0].id).update({
