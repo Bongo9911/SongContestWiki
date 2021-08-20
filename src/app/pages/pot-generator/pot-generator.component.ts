@@ -109,7 +109,7 @@ export class PotGeneratorComponent implements OnInit {
           else {
             //Set similarities to a really small number in case the 2 users have no similarities
             //so the pot generation doesn't get stuck
-            similarities[i][j] = 1e-40;
+            similarities[i][j] = 1e-80;
             sharededs[i][j] = 0;
             for (let ed = 0; ed < pointsets[i].length; ++ed) {
               if (pointsets[i][ed] && pointsets[j][ed]) {
@@ -124,70 +124,80 @@ export class PotGeneratorComponent implements OnInit {
                 }
               }
             }
+            if (sharededs[i][j] === 0) {
+              sharededs[i][j] = 1e-40;
+            }
           }
         }
       }
 
-      similarities = math.dotDivide(similarities, math.multiply(sharededs,52)) as number[][];
+      similarities = math.dotDivide(similarities, math.multiply(sharededs, 52)) as number[][];
 
-      console.log(math.multiply(sharededs,52));
       console.log(similarities);
       let potheads: number[] = [];
 
-      for (let i = 0; i < this.pots; ++i) {
-        let rand = this.getRandomInt(filteredUsers.length);
-        if (potheads.indexOf(rand) === -1) {
-          potheads.push(rand);
-        }
-        else {
-          --i;
-        }
-      }
+      if (this.pots <= filteredUsers.length) {
 
-      console.log(potheads);
-
-      let claimedUsers: number[] = [...potheads];
-      let pots: number[][] = new Array(potheads.length);
-
-      for(let i = 0; i < pots.length; ++i) {
-        pots[i] = [potheads[i]];
-      }
-
-      while (claimedUsers.length !== filteredUsers.length) {
-        for (let i = 0; i < potheads.length; ++i) {
-          let added = false;
-          let userSim = similarities[potheads[i]];
-          while (!added && claimedUsers.length !== filteredUsers.length) {
-            let index = userSim.indexOf(math.max(userSim));
-            if(claimedUsers.indexOf(index) === -1) {
-              claimedUsers.push(index);
-              pots[i].push(index);
-              added = true;
-            }
-            else {
-              userSim[index] = 0;
-            }
+        for (let i = 0; i < this.pots; ++i) {
+          let rand = this.getRandomInt(filteredUsers.length);
+          if (potheads.indexOf(rand) === -1) {
+            potheads.push(rand);
+          }
+          else {
+            --i;
           }
         }
-      }
 
-      for(let i = 0; i < pots.length; ++i) {
-        this.potList.push([]);
-        for(let j = 0; j < pots[i].length; ++j) {
-          this.potList[i].push(filteredUsers[pots[i][j]]);
+        console.log(potheads);
+
+        let claimedUsers: number[] = [...potheads];
+        let pots: number[][] = new Array(potheads.length);
+
+        for (let i = 0; i < pots.length; ++i) {
+          pots[i] = [potheads[i]];
         }
-      }
 
-      let potNum: number = this.potList.length - 1;
-      for(let i = 0; i < this.invalid.length; ++i) {
-        this.potList[potNum].push(this.invalid[i]);
-        potNum--;
-        if(potNum < 0) {
-          potNum = this.potList.length - 1;
+        let iter = 0; //no. of iterations
+        while (claimedUsers.length !== filteredUsers.length) {
+          for (let i = 0; i < potheads.length; ++i) {
+            let added = false;
+            let userSim = similarities[pots[i][iter]];
+            while (!added && claimedUsers.length !== filteredUsers.length) {
+              let index = userSim.indexOf(Math.max(...userSim));
+              if (claimedUsers.indexOf(index) === -1) {
+                claimedUsers.push(index);
+                pots[i].push(index);
+                added = true;
+              }
+              else {
+                userSim[index] = 0;
+              }
+            }
+          }
+          iter++;
         }
-      }
 
-      console.log(pots);
+        for (let i = 0; i < pots.length; ++i) {
+          this.potList.push([]);
+          for (let j = 0; j < pots[i].length; ++j) {
+            this.potList[i].push(filteredUsers[pots[i][j]]);
+          }
+        }
+
+        let potNum: number = this.potList.length - 1;
+        for (let i = 0; i < this.invalid.length; ++i) {
+          this.potList[potNum].push(this.invalid[i]);
+          potNum--;
+          if (potNum < 0) {
+            potNum = this.potList.length - 1;
+          }
+        }
+
+        console.log(pots);
+      }
+      else {
+        console.error("Error: number of pots is greater than number of users")
+      }
     }
   }
 

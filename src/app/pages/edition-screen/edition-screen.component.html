@@ -145,13 +145,15 @@
             <th>External</th>
             <th>Total</th>
           </tr>
-          <tr *ngFor="let song of sfptsongs[i]" [ngStyle]="getSFPointStyle(song)">
-            <td>{{song.sfplace}}</td>
-            <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> {{song.country}}</td>
-            <td>{{song.intpoints}}</td>
-            <td>{{song.extpoints}}</td>
-            <td>{{song.sfpoints}}</td>
-          </tr>
+          <ng-container *ngFor="let song of sfptsongs[i]">
+            <tr [ngStyle]="getSFPointStyle(song)" *ngIf="song.sfplace !== -1">
+              <td>{{song.sfplace}}</td>
+              <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> {{song.country}}</td>
+              <td>{{song.intpoints}}</td>
+              <td>{{song.extpoints}}</td>
+              <td>{{song.sfpoints}}</td>
+            </tr>
+          </ng-container>
         </table>
 
         <h4>Internal Votes</h4>
@@ -217,6 +219,7 @@
             <ng-template #emptyFScoreboard>
               <td></td>
               <td></td>
+              <td></td>
             </ng-template>
           </tr>
         </table>
@@ -254,9 +257,9 @@
     </table>
   </ng-container>
 
-  <!-- <textarea #song></textarea>
+  <textarea #song></textarea>
 
-  <button (click)="uploadSong(song.value)">Click me</button> -->
+  <button (click)="uploadSong(song.value)">Click me</button>
 
 
 </div>

@@ -3,6 +3,7 @@ import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
 import { Song } from 'src/app/shared/datatypes';
+import firebase from 'firebase';
 
 @Component({
   selector: 'app-user-screen',
@@ -57,12 +58,22 @@ export class UserScreenComponent implements OnInit {
         });
       });
 
-    // this.database.firestore.collection('contests').doc(this.id)
-    //   .collection('songs').get().then(docs => {
-    //     docs.forEach((doc) => {
-    //       this.songlist.push({ id: doc.id, ...doc.data() });
-    //     });
-    //   });
+    this.database.firestore.collection('contests').doc(this.id)
+      .collection('songs').where('edition','==','44').get().then(docs => {
+        docs.forEach((doc) => {
+          this.songlist.push({ id: doc.id, ...doc.data() });
+        });
+      });
+
+      // this.database.firestore.collection('contests').doc(this.id)
+      // .collection('songs').where('edition','==','44').where('sfnum','==','3').get().then(docs => {
+      //   docs.forEach(doc => {
+      //     this.database.firestore.collection('contests').doc(this.id)
+      //     .collection('songs').doc(doc.id).update({
+      //       sf2pointset: firebase.firestore.FieldValue.delete()
+      //     })
+      //   })
+      // })
   }
 
   //Converts the number to a string in the form of "nth"
@@ -177,6 +188,8 @@ export class UserScreenComponent implements OnInit {
           data[parsedString[i][1].toLowerCase() + 'pointset']['cv'] = false;
         }
 
+        console.log(parsedString[i][3])
+
         this.database.firestore.collection('contests').doc(this.id)
           .collection('songs').doc(this.songlist.filter(function (song) {
             return song.edition === parsedString[i][0];
@@ -211,7 +224,7 @@ export class UserScreenComponent implements OnInit {
 
           this.database.firestore.collection('contests').doc(this.id)
             .collection('songs').doc(this.songlist.filter(function (song) {
-              return song.edition === '23';
+              return song.edition === '21';
             }).filter(function (song) {
               return song.country === parsedString[i][0];
             })[0].id).update(data)
@@ -236,11 +249,37 @@ export class UserScreenComponent implements OnInit {
 
       this.database.firestore.collection('contests').doc(this.id)
         .collection('songs').doc(this.songlist.filter(function (song) {
-          return song.edition === '23';
+          return song.edition === '44';
         }).filter(function (song) {
           return song.country === x[0];
         })[0].id).update(data)
     })
+  }
+
+  uploadPointsFromSpreadsheet(points: string) {
+    const parsedString = points.split('\n').map((line) => line.split('\t'))
+
+    for(let j = 1; j < parsedString[0].length; ++j) {
+      let pointsarray: string[] = new Array(10);
+      for(let i = 1; i < parsedString.length; ++i) {
+        if(this.pointset.indexOf(parsedString[i][j]) !== -1) {
+          pointsarray[this.pointset.indexOf(parsedString[i][j])] = parsedString[i][0];
+        }
+      }
+      console.log(pointsarray);
+
+      this.database.firestore.collection('contests').doc(this.id)
+            .collection('songs').doc(this.songlist.filter(function (song) {
+              return song.edition === '44';
+            }).filter(function (song) {
+              return song.country === parsedString[0][j];
+            })[0].id).update({
+              sf3pointset: {
+                cv: true,
+                points: pointsarray,
+              }
+            })
+    }
   }
 
   deleteSongs() {
