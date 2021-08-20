@@ -17,6 +17,7 @@ import { EditionScreenComponent } from './pages/edition-screen/edition-screen.co
 import { UserScreenComponent } from './pages/user-screen/user-screen.component';
 import { ReallocatorScreenComponent } from './pages/reallocator-screen/reallocator-screen.component';
 import { CountryScreenComponent } from './pages/country-screen/country-screen.component';
+import { PotGeneratorComponent } from './pages/pot-generator/pot-generator.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { CountryScreenComponent } from './pages/country-screen/country-screen.co
     UserScreenComponent,
     ReallocatorScreenComponent,
     CountryScreenComponent,
+    PotGeneratorComponent,
   ],
   imports: [
     BrowserModule,

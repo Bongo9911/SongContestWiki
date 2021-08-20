@@ -1,0 +1,37 @@
+<h1 style="text-align: center;">Pot Generator</h1>
+
+<div style="display: flex;">
+	<div style="text-align: center;">
+		<h3>Users</h3>
+		<textarea style="height: 300px;" #users></textarea>
+	</div>
+
+	<div style="text-align: center;">
+		<h3>Editions</h3>
+		<textarea style="height: 300px;" #editions></textarea>
+	</div>
+</div>
+
+Number of pots:
+<input type="number" [(ngModel)]="pots" min="1">
+
+<button (click)="generate(users.value, editions.value)">Generate</button>
+
+<div *ngIf="invalid.length">
+	The following users were not found in the database and will be treated as debutants:
+	<div *ngFor="let inv of invalid">
+		{{inv}}
+	</div>
+</div>
+
+<div>
+	<h2>Pots:</h2>
+	<div *ngFor="let pot of potList; index as i">
+		<h3>Pot #{{i + 1}}</h3>
+		<ul>
+			<li *ngFor="let user of pot">{{user}}</li>
+		</ul>
+	</div>
+</div>
+
+<br/>

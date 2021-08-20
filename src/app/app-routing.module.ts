@@ -6,6 +6,7 @@ import { EditionScreenComponent } from './pages/edition-screen/edition-screen.co
 import { UserScreenComponent } from './pages/user-screen/user-screen.component';
 import { ReallocatorScreenComponent } from './pages/reallocator-screen/reallocator-screen.component';
 import { CountryScreenComponent } from './pages/country-screen/country-screen.component';
+import { PotGeneratorComponent } from './pages/pot-generator/pot-generator.component';
 
 const routes: Routes = [
   { path: "", component: StartScreenComponent },
@@ -13,6 +14,7 @@ const routes: Routes = [
   { path: "contest/:id/ed/:num", component: EditionScreenComponent },
   { path: "contest/:id/user/:user", component: UserScreenComponent },
   { path: "contest/:id/country/:country", component: CountryScreenComponent },
+  { path: "contest/:id/pot-generator", component: PotGeneratorComponent },
   { path: "tools/reallocator", component: ReallocatorScreenComponent },
   { path: "**", redirectTo: ''}
 ];

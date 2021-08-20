@@ -13,13 +13,6 @@ export class CountryScreenComponent implements OnInit {
 
   readonly pointset: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
   
-  edition: Edition = {
-    edition: '0',
-    entries: 0,
-    hostcountry: '',
-    hostuser: '',
-    slogan: '',
-  };
   id: string;
   country: string;
 
@@ -220,53 +213,4 @@ export class CountryScreenComponent implements OnInit {
 
 function compare(a: number | string, b: number | string, isAsc: boolean) {
   return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
-}
-
-interface Contest {
-  id: string;
-  name: string;
-}
-
-interface Edition {
-  edition: string;
-  entries: number;
-  hostcountry: string;
-  hostuser: string;
-  slogan: string;
-}
-
-interface Song {
-  artist: string;
-  country: string;
-  disqualified: string;
-  edition: string;
-  extpoints: number;
-  fpointset: {
-    points: string[10];
-  };
-  fplace: number;
-  fpoints: number;
-  fro: number;
-  intpoints: number;
-  language: string;
-  qualifier: string;
-  rawextpoints: number;
-  sf1pointset: {
-    cv: boolean;
-    points: string[10];
-  };
-  sf2pointset: {
-    cv: boolean;
-    points: string[10];
-  };
-  sf3pointset: {
-    cv: boolean;
-    points: string[10];
-  };
-  sfnum: string;
-  sfplace: number;
-  sfpoints: number;
-  sfro: number;
-  song: string;
-  user: string;
 }

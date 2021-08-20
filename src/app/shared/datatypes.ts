@@ -1,0 +1,49 @@
+interface Contest {
+	id: string;
+	name: string;
+}
+
+interface Edition {
+	crossvoting: boolean;
+	edition: string;
+	entries: number;
+    hostcountries: string[];
+	hostusers: string[];
+	slogan: string;
+}
+
+interface Song {
+	artist: string;
+	country: string;
+	disqualified: string;
+	edition: string;
+	extpoints: number;
+	fpointset: {
+		points: string[];
+	};
+	fplace: number;
+	fpoints: number;
+	fro: number;
+	intpoints: number;
+	language: string;
+	qualifier: string;
+	rawextpoints: number;
+	sf1pointset: {
+		cv: boolean;
+		points: string[10];
+	};
+	sf2pointset: {
+		cv: boolean;
+		points: string[10];
+	};
+	sf3pointset: {
+		cv: boolean;
+		points: string[10];
+	};
+	sfnum: string;
+	sfplace: number;
+	sfpoints: number;
+	sfro: number;
+	song: string;
+	user: string;
+}
