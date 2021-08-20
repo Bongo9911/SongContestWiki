@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
+import { Contest, Edition } from 'src/app/shared/datatypes';
 
 @Component({
   selector: 'app-contest-screen',
@@ -38,16 +39,4 @@ export class ContestScreenComponent implements OnInit {
   ngOnInit(): void {
   }
 
-}
-
-interface Contest {
-  id: string;
-  name: string;
-}
-
-interface Edition {
-  entries: number;
-  hostcountry: string;
-  hostuser: string;
-  edition: string;
 }

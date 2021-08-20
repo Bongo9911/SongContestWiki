@@ -3,6 +3,7 @@ import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
 import { firestore } from 'firebase';
+import { Contest, Song } from 'src/app/shared/datatypes';
 
 @Component({
   selector: 'app-country-screen',

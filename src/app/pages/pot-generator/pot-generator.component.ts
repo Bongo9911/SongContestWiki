@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import * as math from 'mathjs';
+import { Song } from '../../shared/datatypes';
 
 @Component({
   selector: 'app-pot-generator',

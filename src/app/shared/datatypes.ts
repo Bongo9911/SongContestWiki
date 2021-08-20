@@ -1,9 +1,9 @@
-interface Contest {
+export interface Contest {
 	id: string;
 	name: string;
 }
 
-interface Edition {
+export interface Edition {
 	crossvoting: boolean;
 	edition: string;
 	entries: number;
@@ -12,7 +12,7 @@ interface Edition {
 	slogan: string;
 }
 
-interface Song {
+export interface Song {
 	artist: string;
 	country: string;
 	disqualified: string;

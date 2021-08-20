@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
+import { Contest, Edition, Song } from 'src/app/shared/datatypes';
 
 @Component({
   selector: 'app-edition-screen',
