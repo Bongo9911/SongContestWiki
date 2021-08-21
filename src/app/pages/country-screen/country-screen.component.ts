@@ -41,7 +41,7 @@ export class CountryScreenComponent implements OnInit {
       .collection('songs').where('country', '==', this.country).get().then(docs => {
         docs.forEach((doc) => {
           this.songs.push(doc.data() as Song);
-          this.songs = this.songs.sort((a, b) => (a.edition > b.edition) ? 1 : -1);
+          this.songs = this.songs.sort((a, b) => (a.edval > b.edval) ? 1 : -1);
           this.numEntries = this.songs.length;
           this.numQualifiers = this.songs.filter(function (song) {
             return song.qualifier !== 'NQ';
