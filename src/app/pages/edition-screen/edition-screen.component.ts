@@ -19,6 +19,7 @@ export class EditionScreenComponent implements OnInit {
   edition: Edition = {
     crossvoting: false,
     edition: '0',
+    edval: 0,
     entries: 0,
     hostcountries: [],
     hostusers: [],
@@ -165,6 +166,7 @@ export class EditionScreenComponent implements OnInit {
       this.database.firestore
         .collection('contests').doc(this.id).collection('songs').add({
           edition: song[0],
+          edval: parseInt(song[0]) + Math.floor((parseInt(song[0]) - 1) / 10),
           qualifier: song[1],
           disqualified: song[2],
           sfnum: song[3],

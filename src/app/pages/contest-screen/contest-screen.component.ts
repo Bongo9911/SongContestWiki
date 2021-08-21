@@ -33,6 +33,7 @@ export class ContestScreenComponent implements OnInit {
           this.eds.push(doc.data() as Edition);
           console.log(doc.data());
         });
+        this.eds.sort((a,b) => a.edval > b.edval ? 1 : -1);
       });
   }
 

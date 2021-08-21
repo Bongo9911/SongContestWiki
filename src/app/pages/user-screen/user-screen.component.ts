@@ -38,7 +38,7 @@ export class UserScreenComponent implements OnInit {
       .collection('songs').where('user', '==', this.user).get().then(docs => {
         docs.forEach((doc) => {
           this.songs.push(doc.data() as Song);
-          this.songs = this.songs.sort((a, b) => (a.edition > b.edition) ? 1 : -1);
+          this.songs = this.songs.sort((a, b) => (a.edval > b.edval) ? 1 : -1);
           this.numEntries = this.songs.length;
           this.numQualifiers = this.songs.filter(function (song) {
             return song.qualifier !== 'NQ';
@@ -59,7 +59,7 @@ export class UserScreenComponent implements OnInit {
       });
 
     this.database.firestore.collection('contests').doc(this.id)
-      .collection('songs').where('edition','==','43').get().then(docs => {
+      .collection('songs').where('edition','==','30').get().then(docs => {
         docs.forEach((doc) => {
           this.songlist.push({ id: doc.id, ...doc.data() });
         });
@@ -154,7 +154,7 @@ export class UserScreenComponent implements OnInit {
           else {
             return compare(a.sfro, b.sfro, isAsc);
           }
-        case 'edition': return compare(a.edition, b.edition, isAsc);
+        case 'edition': return compare(a.edval, b.edval, isAsc);
         case 'country': return compare(a.country, b.country, isAsc);
         case 'language': return compare(a.language, b.language, isAsc);
         case 'artist': return compare(a.artist.toLowerCase(), b.artist.toLowerCase(), isAsc);
@@ -249,8 +249,6 @@ export class UserScreenComponent implements OnInit {
 
       this.database.firestore.collection('contests').doc(this.id)
         .collection('songs').doc(this.songlist.filter(function (song) {
-          return song.edition === '43';
-        }).filter(function (song) {
           return song.country === x[0];
         })[0].id).update(data)
     })
@@ -270,12 +268,10 @@ export class UserScreenComponent implements OnInit {
 
       this.database.firestore.collection('contests').doc(this.id)
             .collection('songs').doc(this.songlist.filter(function (song) {
-              return song.edition === '43';
-            }).filter(function (song) {
               return song.country === parsedString[0][j];
             })[0].id).update({
-              sf3pointset: {
-                cv: true,
+              fpointset: {
+                // cv: false,
                 points: pointsarray,
               }
             })

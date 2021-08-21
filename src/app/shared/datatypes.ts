@@ -6,6 +6,7 @@ export interface Contest {
 export interface Edition {
 	crossvoting: boolean;
 	edition: string;
+	edval: number;
 	entries: number;
     hostcountries: string[];
 	hostusers: string[];
@@ -17,6 +18,7 @@ export interface Song {
 	country: string;
 	disqualified: string;
 	edition: string;
+	edval: number;
 	extpoints: number;
 	fpointset: {
 		points: string[];

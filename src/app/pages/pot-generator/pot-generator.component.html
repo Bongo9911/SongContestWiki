@@ -18,7 +18,10 @@
 				<div *ngFor="let pot of potList; index as i">
 					<h3 style="text-align: center;">Pot #{{i + 1}}</h3>
 					<ul>
-						<li *ngFor="let user of pot">{{user}}</li>
+						<li *ngFor="let user of pot">
+							{{user}}
+							<!-- <a routerLink="/contest/{{id}}/user/{{user}}"></a> -->
+						</li>
 					</ul>
 				</div>
 			</div>

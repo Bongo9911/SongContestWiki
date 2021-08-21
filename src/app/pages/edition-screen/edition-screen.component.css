@@ -35,6 +35,7 @@ table {
 		width: 315px;
 	}
 }
+
 @media (max-width: 500px) {
 	.infobox {
 		width: 100%;
@@ -57,8 +58,8 @@ table {
 	flex-wrap: nowrap;
 }
 
-.infoboxsection> div {
-  min-width: 45%;
+.infoboxsection>div {
+	min-width: 45%;
 }
 
 a {
@@ -93,8 +94,8 @@ h2 {
 }
 
 ::ng-deep .mat-sort-header-container {
-	display:flex;
-	justify-content:center;
+	display: flex;
+	justify-content: center;
 }
 
 .dqrow {
@@ -111,7 +112,7 @@ h2 {
 }
 
 tr th div, .vertical {
-    writing-mode: vertical-rl;
+	writing-mode: vertical-rl;
 	transform: rotate(180deg);
 	margin: 0px -5px 0px -5px;
 }
@@ -134,5 +135,14 @@ tr th div, .vertical {
 }
 
 .pointtotaltable {
-	float: right;
+	margin-bottom: 10px;
+}
+
+/* Show the interal vote table and combined point table side by side if screen is wide enough */
+@media only screen and (min-width: 1200px) {
+	.pointtableflex {
+		display: flex;
+		justify-content: space-between;
+		flex-direction: row-reverse;
+	}
 }
