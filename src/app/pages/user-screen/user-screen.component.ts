@@ -43,37 +43,37 @@ export class UserScreenComponent implements OnInit {
           this.numQualifiers = this.songs.filter(function (song) {
             return song.qualifier !== 'NQ';
           }).length;
-          let songsort = [...this.songs].filter(song => song.fplace !== -1)
-          if (songsort.length) {
-            songsort.sort((a, b) => a.fplace > b.fplace ? 1 : -1)
-            this.bestPlace = this.numToRankString(songsort[0].fplace);
-            this.bestEd = songsort[0].edition;
-          }
-          else {
-            let songsort = [...this.songs].filter(song => song.sfplace !== -1)
-            songsort.sort((a, b) => a.sfplace > b.sfplace ? 1 : -1)
-            this.bestPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
-            this.bestEd = songsort[0].edition;
-          }
         });
+        let songsort = [...this.songs].filter(song => song.fplace !== -1)
+        if (songsort.length) {
+          songsort.sort((a, b) => a.fplace > b.fplace ? 1 : -1)
+          this.bestPlace = this.numToRankString(songsort[0].fplace);
+          this.bestEd = songsort[0].edition;
+        }
+        else {
+          let songsort = [...this.songs].filter(song => song.sfplace !== -1)
+          songsort.sort((a, b) => a.sfplace > b.sfplace ? 1 : -1)
+          this.bestPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
+          this.bestEd = songsort[0].edition;
+        }
       });
 
     this.database.firestore.collection('contests').doc(this.id)
-      .collection('songs').where('edition','==','30').get().then(docs => {
+      .collection('songs').where('edition', '==', '30').get().then(docs => {
         docs.forEach((doc) => {
           this.songlist.push({ id: doc.id, ...doc.data() });
         });
       });
 
-      // this.database.firestore.collection('contests').doc(this.id)
-      // .collection('songs').where('edition','==','44').where('sfnum','==','3').get().then(docs => {
-      //   docs.forEach(doc => {
-      //     this.database.firestore.collection('contests').doc(this.id)
-      //     .collection('songs').doc(doc.id).update({
-      //       sf2pointset: firebase.firestore.FieldValue.delete()
-      //     })
-      //   })
-      // })
+    // this.database.firestore.collection('contests').doc(this.id)
+    // .collection('songs').where('edition','==','44').where('sfnum','==','3').get().then(docs => {
+    //   docs.forEach(doc => {
+    //     this.database.firestore.collection('contests').doc(this.id)
+    //     .collection('songs').doc(doc.id).update({
+    //       sf2pointset: firebase.firestore.FieldValue.delete()
+    //     })
+    //   })
+    // })
   }
 
   //Converts the number to a string in the form of "nth"
@@ -257,24 +257,24 @@ export class UserScreenComponent implements OnInit {
   uploadPointsFromSpreadsheet(points: string) {
     const parsedString = points.split('\n').map((line) => line.split('\t'))
 
-    for(let j = 1; j < parsedString[0].length; ++j) {
+    for (let j = 1; j < parsedString[0].length; ++j) {
       let pointsarray: string[] = new Array(10);
-      for(let i = 1; i < parsedString.length; ++i) {
-        if(this.pointset.indexOf(parsedString[i][j]) !== -1) {
+      for (let i = 1; i < parsedString.length; ++i) {
+        if (this.pointset.indexOf(parsedString[i][j]) !== -1) {
           pointsarray[this.pointset.indexOf(parsedString[i][j])] = parsedString[i][0];
         }
       }
       console.log(pointsarray);
 
       this.database.firestore.collection('contests').doc(this.id)
-            .collection('songs').doc(this.songlist.filter(function (song) {
-              return song.country === parsedString[0][j];
-            })[0].id).update({
-              fpointset: {
-                // cv: false,
-                points: pointsarray,
-              }
-            })
+        .collection('songs').doc(this.songlist.filter(function (song) {
+          return song.country === parsedString[0][j];
+        })[0].id).update({
+          fpointset: {
+            // cv: false,
+            points: pointsarray,
+          }
+        })
     }
   }
 
