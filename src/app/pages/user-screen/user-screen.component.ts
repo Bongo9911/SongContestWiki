@@ -24,6 +24,8 @@ export class UserScreenComponent implements OnInit {
 
   bestPlace: string = "";
   bestEd: string = "";
+  worstPlace: string = "";
+  worstEd: string = "";
 
   songlist: any[] = []
 
@@ -55,6 +57,19 @@ export class UserScreenComponent implements OnInit {
           songsort.sort((a, b) => a.sfplace > b.sfplace ? 1 : -1)
           this.bestPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
           this.bestEd = songsort[0].edition;
+        }
+
+        songsort = [...this.songs].filter(song => song.sfplace !== -1 && song.fplace === -1)
+        if (songsort.length) {
+          songsort.sort((a, b) => a.sfplace < b.sfplace ? 1 : -1)
+          this.worstPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
+          this.worstEd = songsort[0].edition;
+        }
+        else {
+          let songsort = [...this.songs].filter(song => song.fplace !== -1)
+          songsort.sort((a, b) => a.fplace < b.fplace ? 1 : -1)
+          this.worstPlace = this.numToRankString(songsort[0].fplace);
+          this.worstEd = songsort[0].edition;
         }
       });
 

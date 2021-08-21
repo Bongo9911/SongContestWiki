@@ -19,6 +19,14 @@
 			<div>{{numEntries}} ({{numQualifiers}} final<ng-container *ngIf="numQualifiers !== 1">s</ng-container>)
 			</div>
 		</div>
+		<div class="infoboxsection">
+			<div><b>Best Result</b></div>
+			<div>{{bestPlace}}: <a routerLink="/contest/{{id}}/ed/{{bestEd}}">{{bestEd}}</a></div>
+		</div>
+		<div class="infoboxsection">
+			<div><b>Worst Result</b></div>
+			<div>{{worstPlace}}: <a routerLink="/contest/{{id}}/ed/{{worstEd}}">{{worstEd}}</a></div>
+		</div>
 	</div>
 
 	<div class="sectionheader">
@@ -74,12 +82,4 @@
 			</tr>
 		</ng-container>
 	</table>
-
-	<!-- <textarea #points></textarea>
-
-	<button (click)="uploadPoints(points.value)">Upload</button>
-	<button (click)="uploadTablePoints(points.value)">Upload From Table</button>
-	<button (click)="uploadPointTotals(points.value)">Upload Totals</button>
-
-	<button (click)="deleteSongs()">Delete</button> -->
 </div>

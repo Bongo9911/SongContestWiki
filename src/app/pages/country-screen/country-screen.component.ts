@@ -23,6 +23,11 @@ export class CountryScreenComponent implements OnInit {
   numEntries: number = 0;
   numQualifiers: number = 0;
 
+  bestPlace: string = "";
+  bestEd: string = "";
+  worstPlace: string = "";
+  worstEd: string = "";
+
   songlist: any[] = []
 
   constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
@@ -42,6 +47,32 @@ export class CountryScreenComponent implements OnInit {
             return song.qualifier !== 'NQ';
           }).length;
         });
+
+        let songsort = [...this.songs].filter(song => song.fplace !== -1)
+        if (songsort.length) {
+          songsort.sort((a, b) => a.fplace > b.fplace ? 1 : -1)
+          this.bestPlace = this.numToRankString(songsort[0].fplace);
+          this.bestEd = songsort[0].edition;
+        }
+        else {
+          let songsort = [...this.songs].filter(song => song.sfplace !== -1)
+          songsort.sort((a, b) => a.sfplace > b.sfplace ? 1 : -1)
+          this.bestPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
+          this.bestEd = songsort[0].edition;
+        }
+
+        songsort = [...this.songs].filter(song => song.sfplace !== -1 && song.fplace === -1)
+        if (songsort.length) {
+          songsort.sort((a, b) => a.sfplace < b.sfplace ? 1 : -1)
+          this.worstPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
+          this.worstEd = songsort[0].edition;
+        }
+        else {
+          let songsort = [...this.songs].filter(song => song.fplace !== -1)
+          songsort.sort((a, b) => a.fplace < b.fplace ? 1 : -1)
+          this.worstPlace = this.numToRankString(songsort[0].fplace);
+          this.worstEd = songsort[0].edition;
+        }
       });
 
     // this.database.firestore.collection('contests')
@@ -53,6 +84,32 @@ export class CountryScreenComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  //Converts the number to a string in the form of "nth"
+  numToRankString(num: number): string {
+    let place = num.toString();
+    if (place.length === 1 || (place.length >= 2 && place[place.length - 2] !== "1")) {
+      switch (place[place.length - 1]) {
+        case "1":
+          place += "st";
+          break;
+        case "2":
+          place += "nd";
+          break;
+        case "3":
+          place += "rd";
+          break;
+        default:
+          place += "th";
+          break;
+      }
+    }
+    else {
+      place += "th";
+    }
+
+    return place;
   }
 
   getStyle(dq: string, place: number): object {
@@ -118,90 +175,6 @@ export class CountryScreenComponent implements OnInit {
     });
 
     this.songs = this.sortedData;
-  }
-
-  async uploadPoints(points: string) {
-    const parsedString = points.split('\n').map((line) => line.split('\t'))
-
-    let pointsarray = new Array<string>(10);
-    let data = {}
-
-    for (let i = 0; i < parsedString.length; ++i) {
-
-      pointsarray[this.pointset.indexOf(parsedString[i][7])] = parsedString[i][5];
-      console.log('foo');
-      if (i + 1 === parsedString.length || parsedString[i][4] != parsedString[i + 1][4]) {
-        data[parsedString[i][1].toLowerCase() + 'pointset'] = {};
-        data[parsedString[i][1].toLowerCase() + 'pointset']['points'] = [...pointsarray];
-
-        if (parsedString[i][1] != 'F') {
-          data[parsedString[i][1].toLowerCase() + 'pointset']['cv'] = false;
-        }
-
-        this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
-          .doc(this.id).collection<Song>('songs').doc(this.songlist.filter(function (song) {
-            return song.edition === parsedString[i][0];
-          }).filter(function (song) {
-            return song.country === parsedString[i][3];
-          })[0].id).update(data)
-
-        data = {}
-        pointsarray = new Array<string>(10); //destroy the old array and make a new empty one
-      }
-    }
-  }
-
-  //TODO: Upload points from sheet https://docs.google.com/spreadsheets/d/17goq4iFSuPCpw2EdfJ49YvNxlai5NO-vJDj8I7_iTos/edit#gid=2029422360
-  async uploadTablePoints(points: string) {
-    const parsedString = points.split('\n').map((line) => line.split('\t'))
-
-    let pointsarray = new Array<string>(10);
-    let data = {}
-
-    for (let i = 1; i < parsedString.length; ++i) {
-
-      for (let j = 1; j < parsedString[i].length; ++j) {
-
-        pointsarray[this.pointset.indexOf(parsedString[i][j])] = parsedString[0][j];
-        console.log('foo');
-
-        if (j + 1 === parsedString[i].length) {
-          data['sf2pointset'] = {};
-          data['sf2pointset']['points'] = [...pointsarray];
-          data['sf2pointset']['cv'] = true;
-
-          this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
-            .doc(this.id).collection<Song>('songs').doc(this.songlist.filter(function (song) {
-              return song.edition === '23';
-            }).filter(function (song) {
-              return song.country === parsedString[i][0];
-            })[0].id).update(data)
-
-          data = {}
-          pointsarray = new Array<string>(10); //destroy the old array and make a new empty one
-        }
-
-      }
-    }
-  }
-
-  async uploadPointTotals(points: string) {
-    const parsedString = points.split('\n').map((line) => line.split('\t'))
-
-    parsedString.forEach(x => {
-      let data = {
-        rawextpoints: parseInt(x[1]),
-        extpoints: parseInt(x[2]),
-        intpoints: parseInt(x[3])
-      }
-
-      this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
-        .doc(this.id).collection('songs').doc(this.songlist.filter(function (song) {
-          return song.edition === '23';
-        }).filter(function (song) {
-          return song.country === x[0];
-        })[0].id).update(data)
-    })
   }
 
   deleteSongs() {
