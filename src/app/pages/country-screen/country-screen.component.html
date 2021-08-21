@@ -47,26 +47,27 @@
 			<th mat-sort-header="sfpoints">Points</th>
 		</tr>
 		<ng-container *ngFor="let song of songs">
-			<tr [ngStyle]="getStyle(song.disqualified, song.fplace)">
+			<tr [ngStyle]="getStyle(song.disqualified, song.qualifier, song.fplace)">
 				<td><a routerLink="/contest/{{id}}/ed/{{song.edition}}">{{song.edition}}</a></td>
 				<td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
 				<td>{{song.language}}</td>
 				<td>{{song.artist}}</td>
 				<td>"{{song.song}}"</td>
-				<ng-container *ngIf="song.disqualified == 'N' && song.sfplace < 9">
+				<ng-container *ngIf="song.disqualified == 'N' && song.qualifier !== 'NQ'">
 					<td>{{song.fplace}}</td>
 					<td>{{song.fpoints}}</td>
 				</ng-container>
-				<ng-container *ngIf="song.disqualified == 'FDQ'">
+				<ng-container *ngIf="song.disqualified == 'FDQ' && (song.qualifier == Q || song.qualifier == AQ)">
 					<td class="dqrow" colspan="2">Disqualified</td>
 				</ng-container>
-				<ng-container *ngIf="song.disqualified == 'FWD'">
+				<ng-container *ngIf="song.disqualified == 'FWD' && (song.qualifier == Q || song.qualifier == AQ)">
 					<td class="dqrow" colspan="2">Withdrawn</td>
 				</ng-container>
-				<ng-container *ngIf="song.sfplace > 9">
+				<ng-container *ngIf="song.qualifier === 'NQ'">
 					<td class="dqrow" colspan="2">Did not qualify</td>
 				</ng-container>
-				<ng-container *ngIf="song.disqualified == 'N' && song.qualifier != 'AQ'">
+				<ng-container *ngIf="(song.disqualified == 'N' || song.disqualified == 'FDQ' || 
+						song.disqualified == 'FWD') && song.qualifier != 'AQ'">
 					<td [ngStyle]="getSFStyle(song.sfplace)">{{song.sfplace}}</td>
 					<td [ngStyle]="getSFStyle(song.sfplace)">{{song.sfpoints}}</td>
 				</ng-container>

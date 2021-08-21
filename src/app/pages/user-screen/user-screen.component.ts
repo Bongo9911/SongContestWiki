@@ -120,7 +120,7 @@ export class UserScreenComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  getStyle(dq: string, place: number): object {
+  getStyle(dq: string, q: string, place: number): object {
     switch (place) {
       case 1:
         return { 'background-color': '#ffd700' };
@@ -133,7 +133,7 @@ export class UserScreenComponent implements OnInit {
       case 6:
         return { 'background-color': '#bae8ff' };
       default:
-        if (dq === 'FWD' || dq == 'FDQ') return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
+        if ((dq === 'FWD' || dq == 'FDQ') && (q !== 'NQ')) return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
         else return { 'background-color': 'ghostwhite' };
     }
   }
