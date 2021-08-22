@@ -139,7 +139,7 @@ tr th div, .vertical {
 }
 
 /* Show the interal vote table and combined point table side by side if screen is wide enough */
-@media only screen and (min-width: 1200px) {
+@media only screen and (min-width: 1300px) {
 	.pointtableflex {
 		display: flex;
 		justify-content: space-between;

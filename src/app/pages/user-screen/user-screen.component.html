@@ -44,7 +44,7 @@
       <th mat-sort-header="sfpoints">Points</th>
     </tr>
     <ng-container *ngFor="let song of songs">
-      <tr [ngStyle]="getStyle(song.disqualified, song.fplace)">
+      <tr [ngStyle]="getStyle(song.disqualified, song.qualifier, song.fplace)">
         <td><a routerLink="/contest/{{id}}/ed/{{song.edition}}">{{song.edition}}</a></td>
         <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
         <td>{{song.language}}</td>

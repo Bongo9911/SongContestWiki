@@ -285,8 +285,8 @@ export class UserScreenComponent implements OnInit {
         .collection('songs').doc(this.songlist.filter(function (song) {
           return song.country === parsedString[0][j];
         })[0].id).update({
-          fpointset: {
-            // cv: false,
+          sf3pointset: {
+            cv: true,
             points: pointsarray,
           }
         })
