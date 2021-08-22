@@ -69,8 +69,14 @@
             <td>{{song.artist}}</td>
             <td>"{{song.song}}"</td>
             <ng-container *ngIf="song.disqualified != 'SFDQ' && song.disqualified != 'SFWD'">
-              <td>{{song.sfplace}}</td>
-              <td>{{song.sfpoints}}</td>
+              <ng-container *ngIf="song.sfplace !== -1">
+                <td>{{song.sfplace}}</td>
+                <td>{{song.sfpoints}}</td>
+              </ng-container>
+              <ng-container *ngIf="song.sfplace === -1">
+                <td></td>
+                <td></td>
+              </ng-container>
             </ng-container>
             <ng-container *ngIf="song.disqualified == 'SFDQ'">
               <td class="dqrow" colspan="2">Disqualified</td>
@@ -104,7 +110,14 @@
       </tr>
       <ng-container *ngFor="let song of fsongs">
         <tr [ngStyle]="getFStyle(song.fplace, song.disqualified)">
-          <td>{{song.fro}}</td>
+          <td>
+            <ng-container *ngIf="song.fro >= 1">
+              {{song.fro}}
+            </ng-container>
+            <ng-container *ngIf="song.fro === 0">
+              TBD
+            </ng-container>
+          </td>
           <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> <a
               routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
           <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
@@ -112,8 +125,14 @@
           <td>{{song.artist}}</td>
           <td>"{{song.song}}"</td>
           <ng-container *ngIf="song.disqualified == 'N'">
-            <td>{{song.fplace}}</td>
-            <td>{{song.fpoints}}</td>
+            <ng-container *ngIf="song.fplace !== -1">
+              <td>{{song.fplace}}</td>
+              <td>{{song.fpoints}}</td>
+            </ng-container>
+            <ng-container *ngIf="song.fplace === -1">
+              <td></td>
+              <td></td>
+            </ng-container>
           </ng-container>
           <ng-container *ngIf="song.disqualified == 'FDQ'">
             <td class="dqrow" colspan="2">Disqualified</td>
@@ -235,7 +254,7 @@
 
     <h3>Grand final</h3>
 
-    <div style="max-width: 100%; overflow: scroll;">
+    <div style="max-width: 100%; overflow-x: auto;">
       <table class="pointtable">
         <tr>
           <th></th>

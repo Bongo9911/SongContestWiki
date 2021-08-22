@@ -2,10 +2,40 @@
 
   <h1>{{con.name}}</h1>
 
-  <div *ngFor="let ed of eds">
-    <a routerLink="/contest/RSC/ed/{{ ed.edition }}">
-      Edition {{ ed.edition }}
-    </a>
+  <div style="display: flex; justify-content: space-evenly; margin-top: 50px;">
+    <div style="width: 48%;">
+      <div style="border-radius: 6px; border: 1px solid #ffa64d; background-color: #fff9e6;">
+        <div style="background-color: #ffd9b3; border-radius: 3px; border: 1px solid #ffa64d; margin: 6px;">
+          <div style="margin: 6px 5px;">
+            <b>Editions</b>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; margin: 7px; justify-content: center;">
+          <div *ngFor="let ed of eds; index as i">
+            <ng-container *ngIf="i !== 0">
+              <span style="font-size: 20px; line-height: 20px; vertical-align: middle;">&nbsp;• </span>
+            </ng-container>
+            <ng-container *ngFor="let country of ed.hostcountries">
+              <a routerLink="/contest/{{id}}/country/{{country}}">
+                <img class="flag" src="./assets/flags/{{country}} Flag.png">
+              </a>
+            </ng-container>
+            <a routerLink="/contest/RSC/ed/{{ ed.edition }}">{{ ed.edition }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width: 48%;">
+      <div style=" border-radius: 6px; border: 1px solid #ffa64d; background-color: #fff9e6;">
+        <div style="background-color: #ffd9b3; border-radius: 3px; border: 1px solid #ffa64d; margin: 6px;">
+          <div style="margin: 6px 5px;">
+            <b>{{con.name}}</b>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>

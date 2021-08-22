@@ -89,6 +89,7 @@ export class EditionScreenComponent implements OnInit {
           //Gets all users who succesfully internally voted in the semi-final
           this.sfvoters[i - 1] = this.songs.filter(x => x.sfnum == i.toString())
             .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD')
+            .filter(x => 'sf' + i.toString() + 'pointset' in x)
             .filter(x => x['sf' + i.toString() + 'pointset'].cv === false)
             .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
 
@@ -112,9 +113,9 @@ export class EditionScreenComponent implements OnInit {
         this.fsongs = this.songs.filter(x => x.fro !== -1).sort((a, b) => (a.fro > b.fro) ? 1 : -1);
 
         //Filters out all the users who succesfully voted in the final
-        this.fvoters = this.songs.filter(x => x.disqualified === 'N').filter(x => x.qualifier !== 'NQ')
-          .sort((a, b) => (a.fro > b.fro) ? 1 : -1).concat(
-            this.songs.filter(x => x.disqualified == 'N').filter(x => x.qualifier === 'NQ')
+        this.fvoters = this.songs.filter(x => 'fpointset' in x).filter(x => x.qualifier !== 'NQ')
+        .sort((a, b) => (a.fro > b.fro) ? 1 : -1).concat(
+            this.songs.filter(x => 'fpointset' in x).filter(x => x.qualifier === 'NQ')
               .sort((a, b) => (a.country > b.country) ? 1 : -1)
           );
 

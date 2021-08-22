@@ -74,7 +74,7 @@ export class UserScreenComponent implements OnInit {
       });
 
     this.database.firestore.collection('contests').doc(this.id)
-      .collection('songs').where('edition', '==', '30').get().then(docs => {
+      .collection('songs').where('edition', '==', '43').get().then(docs => {
         docs.forEach((doc) => {
           this.songlist.push({ id: doc.id, ...doc.data() });
         });
@@ -257,9 +257,9 @@ export class UserScreenComponent implements OnInit {
 
     parsedString.forEach(x => {
       let data = {
-        rawextpoints: parseInt(x[1]),
-        extpoints: parseInt(x[2]),
-        intpoints: parseInt(x[3])
+        intpoints: parseInt(x[1]),
+        rawextpoints: parseInt(x[2]),
+        extpoints: parseInt(x[3]),
       }
 
       this.database.firestore.collection('contests').doc(this.id)

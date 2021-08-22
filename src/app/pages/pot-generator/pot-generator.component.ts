@@ -32,6 +32,14 @@ export class PotGeneratorComponent implements OnInit {
     //     })
     //   })
     // })
+
+    this.database.firestore.collection("contests").doc('RSC').collection('songs').where('qualifier', '==', 'NQ').where('edition', '==', '45').get().then(docs => {
+      docs.forEach(doc => {
+        this.database.firestore.collection("contests").doc('RSC').collection('songs').doc(doc.id).update({
+          qualifier: 'TBD'
+        })
+      })
+    })
   }
 
   ngOnInit(): void {
@@ -44,13 +52,13 @@ export class PotGeneratorComponent implements OnInit {
     this.invalid = [];
     this.potList = [];
 
-    for(let i = 0; i < usersArray.length; ++i) {
+    for (let i = 0; i < usersArray.length; ++i) {
       usersArray[i] = usersArray[i].trim();
     }
 
     for (let i = 0; i < usersArray.length; ++i) {
       let docs = await this.database.firestore.collection('contests').doc(this.id).collection('users')
-        .where('lower','==', usersArray[i].toLowerCase()).get()
+        .where('lower', '==', usersArray[i].toLowerCase()).get()
       if (!docs.docs.length) {
         this.invalid.push(usersArray[i]);
       }
