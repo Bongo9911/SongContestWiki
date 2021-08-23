@@ -69,7 +69,7 @@ a:hover {
 .flag {
 	width: 23px;
 	height: auto;
-	border: 1px solid white;
+	border: 1px solid lightgray;
 	margin-right: 3px;
 	vertical-align: bottom;
 }
