@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
-import { Song } from 'src/app/shared/datatypes';
+import { Contest, Song } from 'src/app/shared/datatypes';
 import firebase from 'firebase';
 
 @Component({
@@ -13,6 +13,10 @@ import firebase from 'firebase';
 export class UserScreenComponent implements OnInit {
   readonly pointset: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
 
+  con: Contest = {
+    name: '',
+    id: ''
+  };
   id: string;
   user: string;
 
@@ -33,6 +37,13 @@ export class UserScreenComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.id = params.id;
       this.user = params.user;
+    });
+
+    this.database.firestore.collection('contests').where('id', '==', this.id).get()
+    .then(docs => {
+      docs.forEach((doc) => {
+        this.con = doc.data() as Contest;
+      });
     });
 
     //get all the songs sent for that user
@@ -74,7 +85,7 @@ export class UserScreenComponent implements OnInit {
       });
 
     this.database.firestore.collection('contests').doc(this.id)
-      .collection('songs').where('edition', '==', '43').get().then(docs => {
+      .collection('songs').where('edition', '==', '30').get().then(docs => {
         docs.forEach((doc) => {
           this.songlist.push({ id: doc.id, ...doc.data() });
         });

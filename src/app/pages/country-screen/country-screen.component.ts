@@ -14,6 +14,10 @@ export class CountryScreenComponent implements OnInit {
 
   readonly pointset: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
   
+  con: Contest = {
+    name: '',
+    id: ''
+  };
   id: string;
   country: string;
 
@@ -34,6 +38,13 @@ export class CountryScreenComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.id = params.id;
       this.country = params.country;
+    });
+
+    this.database.firestore.collection('contests').where('id', '==', this.id).get()
+    .then(docs => {
+      docs.forEach((doc) => {
+        this.con = doc.data() as Contest;
+      });
     });
 
     //get all the songs sent for that country

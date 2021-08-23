@@ -93,12 +93,14 @@ export class EditionScreenComponent implements OnInit {
             .filter(x => x['sf' + i.toString() + 'pointset'].cv === false)
             .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
 
-          //Gets all users who cross-voted into that semi-final
-          this.sfcrossvoters[i - 1] =
-            this.songs.filter(x => 'sf' + i.toString() + 'pointset' in x)
-              .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD')
-              .filter(x => x['sf' + i.toString() + 'pointset'].cv === true)
-              .sort((a, b) => (a.country > b.country) ? 1 : -1);
+          if(this.edition.crossvoting) {
+            //Gets all users who cross-voted into that semi-final
+            this.sfcrossvoters[i - 1] =
+              this.songs.filter(x => 'sf' + i.toString() + 'pointset' in x)
+                .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD')
+                .filter(x => x['sf' + i.toString() + 'pointset'].cv === true)
+                .sort((a, b) => (a.country > b.country) ? 1 : -1);
+          }
 
           //Separate arrays so that the arrays are not effected by sorting of the song table
           this.sbsfsongs[i - 1] = [...this.sfsongs[i - 1]];
