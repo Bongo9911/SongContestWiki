@@ -18,11 +18,11 @@
       <div><b>Appearances</b></div>
       <div>{{numEntries}} ({{numQualifiers}} final<ng-container *ngIf="numQualifiers !== 1">s</ng-container>)</div>
     </div>
-    <div class="infoboxsection">
+    <div class="infoboxsection" *ngIf="bestPlace">
       <div><b>Best Result</b></div>
       <div>{{bestPlace}}: <a routerLink="/contest/{{id}}/ed/{{bestEd}}">{{bestEd}}</a></div>
     </div>
-    <div class="infoboxsection">
+    <div class="infoboxsection" *ngIf="worstPlace">
       <div><b>Worst Result</b></div>
       <div>{{worstPlace}}: <a routerLink="/contest/{{id}}/ed/{{worstEd}}">{{worstEd}}</a></div>
     </div>
