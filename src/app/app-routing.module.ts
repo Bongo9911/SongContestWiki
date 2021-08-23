@@ -12,6 +12,7 @@ const routes: Routes = [
   { path: "", component: StartScreenComponent },
   { path: "contest/:id", component: ContestScreenComponent },
   { path: "contest/:id/ed/:num", component: EditionScreenComponent },
+  { path: "contest/:id/edition/:num", redirectTo: "/contest/:id/ed/:num"},
   { path: "contest/:id/user/:user", component: UserScreenComponent },
   { path: "contest/:id/country/:country", component: CountryScreenComponent },
   { path: "contest/:id/pot-generator", component: PotGeneratorComponent },
@@ -20,7 +21,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes),],
+  imports: [RouterModule.forRoot(routes, { scrollPositionRestoration: 'top'})],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

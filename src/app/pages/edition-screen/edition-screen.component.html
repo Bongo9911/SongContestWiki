@@ -18,7 +18,8 @@
 
     <div class="infoboxheader">Host</div>
     <div class="infoboxsection">
-      <div><b>Host country</b></div>
+      <div *ngIf="edition.hostcountries.length === 1"><b>Host country</b></div>
+      <div *ngIf="edition.hostcountries.length > 1"><b>Host countries</b></div>
       <div>
         <div *ngFor="let country of edition.hostcountries"><img class="flag" src="./assets/flags/{{country}} Flag.png">
           <a routerLink="/contest/{{id}}/country/{{country}}">{{country}}</a>
@@ -26,7 +27,7 @@
       </div>
     </div>
     <div class="infoboxsection">
-      <div><b>Host</b></div>
+      <div><b>Host<ng-container *ngIf="edition.hostusers.length > 1">s</ng-container></b></div>
       <div>
         <div *ngFor="let host of edition.hostusers">
           <a routerLink="/contest/{{id}}/user/{{host}}">{{host}}</a>
@@ -38,6 +39,18 @@
     <div class="infoboxsection">
       <div><b>Number of entries</b></div>
       <div>{{entries}}</div>
+    </div>
+
+    <div class="infoboxheader"><a routerLink="/contest/{{id}}">{{con.name}}</a></div>
+    <div style="display: flex; justify-content: center;">
+      <span *ngIf="preved.length">
+        <a routerLink="/contest/{{id}}/ed/{{preved}}" (click)="updateData(preved)">◄ {{preved}}</a>
+        &nbsp;&nbsp;•&nbsp;&nbsp;
+      </span>
+      <b>{{edition.edition}}</b>
+      <span *ngIf="nexted.length">&nbsp;&nbsp;•&nbsp;&nbsp;
+        <a routerLink="/contest/{{id}}/ed/{{nexted}}" (click)="updateData(nexted)">{{nexted}} ►</a>
+      </span>
     </div>
   </div>
 

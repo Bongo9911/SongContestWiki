@@ -29,6 +29,9 @@ export class EditionScreenComponent implements OnInit {
   num: string;
   entries: number;
 
+  nexted: string = "";
+  preved: string = "";
+
   songs: Song[] = [];
   sfsongs: Song[][] = new Array(3);
   fsongs: Song[] = [];
@@ -45,27 +48,62 @@ export class EditionScreenComponent implements OnInit {
 
   sfptsongs: Song[][] = new Array(3); //for the point tables in scoreboard section
 
-  sortedData: Song[];
+  sortedData: Song[] = [];
 
   constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
       this.id = params.id;
       this.num = params.num;
     });
+    console.log(this.id)
 
-    this.database.firestore.collection('contests').where('id', '==', this.id).get()
-      .then(docs => {
-        docs.forEach((doc) => {
-          this.con = doc.data() as Contest;
-        });
+    this.database.firestore.collection('contests').doc(this.id).get()
+      .then(doc => {
+        this.con = doc.data() as Contest;
       });
+
+    this.updateData(this.num);
+  }
+
+  ngOnInit(): void {
+  }
+
+  async updateData(edition: string) {
+    this.num = edition;
+    this.preved = "";
+    this.nexted = "";
+    this.songs = [];
+    this.sfsongs = new Array(3);
+    this.fsongs = [];
+    this.sfsongtables = new Array(3);
+    this.sbsfsongs = new Array(3);
+    this.sbfsongs = [];
+    this.sfvoters = new Array(3);
+    this.fvoters = [];
+    this.sfcrossvoters = new Array(3);
+    this.sfptsongs = new Array(3);
+    this.sortedData = [];
 
     //gets the info on the edition
     this.database.firestore.collection('contests').doc(this.id)
-      .collection('editions').where('edition', '==', this.num).get().then(docs => {
-        docs.forEach((doc) => {
-          this.edition = doc.data() as Edition;
-        });
+      .collection('editions').doc(this.num).get().then(doc => {
+        this.edition = doc.data() as Edition;
+
+        this.database.firestore.collection('contests').doc(this.id)
+          .collection('editions').where('edval', '==', this.edition.edval + 1).get().then(docs => {
+            if (docs.docs.length) {
+              let data = docs.docs[0].data() as Edition;
+              console.log(data)
+              this.nexted = data.edition
+            }
+          })
+        this.database.firestore.collection('contests').doc(this.id)
+          .collection('editions').where('edval', '==', this.edition.edval - 1).get().then(docs => {
+            if (docs.docs.length) {
+              let data = docs.docs[0].data() as Edition;
+              this.preved = data.edition
+            }
+          })
       });
 
     //get all the songs sent to that edition
@@ -83,7 +121,7 @@ export class EditionScreenComponent implements OnInit {
 
           //I have no idea why, but this makes table sorting work in an ngFor
           this.sfsongtables[i - 1] = {
-            songs: [...this.sfsongs[i-1]],
+            songs: [...this.sfsongs[i - 1]],
           }
 
           //Gets all users who succesfully internally voted in the semi-final
@@ -93,7 +131,7 @@ export class EditionScreenComponent implements OnInit {
             .filter(x => x['sf' + i.toString() + 'pointset'].cv === false)
             .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
 
-          if(this.edition.crossvoting) {
+          if (this.edition.crossvoting) {
             //Gets all users who cross-voted into that semi-final
             this.sfcrossvoters[i - 1] =
               this.songs.filter(x => 'sf' + i.toString() + 'pointset' in x)
@@ -116,7 +154,7 @@ export class EditionScreenComponent implements OnInit {
 
         //Filters out all the users who succesfully voted in the final
         this.fvoters = this.songs.filter(x => 'fpointset' in x).filter(x => x.qualifier !== 'NQ')
-        .sort((a, b) => (a.fro > b.fro) ? 1 : -1).concat(
+          .sort((a, b) => (a.fro > b.fro) ? 1 : -1).concat(
             this.songs.filter(x => 'fpointset' in x).filter(x => x.qualifier === 'NQ')
               .sort((a, b) => (a.country > b.country) ? 1 : -1)
           );
@@ -124,9 +162,6 @@ export class EditionScreenComponent implements OnInit {
         //Copies the final songs array for the scoreboard so it isn't effected by table sorting
         this.sbfsongs = [...this.fsongs];
       });
-  }
-
-  ngOnInit(): void {
   }
 
   //Returns the style for a semi row based on whether the song qualified and if it was disqualified.
@@ -196,7 +231,7 @@ export class EditionScreenComponent implements OnInit {
           docs.forEach(doc => {
             console.log(doc.id);
             this.database.firestore.collection('contests').doc('RSC').collection('songs')
-            .doc(doc.id).delete();
+              .doc(doc.id).delete();
           })
         })
     })
@@ -265,7 +300,7 @@ export class EditionScreenComponent implements OnInit {
 
     this.sortedData = data.sort((a, b) => {
       let isAsc = sort.direction === 'asc';
-      
+
       switch (sort.active) {
         case 'draw':
           if (!isSf) {
