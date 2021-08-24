@@ -240,11 +240,11 @@ export class NewEditionScreenComponent implements OnInit {
   //Returns the styling for rows in the song tables
   getRowStyle(phase: number, dqphase: number, place: number, qualifier?: string) {
     //Grand final styling
+    if (dqphase === phase) {
+      return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
+    }
     if (phase + 1 === this.edition.phases.length) {
-      if (dqphase === phase) {
-        return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
-      }
-      else if (place === 1) {
+      if (place === 1) {
         return { 'background-color': '#ffd700', 'font-weight': 'bold' };
       }
       else if (place === 2) {
@@ -259,10 +259,7 @@ export class NewEditionScreenComponent implements OnInit {
     }
     //All other styling
     else {
-      if (dqphase === phase) {
-        return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
-      }
-      else if (qualifier === 'Q') {
+      if (qualifier === 'Q') {
         return { 'background-color': '#ffdead', 'font-weight': 'bold' };
       }
     }
@@ -339,11 +336,11 @@ export class NewEditionScreenComponent implements OnInit {
 
   //Returns the styling for scoreboards based on qualification and disqualification status
   getPointStyle(song: NewSong, phase: number) {
+    if (song.dqphase === phase) {
+      return { 'background-color': '#cdb8d8' };
+    }
     if (phase + 1 === this.edition.phases.length) {
-      if (song.dqphase === phase) {
-        return { 'background-color': '#cdb8d8' };
-      }
-      else if (song.draws[phase].place === 1) {
+      if (song.draws[phase].place === 1) {
         return { 'background-color': '#ffd700' };
       }
       else if (song.draws[phase].place === 2) {
@@ -355,9 +352,6 @@ export class NewEditionScreenComponent implements OnInit {
     }
     else {
       if (song.draws[phase].qualifier === 'Q') return { 'background-color': '#fbdead' };
-      else if (song.dqphase === phase) {
-        return { 'background-color': '#cdb8d8' };
-      }
       else return {};
     }
   }
