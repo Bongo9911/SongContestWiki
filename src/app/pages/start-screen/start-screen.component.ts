@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Contest } from 'src/app/shared/datatypes';
 
 @Component({
   selector: 'app-start-screen',
@@ -8,8 +10,14 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class StartScreenComponent implements OnInit {
 
-  constructor(private router: Router, private route: ActivatedRoute) { 
-    this.route.params.subscribe(params => console.log(params));
+  contests: Contest[] = [];
+
+  constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) { 
+    this.database.firestore.collection('contests').get().then(docs => {
+      docs.forEach(doc => {
+        this.contests.push(doc.data() as Contest);
+      })
+    })
   }
 
   ngOnInit(): void {

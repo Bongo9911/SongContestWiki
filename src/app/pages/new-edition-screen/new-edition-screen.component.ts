@@ -2,28 +2,39 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
-import { Contest, Edition, Song } from 'src/app/shared/datatypes';
+import { Contest, Edition, NewEdition, NewSong } from 'src/app/shared/datatypes';
 
 @Component({
-  selector: 'app-edition-screen',
-  templateUrl: './edition-screen.component.html',
-  styleUrls: ['./edition-screen.component.css']
+  selector: 'app-new-edition-screen',
+  templateUrl: './new-edition-screen.component.html',
+  styleUrls: ['./new-edition-screen.component.css']
 })
-export class EditionScreenComponent implements OnInit {
+export class NewEditionScreenComponent implements OnInit {
   readonly pointset: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
 
   con: Contest = {
     name: '',
     id: ''
   };
-  edition: Edition = {
-    crossvoting: false,
+  edition: NewEdition = {
     edition: '0',
     edval: 0,
     entries: 0,
     hostcountries: [],
     hostusers: [],
+    phases: [{
+      name: 'Semi-final',
+      plural: 'Semi-finals',
+      cv: true,
+      num: 3
+    }, {
+      name: 'Grand final',
+      plural: 'Grand final',
+      cv: false,
+      num: 1
+    }],
     slogan: '',
+    aqnum: 6,
   };
   id: string;
   num: string;
@@ -32,23 +43,30 @@ export class EditionScreenComponent implements OnInit {
   nexted: string = "";
   preved: string = "";
 
-  songs: Song[] = [];
-  sfsongs: Song[][] = new Array(3);
-  fsongs: Song[] = [];
+  songs: NewSong[] = [];
+
+  sfsongs: NewSong[][] = new Array(3);
+  fsongs: NewSong[] = [];
 
   sfsongtables: any[] = new Array(3);
 
-  sbsfsongs: Song[][] = new Array(3);
-  sbfsongs: Song[] = [];
+  sbsfsongs: NewSong[][] = new Array(3);
+  sbfsongs: NewSong[] = [];
 
-  sfvoters: Song[][] = new Array(3);
-  fvoters: Song[] = [];
+  sfvoters: NewSong[][] = new Array(3);
+  fvoters: NewSong[] = [];
 
-  sfcrossvoters: Song[][] = new Array(3);
+  sfcrossvoters: NewSong[][] = new Array(3);
 
-  sfptsongs: Song[][] = new Array(3); //for the point tables in scoreboard section
+  sfptsongs: NewSong[][] = new Array(3); //for the point tables in scoreboard section
 
-  sortedData: Song[] = [];
+  sortedData: NewSong[] = [];
+
+  songsbyphase: NewSong[][][] = [];
+  votersbyphase: NewSong[][][] = [];
+  crossvotersbyphase: NewSong[][][] = [];
+  sbsongsbyphase: NewSong[][][] = [] //Song arrays for the scoreboards
+  songtablesbyphase: NewSong[][][] = [];
 
   constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
@@ -62,70 +80,21 @@ export class EditionScreenComponent implements OnInit {
         this.con = doc.data() as Contest;
       });
 
-    this.updateData(this.num);
-
-    // this.database.firestore.collection('contests').doc(this.id).collection('songs')
-    //   .where('edition','==','44').get().then(docs => {
+    // this.database.firestore
+    //   .collection('contests').doc(this.id)
+    //   .collection('newsongs').where('edition', '==', this.num).get().then(docs => {
     //     docs.forEach(doc => {
-    //       let data = doc.data() as Song;
-    //       let song: any = {
-    //         artist: data.artist,
-    //         country: data.country,
-    //         disqualified: data.disqualified,
-    //         edition: data.edition,
-    //         edval: data.edval,
-    //         language: data.language,
-    //         song: data.song,
-    //         user: data.user,
-    //         pointsets: [{}],
-    //         draws: [
-    //           {
-    //             num: data.sfnum,
-    //             qualifier: data.qualifier
-    //           }
-    //         ]
+    //       let data = doc.data() as NewSong;
+    //       for (let i = 0; i < data.draws.length; ++i) {
+    //         data.draws[i].num = parseInt(data.draws[i].num.toString())
     //       }
-
-    //       if(data.sfro !== -1) {
-    //         song.draws[0] = {
-    //           ro: data.sfro,
-    //           place: data.sfplace,
-    //           points: data.sfpoints,
-    //           intpoints: data.intpoints,
-    //           extpoints: data.extpoints,
-    //           rawextpoints: data.rawextpoints,
-    //           ...song.draws[0]
-    //         }
-    //       }
-
-    //       if('sf1pointset' in data) {
-    //         song.pointsets[0]['1'] = data.sf1pointset;
-    //       }
-    //       if('sf2pointset' in data) {
-    //         song.pointsets[0]['2'] = data.sf2pointset;
-    //       }
-    //       if('sf3pointset' in data) {
-    //         song.pointsets[0]['3'] = data.sf3pointset;
-    //       }
-    //       if('fpointset' in data) {
-    //         song.pointsets.push(data.fpointset);
-    //         song.pointsets[1].cv = false;
-    //       }
-
-    //       if(data.fro !== -1) {
-    //         song.draws.push({
-    //           ro: data.fro,
-    //           num: 1,
-    //           place: data.fplace,
-    //           points: data.fpoints,
-    //         })
-    //       }
-
-    //       console.log(song)
-
-    //       //this.database.firestore.collection('contests').doc(this.id).collection('newsongs').add(song)
+    //       this.database.firestore
+    //         .collection('contests').doc(this.id)
+    //         .collection('newsongs').doc(doc.id).set(data);
     //     })
     //   })
+
+    this.updateData(this.num);
   }
 
   ngOnInit(): void {
@@ -150,7 +119,7 @@ export class EditionScreenComponent implements OnInit {
     //gets the info on the edition
     this.database.firestore.collection('contests').doc(this.id)
       .collection('editions').doc(this.num).get().then(doc => {
-        this.edition = doc.data() as Edition;
+        this.edition = doc.data() as NewEdition;
 
         this.database.firestore.collection('contests').doc(this.id)
           .collection('editions').where('edval', '==', this.edition.edval + 1).get().then(docs => {
@@ -167,62 +136,90 @@ export class EditionScreenComponent implements OnInit {
               this.preved = data.edition
             }
           })
-      });
 
-    //get all the songs sent to that edition
-    this.database.firestore
-      .collection('contests').doc(this.id)
-      .collection('songs').where('edition', '==', this.num).get().then(docs => {
-        docs.forEach((doc) => {
-          this.songs.push(doc.data() as Song);
-        });
-        //Populates the arrays for each semi-finals respective arrays
-        for (let i = 1; i <= 3; ++i) {
-          //Separates songs into their respective semi-finals
-          this.sfsongs[i - 1] = this.songs.filter(x => x.sfnum == i.toString())
-            .filter(x => x.qualifier !== 'AQ').sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
+        //get all the songs sent to that edition
+        this.database.firestore
+          .collection('contests').doc(this.id)
+          .collection('newsongs').where('edition', '==', this.num).get().then(docs => {
+            docs.forEach((doc) => {
+              this.songs.push(doc.data() as NewSong);
+            });
 
-          //I have no idea why, but this makes table sorting work in an ngFor
-          this.sfsongtables[i - 1] = {
-            songs: [...this.sfsongs[i - 1]],
-          }
+            for (let i = 0; i < this.edition.phases.length; ++i) {
+              this.songsbyphase.push(new Array(this.edition.phases[i].num));
+              this.votersbyphase.push(new Array(this.edition.phases[i].num));
+              this.crossvotersbyphase.push(new Array(this.edition.phases[i].num));
+              this.sbsongsbyphase.push(new Array(this.edition.phases[i].num));
+              this.songtablesbyphase.push(new Array(this.edition.phases[i].num));
+              for (let j = 0; j < this.edition.phases[i].num; ++j) {
+                this.songsbyphase[i][j] = this.songs.filter(x =>
+                  x.draws.length > i && x.draws[i].num === j + 1 && 
+                  (!('qualifier' in x.draws[i]) || x.draws[i].qualifier !== 'AQ')
+                ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1);
+                this.sbsongsbyphase[i][j] = [...this.songsbyphase[i][j]]
+                this.votersbyphase[i][j] = this.songs.filter(x => {
+                  x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
+                    && !x.pointsets[i][(j + 1).toString()].cv;
+                })
+                if (this.edition.phases[i].cv) {
+                  this.crossvotersbyphase[i][j] = this.songs.filter(x => {
+                    x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
+                      && x.pointsets[i][(j + 1).toString()].cv;
+                  })
+                }
+              }
+            }
 
-          //Gets all users who succesfully internally voted in the semi-final
-          this.sfvoters[i - 1] = this.songs.filter(x => x.sfnum == i.toString())
-            .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD' &&
-            'sf' + i.toString() + 'pointset' in x && !x['sf' + i.toString() + 'pointset'].cv)
-            .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
+            console.log(this.songsbyphase);
 
-          if (this.edition.crossvoting) {
-            //Gets all users who cross-voted into that semi-final
-            this.sfcrossvoters[i - 1] =
-              this.songs.filter(x => 'sf' + i.toString() + 'pointset' in x)
-                .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD' &&
-                  x['sf' + i.toString() + 'pointset'].cv)
-                .sort((a, b) => (a.country > b.country) ? 1 : -1);
-          }
+            // //Populates the arrays for each semi-finals respective arrays
+            // for (let i = 1; i <= 3; ++i) {
+            //   //Separates songs into their respective semi-finals
+            //   this.sfsongs[i - 1] = this.songs.filter(x => x.sfnum == i.toString())
+            //     .filter(x => x.qualifier !== 'AQ').sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
 
-          //Separate arrays so that the arrays are not effected by sorting of the song table
-          this.sbsfsongs[i - 1] = [...this.sfsongs[i - 1]];
+            //   //I have no idea why, but this makes table sorting work in an ngFor
+            //   this.sfsongtables[i - 1] = {
+            //     songs: [...this.sfsongs[i - 1]],
+            //   }
 
-          this.sfptsongs[i - 1] = [...this.sfsongs[i - 1]];
-          this.sfptsongs[i - 1].sort((a, b) => (a.sfplace > b.sfplace) ? 1 : -1);
-        }
-        //Counts the number of entries to display in the infobox
-        this.entries = this.songs.length;
+            //   //Gets all users who succesfully internally voted in the semi-final
+            //   this.sfvoters[i - 1] = this.songs.filter(x => x.sfnum == i.toString())
+            //     .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD' &&
+            //     'sf' + i.toString() + 'pointset' in x && !x['sf' + i.toString() + 'pointset'].cv)
+            //     .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
 
-        //Filters out all the songs that qualified for the finals
-        this.fsongs = this.songs.filter(x => x.fro !== -1).sort((a, b) => (a.fro > b.fro) ? 1 : -1);
+            //   if (this.edition.crossvoting) {
+            //     //Gets all users who cross-voted into that semi-final
+            //     this.sfcrossvoters[i - 1] =
+            //       this.songs.filter(x => 'sf' + i.toString() + 'pointset' in x)
+            //         .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD' &&
+            //           x['sf' + i.toString() + 'pointset'].cv)
+            //         .sort((a, b) => (a.country > b.country) ? 1 : -1);
+            //   }
 
-        //Filters out all the users who succesfully voted in the final
-        this.fvoters = this.songs.filter(x => 'fpointset' in x && x.qualifier !== 'NQ')
-          .sort((a, b) => (a.fro > b.fro) ? 1 : -1).concat(
-            this.songs.filter(x => 'fpointset' in x && x.qualifier === 'NQ')
-              .sort((a, b) => (a.country > b.country) ? 1 : -1)
-          );
+            //   //Separate arrays so that the arrays are not effected by sorting of the song table
+            //   this.sbsfsongs[i - 1] = [...this.sfsongs[i - 1]];
 
-        //Copies the final songs array for the scoreboard so it isn't effected by table sorting
-        this.sbfsongs = [...this.fsongs];
+            //   this.sfptsongs[i - 1] = [...this.sfsongs[i - 1]];
+            //   this.sfptsongs[i - 1].sort((a, b) => (a.sfplace > b.sfplace) ? 1 : -1);
+            // }
+            // //Counts the number of entries to display in the infobox
+            // this.entries = this.songs.length;
+
+            // //Filters out all the songs that qualified for the finals
+            // this.fsongs = this.songs.filter(x => x.fro !== -1).sort((a, b) => (a.fro > b.fro) ? 1 : -1);
+
+            // //Filters out all the users who succesfully voted in the final
+            // this.fvoters = this.songs.filter(x => 'fpointset' in x && x.qualifier !== 'NQ')
+            //   .sort((a, b) => (a.fro > b.fro) ? 1 : -1).concat(
+            //     this.songs.filter(x => 'fpointset' in x && x.qualifier === 'NQ')
+            //       .sort((a, b) => (a.country > b.country) ? 1 : -1)
+            //   );
+
+            // //Copies the final songs array for the scoreboard so it isn't effected by table sorting
+            // this.sbfsongs = [...this.fsongs];
+          });
       });
   }
 
@@ -300,7 +297,7 @@ export class EditionScreenComponent implements OnInit {
   }
 
   //Returns the semi-final points given from voter to receiver, returns nothing if no points given.
-  getSFPoints(voter: Song, receiver: string, sfnum: number) {
+  getSFPoints(voter: NewSong, receiver: string, sfnum: number) {
     let index = voter['sf' + (sfnum + 1).toString() + 'pointset'].points.indexOf(receiver);
     if (index != -1) {
       if (index < 8) {
@@ -313,8 +310,8 @@ export class EditionScreenComponent implements OnInit {
   }
 
   //Returns the styling for semi-final scoreboards based on qualification and disqualification status
-  getSFPointStyle(song: Song) {
-    if (song.qualifier === 'Q') return { 'background-color': '#fbdead' };
+  getSFPointStyle(song: NewSong) {
+    if (song.draws[0].qualifier === 'Q') return { 'background-color': '#fbdead' };
     else if (song.disqualified === 'SFDQ' || song.disqualified === 'SFWD') {
       return { 'background-color': '#cdb8d8' };
     }
@@ -322,8 +319,8 @@ export class EditionScreenComponent implements OnInit {
   }
 
   //Returns the final points given from voter to receiver, returns nothing if no points given.
-  getFPoints(voter: Song, receiver: string) {
-    let index = voter.fpointset.points.indexOf(receiver);
+  getFPoints(voter: NewSong, receiver: string) {
+    let index = voter.pointsets[1][1].points.indexOf(receiver);
     if (index != -1) {
       if (index < 8) {
         return (index + 1).toString();
@@ -335,8 +332,8 @@ export class EditionScreenComponent implements OnInit {
   }
 
   //Returns the styling for final scoreboards based on placement and disqualification status
-  getFPointStyle(song: Song) {
-    switch (song.fplace) {
+  getFPointStyle(song: NewSong) {
+    switch (song.draws[1][1].place) {
       case 1:
         return { 'background-color': '#ffd700' }
       case 2:

@@ -2,10 +2,22 @@
 
 <div class="container">
 
-  <span>
-    <a routerLink="/contest/RSC">
-      test
-    </a>
-  </span>
+  <div>
+    <h1>Song Contest Wiki</h1>
+  </div>
 
+  <h2>Contests:</h2>
+
+  <div style="display: flex; justify-content: center; margin-top: 50px;">
+    <div *ngFor="let con of contests" style="width: 30%; border: 1px solid gray;">
+      <a routerLink="contest/{{con.id}}">
+        <img class="logo" src="./assets/contestlogos/{{con.id}}.png" title="{{con.name}}">
+
+        <div style="text-align: center; font-weight: bold; font-size: large; 
+          border-top: 1px solid gray; padding: 3px;">
+          {{con.name}}
+        </div>
+      </a>
+    </div>
+  </div>
 </div>

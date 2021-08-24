@@ -1,0 +1,148 @@
+.container {
+	margin: 0px 30px 0px 30px;
+}
+
+th, td {
+	padding: 3px 7px 3px 7px;
+}
+
+th {
+	background-color: #dadada;
+	text-align: center;
+}
+
+table, th, td {
+	border: 1px solid gray;
+	border-collapse: collapse;
+	/* font-family: "Verdana", "Trebuchet MS"; */
+	font-size: 14px;
+}
+
+table {
+	margin-right: 10px;
+}
+
+.infobox {
+	border: 1px solid gray;
+	background-color: #f5f5f5;
+	padding: 5px 5px 5px 5px
+}
+
+@media (min-width: 500px) {
+	.infobox {
+		float: right;
+		margin-left: 15px;
+		width: 315px;
+	}
+}
+
+@media (max-width: 500px) {
+	.infobox {
+		width: 100%;
+	}
+}
+
+.infoboxheader {
+	background-color: lightblue;
+	text-align: center;
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+.infoboxheader i {
+	font-size: 13px;
+}
+
+.infoboxsection {
+	display: flex;
+	flex-wrap: nowrap;
+}
+
+.infoboxsection>div {
+	min-width: 45%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+.flag {
+	width: 23px;
+	height: auto;
+	border: 1px solid lightgray;
+	margin-right: 3px;
+	vertical-align: bottom;
+}
+
+.smallflag {
+	width: 20px;
+	height: auto;
+	margin: -7px;
+}
+
+.edlogo {
+	width: 100%;
+	height: auto;
+}
+
+h2 {
+	margin-bottom: -8px;
+}
+
+::ng-deep .mat-sort-header-container {
+	display: flex;
+	justify-content: center;
+}
+
+.dqrow {
+	background-color: #dedede;
+	text-align: center;
+}
+
+.pointtable td {
+	font-size: 12px;
+}
+
+.pointtable td:not(:first-of-type) {
+	text-align: center;
+}
+
+tr th div, .vertical {
+	writing-mode: vertical-rl;
+	transform: rotate(180deg);
+	margin: 0px -5px 0px -5px;
+}
+
+.sfpointtable {
+	margin-right: 10px;
+}
+
+.sfpointtable td {
+	font-size: 11px;
+}
+
+.sfpointtable th {
+	font-size: 11px;
+	vertical-align: bottom;
+}
+
+.sfpointtable td:not(:first-of-type) {
+	text-align: center;
+}
+
+.pointtotaltable {
+	margin-bottom: 10px;
+}
+
+/* Show the interal vote table and combined point table side by side if screen is wide enough */
+@media only screen and (min-width: 1300px) {
+	.pointtableflex {
+		display: flex;
+		justify-content: space-between;
+		flex-direction: row-reverse;
+	}
+}
