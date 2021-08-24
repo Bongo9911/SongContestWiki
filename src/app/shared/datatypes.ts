@@ -71,8 +71,9 @@ export interface Phase {
 export interface NewSong {
 	artist: string;
 	country: string;
-	disqualified: string;
 	draws: Draw[];
+	dqphase: number;
+	dqreason: string;
 	edition: string;
 	edval: number;
 	language: string;

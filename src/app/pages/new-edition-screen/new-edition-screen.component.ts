@@ -22,17 +22,7 @@ export class NewEditionScreenComponent implements OnInit {
     entries: 0,
     hostcountries: [],
     hostusers: [],
-    phases: [{
-      name: 'Semi-final',
-      plural: 'Semi-finals',
-      cv: true,
-      num: 3
-    }, {
-      name: 'Grand final',
-      plural: 'Grand final',
-      cv: false,
-      num: 1
-    }],
+    phases: [],
     slogan: '',
     aqnum: 6,
   };
@@ -94,7 +84,22 @@ export class NewEditionScreenComponent implements OnInit {
     //     })
     //   })
 
+    // this.database.firestore.collection('contests').doc(this.id)
+    //    .collection('newsongs').where('edition', '==', this.num).get().then(docs => {
+    //     docs.forEach(doc => {
+    //       let data = doc.data() as any;
+    //       if(data.pointsets.length === 2) {
+    //         data.pointsets[1] = {1: data.pointsets[1]}
+    //         this.database.firestore.collection('contests').doc(this.id)
+    //         .collection('newsongs').doc(doc.id).set(data);
+    //       }
+    //     })
+    //   })
+
     this.updateData(this.num);
+
+    // let str = "English, Korean"
+    // console.log(str.split(/\s*,\s*/))
   }
 
   ngOnInit(): void {
@@ -143,6 +148,7 @@ export class NewEditionScreenComponent implements OnInit {
           .collection('newsongs').where('edition', '==', this.num).get().then(docs => {
             docs.forEach((doc) => {
               this.songs.push(doc.data() as NewSong);
+              this.entries = this.songs.length;
             });
 
             for (let i = 0; i < this.edition.phases.length; ++i) {
@@ -153,24 +159,32 @@ export class NewEditionScreenComponent implements OnInit {
               this.songtablesbyphase.push(new Array(this.edition.phases[i].num));
               for (let j = 0; j < this.edition.phases[i].num; ++j) {
                 this.songsbyphase[i][j] = this.songs.filter(x =>
-                  x.draws.length > i && x.draws[i].num === j + 1 && 
+                  x.draws.length > i && x.draws[i].num === j + 1 &&
                   (!('qualifier' in x.draws[i]) || x.draws[i].qualifier !== 'AQ')
                 ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1);
                 this.sbsongsbyphase[i][j] = [...this.songsbyphase[i][j]]
-                this.votersbyphase[i][j] = this.songs.filter(x => {
+                this.votersbyphase[i][j] = this.songs.filter(x =>
+                  x.draws.length > i && 'ro' in x.draws[i] &&
                   x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
-                    && !x.pointsets[i][(j + 1).toString()].cv;
-                })
-                if (this.edition.phases[i].cv) {
-                  this.crossvotersbyphase[i][j] = this.songs.filter(x => {
+                  && !x.pointsets[i][(j + 1).toString()].cv
+                ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1).concat(
+                  this.songs.filter(x =>
+                    (x.draws.length <= i || !('ro' in x.draws[i])) &&
                     x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
-                      && x.pointsets[i][(j + 1).toString()].cv;
-                  })
+                    && !x.pointsets[i][(j + 1).toString()].cv
+                  ).sort((a, b) => a.country > b.country ? 1 : -1)
+                );
+                if (this.edition.phases[i].cv) {
+                  this.crossvotersbyphase[i][j] = this.songs.filter(x =>
+                    x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
+                    && x.pointsets[i][(j + 1).toString()].cv
+                  )
                 }
               }
             }
 
             console.log(this.songsbyphase);
+            console.log(this.votersbyphase);
 
             // //Populates the arrays for each semi-finals respective arrays
             // for (let i = 1; i <= 3; ++i) {
@@ -223,34 +237,48 @@ export class NewEditionScreenComponent implements OnInit {
       });
   }
 
-  //Returns the style for a semi row based on whether the song qualified and if it was disqualified.
-  getSFStyle(dq: string, qualifier: string): object {
-    switch (dq) {
-      case 'SFDQ':
-      case 'SFWD':
+  //Returns the styling for rows in the song tables
+  getRowStyle(phase: number, dqphase: number, place: number, qualifier?: string) {
+    //Grand final styling
+    if (phase + 1 === this.edition.phases.length) {
+      if (dqphase === phase) {
         return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
-      default:
-        if (qualifier === 'Q') return { 'background-color': '#ffdead', 'font-weight': 'bold' };
-        else return { 'background-color': 'ghostwhite' };
+      }
+      else if (place === 1) {
+        return { 'background-color': '#ffd700', 'font-weight': 'bold' };
+      }
+      else if (place === 2) {
+        return { 'background-color': '#c0c0c0' };
+      }
+      else if (place === 3) {
+        return { 'background-color': '#cc9966' };
+      }
+      else if (place <= this.edition.aqnum) {
+        return { 'background-color': '#bae8ff' };
+      }
     }
+    //All other styling
+    else {
+      if (dqphase === phase) {
+        return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
+      }
+      else if (qualifier === 'Q') {
+        return { 'background-color': '#ffdead', 'font-weight': 'bold' };
+      }
+    }
+
+    return { 'background-color': 'ghostwhite' }; //default return
   }
 
-  //Returns the style for a final row based on the song's placement and disqualification status
-  getFStyle(place: number, dq: string): object {
-    switch (place) {
-      case 1:
-        return { 'background-color': '#ffd700', 'font-weight': 'bold' };
-      case 2:
-        return { 'background-color': '#c0c0c0' };
-      case 3:
-        return { 'background-color': '#cc9966' };
-      case 4:
-      case 5:
-      case 6:
-        return { 'background-color': '#bae8ff' };
-      default:
-        if (dq === 'FWD' || dq == 'FDQ') return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
-        else return { 'background-color': 'ghostwhite' };
+  getDQReason(reason: string) {
+    if (reason === 'DQ') {
+      return 'Disqualified'
+    }
+    else if (reason === 'WD') {
+      return 'Withdrawn'
+    }
+    else {
+      return reason;
     }
   }
 
@@ -297,8 +325,8 @@ export class NewEditionScreenComponent implements OnInit {
   }
 
   //Returns the semi-final points given from voter to receiver, returns nothing if no points given.
-  getSFPoints(voter: NewSong, receiver: string, sfnum: number) {
-    let index = voter['sf' + (sfnum + 1).toString() + 'pointset'].points.indexOf(receiver);
+  getPoints(voter: NewSong, receiver: string, phase: number, num: number) {
+    let index = voter.pointsets[phase][(num + 1).toString()].points.indexOf(receiver);
     if (index != -1) {
       if (index < 8) {
         return (index + 1).toString();
@@ -309,40 +337,28 @@ export class NewEditionScreenComponent implements OnInit {
     }
   }
 
-  //Returns the styling for semi-final scoreboards based on qualification and disqualification status
-  getSFPointStyle(song: NewSong) {
-    if (song.draws[0].qualifier === 'Q') return { 'background-color': '#fbdead' };
-    else if (song.disqualified === 'SFDQ' || song.disqualified === 'SFWD') {
-      return { 'background-color': '#cdb8d8' };
-    }
-    else return {};
-  }
-
-  //Returns the final points given from voter to receiver, returns nothing if no points given.
-  getFPoints(voter: NewSong, receiver: string) {
-    let index = voter.pointsets[1][1].points.indexOf(receiver);
-    if (index != -1) {
-      if (index < 8) {
-        return (index + 1).toString();
+  //Returns the styling for scoreboards based on qualification and disqualification status
+  getPointStyle(song: NewSong, phase: number) {
+    if (phase + 1 === this.edition.phases.length) {
+      if (song.dqphase === phase) {
+        return { 'background-color': '#cdb8d8' };
       }
-      else {
-        return ((index - 8) * 2 + 10).toString();
+      else if (song.draws[phase].place === 1) {
+        return { 'background-color': '#ffd700' };
       }
-    }
-  }
-
-  //Returns the styling for final scoreboards based on placement and disqualification status
-  getFPointStyle(song: NewSong) {
-    switch (song.draws[1][1].place) {
-      case 1:
-        return { 'background-color': '#ffd700' }
-      case 2:
+      else if (song.draws[phase].place === 2) {
         return { 'background-color': '#c0c0c0' };
-      case 3:
+      }
+      else if (song.draws[phase].place === 3) {
         return { 'background-color': '#cc9966' };
-      default:
-        if (song.disqualified != 'N') return { 'background-color': '#cdb8d8' };
-        else return {};
+      }
+    }
+    else {
+      if (song.draws[phase].qualifier === 'Q') return { 'background-color': '#fbdead' };
+      else if (song.dqphase === phase) {
+        return { 'background-color': '#cdb8d8' };
+      }
+      else return {};
     }
   }
 
