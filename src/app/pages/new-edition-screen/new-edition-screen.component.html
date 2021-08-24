@@ -54,8 +54,8 @@
     </div>
   </div>
 
-  <b>{{con.name}} {{num}}</b> is the {{edition.edval}}th edition of
-  <a routerLink="/contest/{{id}}">{{con.name}}</a>.
+  <b>{{con.name}} {{num}}</b> is the <span [innerHTML]="numToRankString(edition.edval)"></span>
+  edition of <a routerLink="/contest/{{id}}">{{con.name}}</a>.
 
   <div *ngFor="let phase of edition.phases; index as p">
     <div class="sectionheader">
@@ -68,7 +68,7 @@
       </h3>
 
       <ng-container *ngIf="songtablesbyphase.length">
-        <table matSort (matSortChange)="sortData($event, i, true)">
+        <table matSort (matSortChange)="sortData($event, p, i)">
           <tr>
             <th mat-sort-header="draw">Draw</th>
             <th mat-sort-header="country">Country</th>
@@ -221,157 +221,9 @@
     </div>
   </ng-container>
 
-  <!-- <ng-container *ngIf="sfsongtables[0].songs">
-
-    <div class="sectionheader">
-      <h2>Scoreboard</h2>
-      <hr />
-    </div>
-
-    <ng-container *ngFor="let sf of sfvoters; index as i">
-      <ng-container *ngIf="sfvoters[i].length">
-        <h3>Semi-final {{i + 1}}</h3>
-
-        <ng-containter *ngIf="edition.crossvoting">
-          <h4>Internal Votes</h4>
-        </ng-containter>
-
-        <div [ngClass]="{'pointtableflex': edition.crossvoting}">
-          <ng-containter *ngIf="edition.crossvoting">
-            <table class="pointtotaltable">
-              <tr>
-                <th colspan="5">Semi-final {{i + 1}}</th>
-              </tr>
-              <tr>
-                <th>Place</th>
-                <th>Country</th>
-                <th>Internal</th>
-                <th>External</th>
-                <th>Total</th>
-              </tr>
-              <ng-container *ngFor="let song of sfptsongs[i]">
-                <tr [ngStyle]="getSFPointStyle(song)" *ngIf="song.sfplace !== -1">
-                  <td>{{song.sfplace}}</td>
-                  <td>
-                    <img class="flag" src="./assets/flags/{{song.country}} Flag.png">
-                    <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a>
-                  </td>
-                  <td>{{song.intpoints}}</td>
-                  <td>{{song.extpoints}}</td>
-                  <td>{{song.sfpoints}}</td>
-                </tr>
-              </ng-container>
-            </table>
-          </ng-containter>
-
-          <table class="sfpointtable">
-            <tr>
-              <th></th>
-              <th *ngFor="let voter of sfvoters[i]">
-                <a routerLink="/contest/{{id}}/country/{{voter.country}}">
-                  <img class="smallflag" src="./assets/flags/{{voter.country}} Flag.png">
-                </a>
-              </th>
-              <th>Total</th>
-              <th>Place</th>
-            </tr>
-            <tr *ngFor="let song of sbsfsongs[i]" [ngStyle]="getSFPointStyle(song)">
-              <td><b>{{song.country}}</b></td>
-              <ng-container *ngFor="let voter of sfvoters[i]">
-                <td [ngStyle]="(voter.country == song.country) ? { 'background-color': '#aaa' } : { }"
-                  [innerHTML]="getSFPoints(voter, song.country, i)"></td>
-              </ng-container>
-              <ng-container *ngIf="song.sfplace != -1; else emptyFScoreboard">
-                <td *ngIf="!edition.crossvoting">{{song.sfpoints}}</td>
-                <td *ngIf="edition.crossvoting">{{song.intpoints}}</td>
-                <td>{{song.sfplace}}</td>
-              </ng-container>
-              <ng-template #emptyFScoreboard>
-                <td></td>
-                <td></td>
-              </ng-template>
-            </tr>
-          </table>
-        </div>
-
-        <br />
-
-        <ng-container *ngIf="edition.crossvoting">
-          <h4>Cross-Votes</h4>
-
-          <table class="sfpointtable">
-            <tr>
-              <th></th>
-              <th *ngFor="let voter of sfcrossvoters[i]">
-                <a routerLink="/contest/{{id}}/country/{{voter.country}}">
-                  <img class="smallflag" src="./assets/flags/{{voter.country}} Flag.png">
-                </a>
-              </th>
-              <th>Raw Total</th>
-              <th>Scaled Total</th>
-              <th>Place</th>
-            </tr>
-            <tr *ngFor="let song of sbsfsongs[i]" [ngStyle]="getSFPointStyle(song)">
-              <td><b>{{song.country}}</b></td>
-              <ng-container *ngFor="let voter of sfcrossvoters[i]">
-                <td [ngStyle]="(voter.country == song.country) ? { 'background-color': '#aaa' } : { }"
-                  [innerHTML]="getSFPoints(voter, song.country, i)"></td>
-              </ng-container>
-              <ng-container *ngIf="song.sfplace != -1; else emptyFScoreboard">
-                <td>{{song.rawextpoints}}</td>
-                <td>{{song.extpoints}}</td>
-                <td>{{song.sfplace}}</td>
-              </ng-container>
-              <ng-template #emptyFScoreboard>
-                <td></td>
-                <td></td>
-                <td></td>
-              </ng-template>
-            </tr>
-          </table>
-        </ng-container>
-      </ng-container>
-    </ng-container>
-
-    <ng-container *ngIf="fvoters.length">
-      <h3>Grand final</h3>
-
-      <div style="max-width: 100%; overflow-x: auto;">
-        <table class="pointtable">
-          <tr>
-            <th></th>
-            <th *ngFor="let voter of fvoters">
-              <a routerLink="/contest/{{id}}/country/{{voter.country}}">
-                <img class="smallflag" src="./assets/flags/{{voter.country}} Flag.png">
-              </a>
-            </th>
-            <th>Total</th>
-            <th>Place</th>
-          </tr>
-          <tr *ngFor="let song of sbfsongs" [ngStyle]="getFPointStyle(song)">
-            <td><b>{{song.country}}</b></td>
-            <ng-container *ngFor="let voter of fvoters">
-              <td [ngStyle]="(voter.country == song.country) ? { 'background-color': '#aaa' } : { }"
-                [innerHTML]="getFPoints(voter, song.country)"></td>
-            </ng-container>
-            <ng-container *ngIf="song.fplace != -1; else emptyFScoreboard">
-              <td>{{song.fpoints}}</td>
-              <td>{{song.fplace}}</td>
-            </ng-container>
-            <ng-template #emptyFScoreboard>
-              <td></td>
-              <td></td>
-            </ng-template>
-          </tr>
-        </table>
-      </div>
-    </ng-container>
-  </ng-container>
-
   <textarea #song></textarea>
 
   <button (click)="uploadSong(song.value)">Click me</button>
-  <button (click)="deleteSongs(song.value)">Delete</button> -->
-
+  <!-- <button (click)="deleteSongs(song.value)">Delete</button> -->
 
 </div>

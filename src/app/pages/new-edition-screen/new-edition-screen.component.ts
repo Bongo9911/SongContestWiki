@@ -167,7 +167,7 @@ export class NewEditionScreenComponent implements OnInit {
                 this.songtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
                 this.sbsongsbyphase[i][j] = [...this.songsbyphase[i][j]]
                 this.pointtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
-                  .sort((a,b) => a.draws[i].place > b.draws[i].place ? 1 : -1)
+                  .sort((a, b) => a.draws[i].place > b.draws[i].place ? 1 : -1)
                 this.votersbyphase[i][j] = this.songs.filter(x =>
                   x.draws.length > i && 'ro' in x.draws[i] &&
                   x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
@@ -190,54 +190,6 @@ export class NewEditionScreenComponent implements OnInit {
 
             console.log(this.songsbyphase);
             console.log(this.votersbyphase);
-
-            // //Populates the arrays for each semi-finals respective arrays
-            // for (let i = 1; i <= 3; ++i) {
-            //   //Separates songs into their respective semi-finals
-            //   this.sfsongs[i - 1] = this.songs.filter(x => x.sfnum == i.toString())
-            //     .filter(x => x.qualifier !== 'AQ').sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
-
-            //   //I have no idea why, but this makes table sorting work in an ngFor
-            //   this.sfsongtables[i - 1] = {
-            //     songs: [...this.sfsongs[i - 1]],
-            //   }
-
-            //   //Gets all users who succesfully internally voted in the semi-final
-            //   this.sfvoters[i - 1] = this.songs.filter(x => x.sfnum == i.toString())
-            //     .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD' &&
-            //     'sf' + i.toString() + 'pointset' in x && !x['sf' + i.toString() + 'pointset'].cv)
-            //     .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
-
-            //   if (this.edition.crossvoting) {
-            //     //Gets all users who cross-voted into that semi-final
-            //     this.sfcrossvoters[i - 1] =
-            //       this.songs.filter(x => 'sf' + i.toString() + 'pointset' in x)
-            //         .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD' &&
-            //           x['sf' + i.toString() + 'pointset'].cv)
-            //         .sort((a, b) => (a.country > b.country) ? 1 : -1);
-            //   }
-
-            //   //Separate arrays so that the arrays are not effected by sorting of the song table
-            //   this.sbsfsongs[i - 1] = [...this.sfsongs[i - 1]];
-
-            //   this.sfptsongs[i - 1] = [...this.sfsongs[i - 1]];
-            //   this.sfptsongs[i - 1].sort((a, b) => (a.sfplace > b.sfplace) ? 1 : -1);
-            // }
-            // //Counts the number of entries to display in the infobox
-            // this.entries = this.songs.length;
-
-            // //Filters out all the songs that qualified for the finals
-            // this.fsongs = this.songs.filter(x => x.fro !== -1).sort((a, b) => (a.fro > b.fro) ? 1 : -1);
-
-            // //Filters out all the users who succesfully voted in the final
-            // this.fvoters = this.songs.filter(x => 'fpointset' in x && x.qualifier !== 'NQ')
-            //   .sort((a, b) => (a.fro > b.fro) ? 1 : -1).concat(
-            //     this.songs.filter(x => 'fpointset' in x && x.qualifier === 'NQ')
-            //       .sort((a, b) => (a.country > b.country) ? 1 : -1)
-            //   );
-
-            // //Copies the final songs array for the scoreboard so it isn't effected by table sorting
-            // this.sbfsongs = [...this.fsongs];
           });
       });
   }
@@ -362,51 +314,62 @@ export class NewEditionScreenComponent implements OnInit {
   }
 
   //Sorts the data in the song list tables
-  sortData(sort: Sort, sfnum: number, isSf: boolean) {
-    let data = [];
+  sortData(sort: Sort, phase: number, num: number) {
+    let data = [...this.songtablesbyphase[phase][num]];
 
-    data = isSf ? [...this.sfsongtables[sfnum].songs] : [...this.fsongs];
+    let sortedData = []
 
     if (!sort.active || sort.direction === '') {
-      this.sortedData = data;
+      // sortedData = data;
       return;
     }
 
-    this.sortedData = data.sort((a, b) => {
+    sortedData = data.sort((a, b) => {
       let isAsc = sort.direction === 'asc';
 
       switch (sort.active) {
         case 'draw':
-          if (!isSf) {
-            return compare(a.fro, b.fro, isAsc);
-          }
-          else {
-            return compare(a.sfro, b.sfro, isAsc);
-          }
+          return compare(a.draws[phase].ro, b.draws[phase].ro, isAsc);
         case 'country': return compare(a.country, b.country, isAsc);
         case 'user': return compare(a.user, b.user, isAsc);
         case 'language': return compare(a.language, b.language, isAsc);
         case 'artist': return compare(a.artist.toLowerCase(), b.artist.toLowerCase(), isAsc);
         case 'song': return compare(a.song.toLowerCase(), b.song.toLowerCase(), isAsc);
         case 'place':
-          if (!isSf) {
-            return compare(a.fplace, b.fplace, isAsc);
-          }
-          else {
-            return compare(a.sfplace, b.sfplace, isAsc);
-          }
+          return compare(a.draws[phase].place, b.draws[phase].place, isAsc);
         case 'points':
-          if (!isSf) {
-            return compare(a.fpoints, b.fpoints, isAsc);
-          }
-          else {
-            return compare(a.sfpoints, b.sfpoints, isAsc);
-          }
+          return compare(a.draws[phase].points, b.draws[phase].points, isAsc);
         default: return 0;
       }
     });
 
-    isSf ? this.sfsongtables[sfnum].songs = this.sortedData : this.fsongs = this.sortedData;
+    this.songtablesbyphase[phase][num] = [...sortedData]
+  }
+
+  //Converts the number to a string in the form of "nth"
+  numToRankString(num: number): string {
+    let place = num.toString();
+    if (place.length === 1 || (place.length >= 2 && place[place.length - 2] !== "1")) {
+      switch (place[place.length - 1]) {
+        case "1":
+          place += "st";
+          break;
+        case "2":
+          place += "nd";
+          break;
+        case "3":
+          place += "rd";
+          break;
+        default:
+          place += "th";
+          break;
+      }
+    }
+    else {
+      place += "th";
+    }
+
+    return place;
   }
 }
 
