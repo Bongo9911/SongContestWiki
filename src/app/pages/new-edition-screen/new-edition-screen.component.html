@@ -54,7 +54,7 @@
     </div>
   </div>
 
-  <b>{{con.name}} {{num}}</b> is the {{edition.edval}}th edition of 
+  <b>{{con.name}} {{num}}</b> is the {{edition.edval}}th edition of
   <a routerLink="/contest/{{id}}">{{con.name}}</a>.
 
   <div *ngFor="let phase of edition.phases; index as p">
@@ -67,7 +67,7 @@
       <h3>{{phase.name}}<ng-container *ngIf="phase.num > 1"> {{i + 1}}</ng-container>
       </h3>
 
-      <ng-container *ngIf="songsbyphase.length">
+      <ng-container *ngIf="songtablesbyphase.length">
         <table matSort (matSortChange)="sortData($event, i, true)">
           <tr>
             <th mat-sort-header="draw">Draw</th>
@@ -79,7 +79,7 @@
             <th mat-sort-header="place">Place</th>
             <th mat-sort-header="points">Points</th>
           </tr>
-          <ng-container *ngFor="let song of songsbyphase[p][i]">
+          <ng-container *ngFor="let song of songtablesbyphase[p][i]">
             <tr [ngStyle]="getRowStyle(p, song.dqphase, song.draws[p].place, song.draws[p].qualifier)">
               <td>{{song.draws[p].ro}}</td>
               <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> <a
@@ -116,38 +116,40 @@
 
   <ng-container *ngFor="let phase of edition.phases; index as p">
     <div *ngFor="let final of votersbyphase[p]; index as f">
-        <h3>{{phase.name}}<ng-container *ngIf="phase.num > 1"> {{f + 1}}</ng-container></h3>
+      <h3>{{phase.name}}<ng-container *ngIf="phase.num > 1"> {{f + 1}}</ng-container>
+      </h3>
 
-        <h4 *ngIf="phase.cv">Internal Votes</h4>
+      <h4 *ngIf="phase.cv">Internal Votes</h4>
 
-        <div [ngClass]="{'pointtableflex': phase.cv}">
-          <!-- <ng-containter *ngIf="phase.cv">
-            <table class="pointtotaltable">
-              <tr>
-                <th colspan="5">Semi-final {{i + 1}}</th>
+      <div [ngClass]="{'pointtableflex': phase.cv}">
+        <ng-containter *ngIf="phase.cv">
+          <table class="pointtotaltable">
+            <tr>
+              <th colspan="5">Semi-final {{f + 1}}</th>
+            </tr>
+            <tr>
+              <th>Place</th>
+              <th>Country</th>
+              <th>Internal</th>
+              <th>External</th>
+              <th>Total</th>
+            </tr>
+            <ng-container *ngFor="let song of pointtablesbyphase[p][f]">
+              <tr [ngStyle]="getPointStyle(song, p)" *ngIf="song.draws[p].place !== -1">
+                <td>{{song.draws[p].place}}</td>
+                <td>
+                  <img class="flag" src="./assets/flags/{{song.country}} Flag.png">
+                  <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a>
+                </td>
+                <td>{{song.draws[p].intpoints}}</td>
+                <td>{{song.draws[p].extpoints}}</td>
+                <td>{{song.draws[p].points}}</td>
               </tr>
-              <tr>
-                <th>Place</th>
-                <th>Country</th>
-                <th>Internal</th>
-                <th>External</th>
-                <th>Total</th>
-              </tr>
-              <ng-container *ngFor="let song of sfptsongs[i]">
-                <tr [ngStyle]="getSFPointStyle(song)" *ngIf="song.sfplace !== -1">
-                  <td>{{song.sfplace}}</td>
-                  <td>
-                    <img class="flag" src="./assets/flags/{{song.country}} Flag.png">
-                    <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a>
-                  </td>
-                  <td>{{song.draws[p].intpoints}}</td>
-                  <td>{{song.draws[p].extpoints}}</td>
-                  <td>{{song.draws[p].points}}</td>
-                </tr>
-              </ng-container>
-            </table>
-          </ng-containter> -->
+            </ng-container>
+          </table>
+        </ng-containter>
 
+        <div style="overflow-x: auto; max-width: 100%;">
           <table class="sfpointtable">
             <tr>
               <th></th>
@@ -177,43 +179,45 @@
             </tr>
           </table>
         </div>
+      </div>
 
-        <br />
+      <br />
 
-        <!-- <ng-container *ngIf="edition.crossvoting">
-          <h4>Cross-Votes</h4>
+      <div *ngIf="phase.cv">
+        <h4>Cross-Votes</h4>
 
-          <table class="sfpointtable">
-            <tr>
-              <th></th>
-              <th *ngFor="let voter of sfcrossvoters[i]">
-                <a routerLink="/contest/{{id}}/country/{{voter.country}}">
-                  <img class="smallflag" src="./assets/flags/{{voter.country}} Flag.png">
-                </a>
-              </th>
-              <th>Raw Total</th>
-              <th>Scaled Total</th>
-              <th>Place</th>
-            </tr>
-            <tr *ngFor="let song of sbsfsongs[i]" [ngStyle]="getSFPointStyle(song)">
-              <td><b>{{song.country}}</b></td>
-              <ng-container *ngFor="let voter of sfcrossvoters[i]">
-                <td [ngStyle]="(voter.country == song.country) ? { 'background-color': '#aaa' } : { }"
-                  [innerHTML]="getSFPoints(voter, song.country, i)"></td>
-              </ng-container>
-              <ng-container *ngIf="song.draws[p].place != -1; else emptyFScoreboard">
-                <td>{{song.draws[p].rawextpoints}}</td>
-                <td>{{song.draws[p].extpoints}}</td>
-                <td>{{song.draws[p].place}}</td>
-              </ng-container>
-              <ng-template #emptyFScoreboard>
-                <td></td>
-                <td></td>
-                <td></td>
-              </ng-template>
-            </tr>
-          </table>
-        </ng-container> -->
+        <table class="sfpointtable">
+          <tr>
+            <th></th>
+            <th *ngFor="let voter of crossvotersbyphase[p][f]">
+              <a routerLink="/contest/{{id}}/country/{{voter.country}}">
+                <img class="smallflag" src="./assets/flags/{{voter.country}} Flag.png">
+              </a>
+            </th>
+            <th>Raw Total</th>
+            <th>Scaled Total</th>
+            <th>Place</th>
+          </tr>
+          <tr *ngFor="let song of songsbyphase[p][f]" [ngStyle]="getPointStyle(song, p)">
+            <td><b>{{song.country}}</b></td>
+            <ng-container *ngFor="let voter of crossvotersbyphase[p][f]">
+              <td [ngStyle]="(voter.country == song.country) ? { 'background-color': '#aaa' } : { }"
+                [innerHTML]="getPoints(voter, song.country, p, f)"></td>
+            </ng-container>
+            <ng-container *ngIf="song.draws[p].place != -1; else emptyFScoreboard">
+              <td>{{song.draws[p].rawextpoints}}</td>
+              <td>{{song.draws[p].extpoints}}</td>
+              <td>{{song.draws[p].place}}</td>
+            </ng-container>
+            <ng-template #emptyFScoreboard>
+              <td></td>
+              <td></td>
+              <td></td>
+            </ng-template>
+          </tr>
+        </table>
+        <br/>
+      </div>
     </div>
   </ng-container>
 

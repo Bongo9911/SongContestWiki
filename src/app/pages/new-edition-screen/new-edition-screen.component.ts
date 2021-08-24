@@ -57,6 +57,7 @@ export class NewEditionScreenComponent implements OnInit {
   crossvotersbyphase: NewSong[][][] = [];
   sbsongsbyphase: NewSong[][][] = [] //Song arrays for the scoreboards
   songtablesbyphase: NewSong[][][] = [];
+  pointtablesbyphase: NewSong[][][] = [];
 
   constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
@@ -157,12 +158,16 @@ export class NewEditionScreenComponent implements OnInit {
               this.crossvotersbyphase.push(new Array(this.edition.phases[i].num));
               this.sbsongsbyphase.push(new Array(this.edition.phases[i].num));
               this.songtablesbyphase.push(new Array(this.edition.phases[i].num));
+              this.pointtablesbyphase.push(new Array(this.edition.phases[i].num));
               for (let j = 0; j < this.edition.phases[i].num; ++j) {
                 this.songsbyphase[i][j] = this.songs.filter(x =>
                   x.draws.length > i && x.draws[i].num === j + 1 &&
                   (!('qualifier' in x.draws[i]) || x.draws[i].qualifier !== 'AQ')
                 ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1);
+                this.songtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
                 this.sbsongsbyphase[i][j] = [...this.songsbyphase[i][j]]
+                this.pointtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
+                  .sort((a,b) => a.draws[i].place > b.draws[i].place ? 1 : -1)
                 this.votersbyphase[i][j] = this.songs.filter(x =>
                   x.draws.length > i && 'ro' in x.draws[i] &&
                   x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
@@ -239,10 +244,10 @@ export class NewEditionScreenComponent implements OnInit {
 
   //Returns the styling for rows in the song tables
   getRowStyle(phase: number, dqphase: number, place: number, qualifier?: string) {
-    //Grand final styling
     if (dqphase === phase) {
       return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
     }
+    //Grand final styling
     if (phase + 1 === this.edition.phases.length) {
       if (place === 1) {
         return { 'background-color': '#ffd700', 'font-weight': 'bold' };
