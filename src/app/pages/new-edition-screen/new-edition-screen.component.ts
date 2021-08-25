@@ -175,6 +175,28 @@ export class NewEditionScreenComponent implements OnInit {
     //     })
     //   })
 
+    //  this.database.firestore.collection('contests').doc(this.id)
+    //   .collection('newsongs').get().then(docs => {
+    //     docs.forEach(doc => {
+    //       let data = doc.data() as NewSong;
+    //       if(data.draws.length == 2 && data.draws[1].qualifier === 'NQ') {
+    //         data.draws[1].qualifier = 'NAQ'
+    //         this.database.firestore.collection('contests').doc(this.id)
+    //           .collection('newsongs').doc(doc.id).set(data);
+    //       }
+    //     })
+    //   })
+
+      //    this.database.firestore.collection('contests').doc(this.id)
+      // .collection('newsongs').get().then(docs => {
+      //   docs.forEach(doc => {
+      //     let data = doc.data() as NewSong;
+      //     data.phases = 2;
+      //       this.database.firestore.collection('contests').doc(this.id)
+      //         .collection('newsongs').doc(doc.id).set(data);
+      //   })
+      // })
+
     this.updateData(this.num);
 
     // let str = "English, Korean"

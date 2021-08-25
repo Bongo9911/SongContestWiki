@@ -78,6 +78,7 @@ export interface NewSong {
 	edition: string;
 	edval: number;
 	language: string;
+	phases: number;
 	pointsets: Pointsets[];
 	song: string;
 	user: string;
@@ -91,7 +92,7 @@ export interface Draw {
 	intpoints?: number;
 	extpoints?: number; //External points (from cross-voting)
 	rawextpoints?: number; // external points without scaling
-	qualifier?: string; //'Q', 'NQ', or 'AQ'
+	qualifier?: string; //'Q', 'NQ', or 'AQ' for SFs, 'FAQ' or 'NAQ' for F
 }
 
 interface Pointset {

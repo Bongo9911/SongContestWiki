@@ -3,7 +3,7 @@ import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
 import { firestore } from 'firebase';
-import { Contest, Song } from 'src/app/shared/datatypes';
+import { Contest, Song, NewSong } from 'src/app/shared/datatypes';
 
 @Component({
   selector: 'app-country-screen',
@@ -13,7 +13,7 @@ import { Contest, Song } from 'src/app/shared/datatypes';
 export class CountryScreenComponent implements OnInit {
 
   readonly pointset: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
-  
+
   con: Contest = {
     name: '',
     id: ''
@@ -21,8 +21,8 @@ export class CountryScreenComponent implements OnInit {
   id: string;
   country: string;
 
-  songs: Song[] = [];
-  sortedData: Song[];
+  songs: NewSong[] = [];
+  sortedData: NewSong[];
 
   numEntries: number = 0;
   numQualifiers: number = 0;
@@ -32,7 +32,9 @@ export class CountryScreenComponent implements OnInit {
   worstPlace: string = "";
   worstEd: string = "";
 
-  songlist: any[] = []
+  songlist: any[] = [];
+
+  phases: number = 2;
 
   constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
@@ -41,49 +43,96 @@ export class CountryScreenComponent implements OnInit {
     });
 
     this.database.firestore.collection('contests').where('id', '==', this.id).get()
-    .then(docs => {
-      docs.forEach((doc) => {
-        this.con = doc.data() as Contest;
+      .then(docs => {
+        docs.forEach((doc) => {
+          this.con = doc.data() as Contest;
+        });
       });
-    });
 
     //get all the songs sent for that country
     this.database.firestore.collection('contests').doc(this.id)
-      .collection('songs').where('country', '==', this.country).get().then(docs => {
+      .collection('newsongs').where('country', '==', this.country).get().then(docs => {
         docs.forEach((doc) => {
-          this.songs.push(doc.data() as Song);
+          this.songs.push(doc.data() as NewSong);
           this.songs = this.songs.sort((a, b) => (a.edval > b.edval) ? 1 : -1);
           this.numEntries = this.songs.length;
           this.numQualifiers = this.songs.filter(function (song) {
-            return song.qualifier !== 'NQ';
+            return song.draws.length === song.phases;
           }).length;
+
+          this.phases = [...this.songs].sort((a,b) => a.phases > b.phases ? 1 : -1)[0].phases
         });
 
-        let songsort = [...this.songs].filter(song => song.fplace !== -1)
-        if (songsort.length) {
-          songsort.sort((a, b) => a.fplace > b.fplace ? 1 : -1)
-          this.bestPlace = this.numToRankString(songsort[0].fplace);
-          this.bestEd = songsort[0].edition;
-        }
-        else {
-          let songsort = [...this.songs].filter(song => song.sfplace !== -1)
-          songsort.sort((a, b) => a.sfplace > b.sfplace ? 1 : -1)
-          this.bestPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
-          this.bestEd = songsort[0].edition;
+        for (let i = 0; i <= 3; ++i) {
+          let songsort = [...this.songs].filter(song => song.draws.length === 2 - i &&
+            'place' in song.draws[2 - i - 1])
+          if (songsort.length) {
+            songsort.sort((a, b) => a.draws[a.phases - i - 1].place > b.draws[b.phases - i - 1].place
+              ? 1 : -1)
+            this.bestPlace = this.numToRankString(songsort[0].draws[songsort[0].phases - i - 1].place);
+            switch (i) {
+              case 1:
+                this.bestPlace += ' (SF)'
+                break;
+              case 2:
+                this.bestPlace += ' (QF)'
+                break;
+              case 3:
+                this.bestPlace += ' (OF)'
+                break;
+            }
+            this.bestEd = songsort[0].edition;
+            break;
+          }
         }
 
-        songsort = [...this.songs].filter(song => song.sfplace !== -1 && song.fplace === -1)
-        if (songsort.length) {
-          songsort.sort((a, b) => a.sfplace < b.sfplace ? 1 : -1)
-          this.worstPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
-          this.worstEd = songsort[0].edition;
+        for (let i = 3; i >= 0; --i) {
+          let songsort = [...this.songs].filter(song => song.draws.length === 2 - i &&
+            'place' in song.draws[2 - i - 1])
+          if (songsort.length) {
+            songsort.sort((a, b) => a.draws[2 - i - 1].place < b.draws[2 - i - 1].place ? 1 : -1)
+            this.worstPlace = this.numToRankString(songsort[0].draws[2 - i - 1].place);
+            switch (i) {
+              case 1:
+                this.worstPlace += ' (SF)'
+                break;
+              case 2:
+                this.worstPlace += ' (QF)'
+                break;
+              case 3:
+                this.worstPlace += ' (OF)'
+                break;
+            }
+            this.worstEd = songsort[0].edition;
+            break;
+          }
         }
-        else {
-          let songsort = [...this.songs].filter(song => song.fplace !== -1)
-          songsort.sort((a, b) => a.fplace < b.fplace ? 1 : -1)
-          this.worstPlace = this.numToRankString(songsort[0].fplace);
-          this.worstEd = songsort[0].edition;
-        }
+
+        // let songsort = [...this.songs].filter(song => song.fplace !== -1)
+        // if (songsort.length) {
+        //   songsort.sort((a, b) => a.fplace > b.fplace ? 1 : -1)
+        //   this.bestPlace = this.numToRankString(songsort[0].fplace);
+        //   this.bestEd = songsort[0].edition;
+        // }
+        // else {
+        //   let songsort = [...this.songs].filter(song => song.sfplace !== -1)
+        //   songsort.sort((a, b) => a.sfplace > b.sfplace ? 1 : -1)
+        //   this.bestPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
+        //   this.bestEd = songsort[0].edition;
+        // }
+
+        // songsort = [...this.songs].filter(song => song.sfplace !== -1 && song.fplace === -1)
+        // if (songsort.length) {
+        //   songsort.sort((a, b) => a.sfplace < b.sfplace ? 1 : -1)
+        //   this.worstPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
+        //   this.worstEd = songsort[0].edition;
+        // }
+        // else {
+        //   let songsort = [...this.songs].filter(song => song.fplace !== -1)
+        //   songsort.sort((a, b) => a.fplace < b.fplace ? 1 : -1)
+        //   this.worstPlace = this.numToRankString(songsort[0].fplace);
+        //   this.worstEd = songsort[0].edition;
+        // }
       });
 
     // this.database.firestore.collection('contests')
@@ -123,22 +172,21 @@ export class CountryScreenComponent implements OnInit {
     return place;
   }
 
-  getStyle(dq: string, q: string, place: number): object {
-    switch (place) {
-      case 1:
-        return { 'background-color': '#ffd700' };
-      case 2:
-        return { 'background-color': '#c0c0c0' };
-      case 3:
-        return { 'background-color': '#cc9966' };
-      case 4:
-      case 5:
-      case 6:
-        return { 'background-color': '#bae8ff' };
-      default:
-        if ((dq === 'FWD' || dq == 'FDQ') && (q !== 'NQ')) return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
-        else return { 'background-color': 'ghostwhite' };
+  getStyle(song: NewSong): object {
+    if(song.dqphase + 1 === song.draws.length) {
+      return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
     }
+    else {
+      if(song.phases === song.draws.length) {
+        if(song.draws[song.phases - 1].place === 1) return { 'background-color': '#ffd700' };
+        else if(song.draws[song.phases - 1].place === 2) return { 'background-color': '#c0c0c0' };
+        else if(song.draws[song.phases - 1].place === 3) return { 'background-color': '#cc9966' };
+        else if(song.draws[song.phases - 1].qualifier === 'FAQ') 
+          return { 'background-color': '#bae8ff' }; //AQ
+      }
+    }
+    //default return
+    return { 'background-color': 'ghostwhite' };
   }
 
   getSFStyle(place: number): object {
@@ -162,28 +210,28 @@ export class CountryScreenComponent implements OnInit {
       return;
     }
 
-    this.sortedData = data.sort((a, b) => {
-      const isAsc = sort.direction === 'asc';
-      switch (sort.active) {
-        case 'draw':
-          if (sf === 'f') {
-            return compare(a.fro, b.fro, isAsc);
-          }
-          else {
-            return compare(a.sfro, b.sfro, isAsc);
-          }
-        case 'edition': return compare(a.edition, b.edition, isAsc);
-        case 'user': return compare(a.user, b.user, isAsc);
-        case 'language': return compare(a.language, b.language, isAsc);
-        case 'artist': return compare(a.artist.toLowerCase(), b.artist.toLowerCase(), isAsc);
-        case 'song': return compare(a.song.toLowerCase(), b.song.toLowerCase(), isAsc);
-        case 'fplace': return compare(a.fplace, b.fplace, isAsc);
-        case 'fpoints': return compare(a.fpoints, b.fpoints, isAsc);
-        case 'sfplace': return compare(a.sfplace, b.sfplace, isAsc);
-        case 'sfpoints': return compare(a.sfpoints, b.sfpoints, isAsc);
-        default: return 0;
-      }
-    });
+    // this.sortedData = data.sort((a, b) => {
+    //   const isAsc = sort.direction === 'asc';
+    //   switch (sort.active) {
+    //     case 'draw':
+    //       if (sf === 'f') {
+    //         return compare(a.fro, b.fro, isAsc);
+    //       }
+    //       else {
+    //         return compare(a.sfro, b.sfro, isAsc);
+    //       }
+    //     case 'edition': return compare(a.edition, b.edition, isAsc);
+    //     case 'user': return compare(a.user, b.user, isAsc);
+    //     case 'language': return compare(a.language, b.language, isAsc);
+    //     case 'artist': return compare(a.artist.toLowerCase(), b.artist.toLowerCase(), isAsc);
+    //     case 'song': return compare(a.song.toLowerCase(), b.song.toLowerCase(), isAsc);
+    //     case 'fplace': return compare(a.fplace, b.fplace, isAsc);
+    //     case 'fpoints': return compare(a.fpoints, b.fpoints, isAsc);
+    //     case 'sfplace': return compare(a.sfplace, b.sfplace, isAsc);
+    //     case 'sfpoints': return compare(a.sfpoints, b.sfpoints, isAsc);
+    //     default: return 0;
+    //   }
+    // });
 
     this.songs = this.sortedData;
   }

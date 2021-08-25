@@ -1,7 +1,7 @@
 <!-- Start Screen html file -->
 
 <div class="container">
-	
+
 	<a routerLink="/contest/{{id}}">&#60; {{con.name}}</a>
 
 	<h1>{{country}}</h1>
@@ -45,33 +45,86 @@
 			<th mat-sort-header="song">Song</th>
 			<th mat-sort-header="fplace">Final</th>
 			<th mat-sort-header="fpoints">Points</th>
-			<th mat-sort-header="sfplace">Semi</th>
-			<th mat-sort-header="sfpoints">Points</th>
+			<th mat-sort-header="sfplace" *ngIf="phases >= 2">Semi</th>
+			<th mat-sort-header="sfpoints" *ngIf="phases >= 2">Points</th>
+			<th mat-sort-header="qfplace" *ngIf="phases >= 3">Qtr</th>
+			<th mat-sort-header="qfpoints" *ngIf="phases >= 3">Points</th>
+			<th mat-sort-header="ofplace" *ngIf="phases >= 4">Octo</th>
+			<th mat-sort-header="ofpoints" *ngIf="phases >= 4">Points</th>
 		</tr>
 		<ng-container *ngFor="let song of songs">
-			<tr [ngStyle]="getStyle(song.disqualified, song.qualifier, song.fplace)">
+			<tr [ngStyle]="getStyle(song)">
 				<td><a routerLink="/contest/{{id}}/ed/{{song.edition}}">{{song.edition}}</a></td>
 				<td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
 				<td>{{song.language}}</td>
 				<td>{{song.artist}}</td>
 				<td>"{{song.song}}"</td>
-				<ng-container *ngIf="song.disqualified == 'N' && song.qualifier !== 'NQ'">
-					<ng-container *ngIf="song.fplace !== -1">
-						<td>{{song.fplace}}</td>
-						<td>{{song.fpoints}}</td>
+
+				<ng-container *ngFor="let num of [].constructor(phases); index as p">
+					<ng-container *ngIf="song.phases >= (p + 1)">
+						<ng-container *ngIf="(song.dqphase === -1 || song.dqphase > (song.phases - p)) 
+							&& song.draws.length >= (song.phases - p) &&
+							song.draws[song.phases - p - 1].qualifier !== 'AQ'">
+							<ng-container *ngIf="song.draws[song.phases - p - 1].place">
+								<td [ngStyle]="p !== 0 ? getSFStyle(song.draws[song.phases - p - 1].place) : {}">
+									{{song.draws[song.phases - p - 1].place}}
+								</td>
+								<td [ngStyle]="p !== 0 ? getSFStyle(song.draws[song.phases - p - 1].place) : {}">
+									{{song.draws[song.phases - p - 1].points}}
+								</td>
+							</ng-container>
+							<ng-container *ngIf="!(song.draws[song.phases - p - 1].place)">
+								<td></td>
+								<td></td>
+							</ng-container>
+						</ng-container>
+						<ng-container *ngIf="song.draws.length > song.dqphase &&
+							song.dqphase !== -1 && p == 0 && song.dqreason === 'DQ'">
+							<td class="dqrow" colspan="2 * (song.phases - song.dqphase)">Disqualified</td>
+						</ng-container>
+						<ng-container *ngIf="song.draws.length > song.dqphase &&
+							song.dqphase !== -1 && p == 0 && song.dqreason === 'WD'">
+							<td class="dqrow" colspan="2 * (song.phases - song.dqphase)">Withdrawn</td>
+						</ng-container>
+						<ng-container *ngIf="song.draws.length >= (song.phases - p) &&
+							song.draws[song.phases - p - 1].qualifier === 'AQ'">
+							<td class="dqrow" colspan="2">Automatic qualifier</td>
+						</ng-container>
+						<ng-container *ngIf="song.draws.length < (song.phases - p) && p == 0">
+							<td class="dqrow" colspan="2 * (p + 1)">Did not qualify</td>
+						</ng-container>
 					</ng-container>
-					<ng-container *ngI Ff="song.fplace === -1">
+					<ng-container *ngIf="song.phases < (p + 1) && p === 1">
+						<td class="dqrow" colspan="2"> No semi-finals</td>
+					</ng-container>
+					<ng-container *ngIf="song.phases < (p + 1) && p === 2">
+						<td class="dqrow" colspan="2"> No quarter-finals</td>
+					</ng-container>
+					<ng-container *ngIf="song.phases < (p + 1) && p === 2">
+						<td class="dqrow" colspan="2"> No octo-finals</td>
+					</ng-container>
+				</ng-container>
+
+
+				<!-- <ng-container *ngIf="song.dqphase === -1 && song.draws.length === song.phases">
+					<ng-container *ngIf="'place' in song.draws[song.phases - 1]">
+						<td>{{song.draws[song.phases - 1].place}}</td>
+						<td>{{song.draws[song.phases - 1].points}}</td>
+					</ng-container>
+					<ng-container *ngIf="song.fplace === -1">
 						<td></td>
 						<td></td>
 					</ng-container>
 				</ng-container>
-				<ng-container *ngIf="song.disqualified == 'FDQ' && (song.qualifier == Q || song.qualifier == AQ)">
+				<ng-container *ngIf="song.dqphase === (song.phases - 1) && song.draws.length === song.phases
+					&& song.dqreason === 'DQ'">
 					<td class="dqrow" colspan="2">Disqualified</td>
 				</ng-container>
-				<ng-container *ngIf="song.disqualified == 'FWD' && (song.qualifier == Q || song.qualifier == AQ)">
+				<ng-container *ngIf="song.dqphase === (song.phases - 1) && song.draws.length === song.phases
+					&& song.dqreason === 'WD'">
 					<td class="dqrow" colspan="2">Withdrawn</td>
 				</ng-container>
-				<ng-container *ngIf="song.qualifier === 'NQ'">
+				<ng-container *ngIf="song.draws.length !== song.phases">
 					<td class="dqrow" colspan="2">Did not qualify</td>
 				</ng-container>
 				<ng-container *ngIf="(song.disqualified == 'N' || song.disqualified == 'FDQ' || 
@@ -93,7 +146,7 @@
 				</ng-container>
 				<ng-container *ngIf="song.qualifier == 'AQ'">
 					<td class="dqrow" colspan="2">Automatic qualifier</td>
-				</ng-container>
+				</ng-container> -->
 			</tr>
 		</ng-container>
 	</table>
