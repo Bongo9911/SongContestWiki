@@ -33,8 +33,6 @@ export class NewEditionScreenComponent implements OnInit {
   nexted: string = "";
   preved: string = "";
 
-  songs: NewSong[] = [];
-
   songsbyphase: NewSong[][][] = [];
   votersbyphase: NewSong[][][] = [];
   crossvotersbyphase: NewSong[][][] = [];
@@ -210,12 +208,11 @@ export class NewEditionScreenComponent implements OnInit {
     this.num = edition;
     this.preved = "";
     this.nexted = "";
-    this.songs = [];
 
     this.songsbyphase = [];
     this.votersbyphase = [];
     this.crossvotersbyphase = [];
-    this.sbsongsbyphase = [] //Song arrays for the scoreboards
+    this.sbsongsbyphase = [];
     this.songtablesbyphase = [];
     this.pointtablesbyphase = [];
 
@@ -244,10 +241,11 @@ export class NewEditionScreenComponent implements OnInit {
         this.database.firestore
           .collection('contests').doc(this.id)
           .collection('newsongs').where('edition', '==', this.num).get().then(docs => {
+            let songs: NewSong[] = []
             docs.forEach((doc) => {
-              this.songs.push(doc.data() as NewSong);
-              this.entries = this.songs.length;
+              songs.push(doc.data() as NewSong);
             });
+            this.entries = songs.length;
 
             for (let i = 0; i < this.edition.phases.length; ++i) {
               this.songsbyphase.push(new Array(this.edition.phases[i].num));
@@ -257,7 +255,7 @@ export class NewEditionScreenComponent implements OnInit {
               this.songtablesbyphase.push(new Array(this.edition.phases[i].num));
               this.pointtablesbyphase.push(new Array(this.edition.phases[i].num));
               for (let j = 0; j < this.edition.phases[i].num; ++j) {
-                this.songsbyphase[i][j] = this.songs.filter(x =>
+                this.songsbyphase[i][j] = songs.filter(x =>
                   x.draws.length > i && x.draws[i].num === j + 1 &&
                   (!('qualifier' in x.draws[i]) || x.draws[i].qualifier !== 'AQ')
                 ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1);
@@ -265,19 +263,19 @@ export class NewEditionScreenComponent implements OnInit {
                 this.sbsongsbyphase[i][j] = [...this.songsbyphase[i][j]]
                 this.pointtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
                   .sort((a, b) => a.draws[i].place > b.draws[i].place ? 1 : -1)
-                this.votersbyphase[i][j] = this.songs.filter(x =>
+                this.votersbyphase[i][j] = songs.filter(x =>
                   x.draws.length > i && 'ro' in x.draws[i] &&
                   x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
                   && !x.pointsets[i][(j + 1).toString()].cv
                 ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1).concat(
-                  this.songs.filter(x =>
+                  songs.filter(x =>
                     (x.draws.length <= i || !('ro' in x.draws[i])) &&
                     x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
                     && !x.pointsets[i][(j + 1).toString()].cv
                   ).sort((a, b) => a.country > b.country ? 1 : -1)
                 );
                 if (this.edition.phases[i].cv) {
-                  this.crossvotersbyphase[i][j] = this.songs.filter(x =>
+                  this.crossvotersbyphase[i][j] = songs.filter(x =>
                     x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
                     && x.pointsets[i][(j + 1).toString()].cv
                   )
