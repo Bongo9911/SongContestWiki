@@ -78,6 +78,9 @@
 								<td></td>
 							</ng-container>
 						</ng-container>
+						<ng-container *ngIf="song.draws.length < (song.phases - p) && p == 0">
+							<td class="dqrow" colspan="2 * (p + 1)">Did not qualify</td>
+						</ng-container>
 						<ng-container *ngIf="song.draws.length > song.dqphase &&
 							song.dqphase !== -1 && p == 0 && song.dqreason === 'DQ'">
 							<td class="dqrow" colspan="2 * (song.phases - song.dqphase)">Disqualified</td>
@@ -89,9 +92,6 @@
 						<ng-container *ngIf="song.draws.length >= (song.phases - p) &&
 							song.draws[song.phases - p - 1].qualifier === 'AQ'">
 							<td class="dqrow" colspan="2">Automatic qualifier</td>
-						</ng-container>
-						<ng-container *ngIf="song.draws.length < (song.phases - p) && p == 0">
-							<td class="dqrow" colspan="2 * (p + 1)">Did not qualify</td>
 						</ng-container>
 					</ng-container>
 					<ng-container *ngIf="song.phases < (p + 1) && p === 1">
