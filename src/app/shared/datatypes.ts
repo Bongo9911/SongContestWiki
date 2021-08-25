@@ -21,6 +21,7 @@ export interface Song {
 	edval: number;
 	extpoints: number;
 	fpointset: {
+		cv: boolean;
 		points: string[];
 	};
 	fplace: number;
@@ -73,7 +74,7 @@ export interface NewSong {
 	country: string;
 	draws: Draw[];
 	dqphase: number;
-	dqreason: string;
+	dqreason?: string;
 	edition: string;
 	edval: number;
 	language: string;
@@ -82,7 +83,7 @@ export interface NewSong {
 	user: string;
 }
 
-interface Draw {
+export interface Draw {
 	ro: number;
 	num?: number; //Which number final they're in (Semi-final 1, Quarter-final 5, etc.)
 	place?: number;
@@ -99,16 +100,16 @@ interface Pointset {
 }
 
 interface Pointsets {
-	1: Pointset;
-	2: Pointset;
-	3: Pointset;
-	4: Pointset;
-	5: Pointset;
-	6: Pointset;
-	7: Pointset;
-	8: Pointset;
-	9: Pointset;
-	10: Pointset;
-	11: Pointset;
-	12: Pointset;
+	1?: Pointset;
+	2?: Pointset;
+	3?: Pointset;
+	4?: Pointset;
+	5?: Pointset;
+	6?: Pointset;
+	7?: Pointset;
+	8?: Pointset;
+	9?: Pointset;
+	10?: Pointset;
+	11?: Pointset;
+	12?: Pointset;
 }
