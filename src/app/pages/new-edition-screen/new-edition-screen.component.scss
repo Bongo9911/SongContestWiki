@@ -1,5 +1,5 @@
 .container {
-	margin: 0px 30px 0px 30px;
+	margin: 0px 2vw;
 }
 
 th, td {
@@ -16,10 +16,6 @@ table, th, td {
 	border-collapse: collapse;
 	/* font-family: "Verdana", "Trebuchet MS"; */
 	font-size: 14px;
-}
-
-table {
-	margin-right: 10px;
 }
 
 .infobox {
@@ -39,6 +35,13 @@ table {
 @media (max-width: 500px) {
 	.infobox {
 		width: 100%;
+	}
+	.infoboxcon {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: row;
+		width: 96vw;
 	}
 }
 
@@ -114,11 +117,10 @@ h2 {
 tr th div, .vertical {
 	writing-mode: vertical-rl;
 	transform: rotate(180deg);
-	margin: 0px -5px 0px -5px;
+	margin: 0px -5px;
 }
 
 .sfpointtable {
-	margin-right: 10px;
 }
 
 .sfpointtable td {
@@ -144,5 +146,8 @@ tr th div, .vertical {
 		display: flex;
 		justify-content: space-between;
 		flex-direction: row-reverse;
+		.pointtotaltable {
+			margin-left: 10px;
+		}
 	}
 }

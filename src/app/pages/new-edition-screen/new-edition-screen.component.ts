@@ -7,7 +7,7 @@ import { Contest, Draw, Edition, NewEdition, NewSong, Song } from 'src/app/share
 @Component({
   selector: 'app-new-edition-screen',
   templateUrl: './new-edition-screen.component.html',
-  styleUrls: ['./new-edition-screen.component.css']
+  styleUrls: ['./new-edition-screen.component.scss']
 })
 export class NewEditionScreenComponent implements OnInit {
   readonly pointset: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
