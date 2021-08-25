@@ -36,7 +36,6 @@ export class NewEditionScreenComponent implements OnInit {
   songsbyphase: NewSong[][][] = [];
   votersbyphase: NewSong[][][] = [];
   crossvotersbyphase: NewSong[][][] = [];
-  sbsongsbyphase: NewSong[][][] = [] //Song arrays for the scoreboards
   songtablesbyphase: NewSong[][][] = [];
   pointtablesbyphase: NewSong[][][] = [];
 
@@ -212,7 +211,6 @@ export class NewEditionScreenComponent implements OnInit {
     this.songsbyphase = [];
     this.votersbyphase = [];
     this.crossvotersbyphase = [];
-    this.sbsongsbyphase = [];
     this.songtablesbyphase = [];
     this.pointtablesbyphase = [];
 
@@ -251,7 +249,6 @@ export class NewEditionScreenComponent implements OnInit {
               this.songsbyphase.push(new Array(this.edition.phases[i].num));
               this.votersbyphase.push(new Array(this.edition.phases[i].num));
               this.crossvotersbyphase.push(new Array(this.edition.phases[i].num));
-              this.sbsongsbyphase.push(new Array(this.edition.phases[i].num));
               this.songtablesbyphase.push(new Array(this.edition.phases[i].num));
               this.pointtablesbyphase.push(new Array(this.edition.phases[i].num));
               for (let j = 0; j < this.edition.phases[i].num; ++j) {
@@ -260,7 +257,6 @@ export class NewEditionScreenComponent implements OnInit {
                   (!('qualifier' in x.draws[i]) || x.draws[i].qualifier !== 'AQ')
                 ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1);
                 this.songtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
-                this.sbsongsbyphase[i][j] = [...this.songsbyphase[i][j]]
                 this.pointtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
                   .sort((a, b) => a.draws[i].place > b.draws[i].place ? 1 : -1)
                 this.votersbyphase[i][j] = songs.filter(x =>
