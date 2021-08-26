@@ -51,6 +51,55 @@
   <div style="border-radius: 6px; border: 1px solid #ffa64d; background-color: #fff9e6; margin: 10px calc(4%/3);">
     <div style="background-color: #ffd9b3; border-radius: 3px; border: 1px solid #ffa64d; margin: 6px;">
       <div style="margin: 6px 5px;">
+        <b>Winners</b>
+      </div>
+    </div>
+
+    <div style="margin: 6px 10px; display: flex; justify-content: center;">
+      <table>
+        <tr>
+          <th>Edition</th>
+          <th>Host</th>
+          <th>Winner</th>
+          <th>User</th>
+          <th>Artist</th>
+          <th>Song</th>
+        </tr>
+        <ng-container *ngFor="let winner of winners; index as i;">
+          <tr>
+            <td style="text-align: center; background-color: #eee;">
+              <a routerLink="/contest/{{con.id}}/ed/{{winner.edition}}">{{winner.edition}}</a>
+            </td>
+            <td>
+              <div style="display: flex; flex-direction: column;">
+                <div *ngFor="let country of winnderEds[i].hostcountries">
+                  <img class="flag" src="./assets/flags/{{country}} Flag.png">
+                  <a routerLink="/contest/{{con.id}}/country/{{country}}">{{country}}</a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <img class="flag" src="./assets/flags/{{winner.country}} Flag.png">
+              <a routerLink="/contest/{{con.id}}/country/{{winner.country}}">{{winner.country}}</a>
+            </td>
+            <td>
+              <a routerLink="/contest/{{con.id}}/user/{{winner.user}}">{{winner.user}}</a>
+            </td>
+            <td>
+              {{winner.artist}}
+            </td>
+            <td>
+              "{{winner.song}}"
+            </td>
+          </tr>
+        </ng-container>
+      </table>
+    </div>
+  </div>
+
+  <div style="border-radius: 6px; border: 1px solid #ffa64d; background-color: #fff9e6; margin: 10px calc(4%/3);">
+    <div style="background-color: #ffd9b3; border-radius: 3px; border: 1px solid #ffa64d; margin: 6px;">
+      <div style="margin: 6px 5px;">
         <b>Logo Gallery</b>
       </div>
     </div>

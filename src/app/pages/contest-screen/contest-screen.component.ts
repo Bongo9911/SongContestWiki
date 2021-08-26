@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
-import { Contest, Edition } from 'src/app/shared/datatypes';
+import { Contest, Edition, Song } from 'src/app/shared/datatypes';
 
 @Component({
   selector: 'app-contest-screen',
@@ -17,6 +17,9 @@ export class ContestScreenComponent implements OnInit {
   };
   eds: Edition[] = [];
   id: string;
+
+  winners: Song[] = [];
+  winnderEds: Edition[] = [];
 
   constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => this.id = params.id);
@@ -35,6 +38,17 @@ export class ContestScreenComponent implements OnInit {
         });
         this.eds.sort((a,b) => a.edval > b.edval ? 1 : -1);
       });
+
+    this.database.firestore.collection('contests').doc(this.id).collection('newsongs')
+      .where('winner', '==', true).get().then(docs => {
+        docs.forEach(doc => {
+          this.winners.push(doc.data() as Song)
+        })
+        this.winners.sort((a,b) => a.edval > b.edval ? 1 : -1);
+        this.winners.forEach(w => {
+          this.winnderEds.push(this.eds.filter(ed => ed.edition == w.edition)[0])
+        })
+      })
   }
 
   ngOnInit(): void {

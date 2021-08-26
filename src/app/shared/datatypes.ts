@@ -72,6 +72,7 @@ export interface Song {
 	pointsets: Pointsets[];
 	song: string;
 	user: string;
+	winner?: boolean;
 }
 
 export interface Draw {
