@@ -62,7 +62,7 @@
 
         <ng-container *ngFor="let num of [].constructor(phases); index as p">
           <ng-container *ngIf="song.phases >= (p + 1)">
-            <ng-container *ngIf="(song.dqphase === -1 || song.dqphase > (song.phases - p)) 
+            <ng-container *ngIf="(song.dqphase === -1 || song.dqphase >= (song.phases - p)) 
 							&& song.draws.length >= (song.phases - p) &&
 							song.draws[song.phases - p - 1].qualifier !== 'AQ'">
               <ng-container *ngIf="song.draws[song.phases - p - 1].place">
