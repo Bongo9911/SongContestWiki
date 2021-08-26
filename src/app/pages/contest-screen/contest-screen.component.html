@@ -77,14 +77,14 @@
                 </td>
                 <td>
                   <div style="display: flex; flex-direction: column;">
-                    <div *ngFor="let country of winnderEds[i].hostcountries">
+                    <div *ngFor="let country of winnerEds[i].hostcountries">
                       <img class="flag" src="./assets/flags/{{country}} Flag.png">
                       <a routerLink="/contest/{{con.id}}/country/{{country}}">{{country}}</a>
                     </div>
                   </div>
                 </td>
                 <td>
-                  <img class="flag" src="./assets/flags/{{winner.country}} Flag.png">
+                  <img class="flag" src="{{winner.flagurl}}">
                   <a routerLink="/contest/{{con.id}}/country/{{winner.country}}">{{winner.country}}</a>
                 </td>
                 <td>

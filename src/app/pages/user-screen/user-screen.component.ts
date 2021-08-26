@@ -109,7 +109,7 @@ export class UserScreenComponent implements OnInit {
       });
 
     this.database.firestore.collection('contests').doc(this.id)
-      .collection('songs').where('edition', '==', '30').get().then(docs => {
+      .collection('newsongs').where('edition', '==', '4').get().then(docs => {
         docs.forEach((doc) => {
           this.songlist.push({ id: doc.id, ...doc.data() });
         });
@@ -321,13 +321,15 @@ export class UserScreenComponent implements OnInit {
       console.log(pointsarray);
 
       this.database.firestore.collection('contests').doc(this.id)
-        .collection('songs').doc(this.songlist.filter(function (song) {
+        .collection('newsongs').doc(this.songlist.filter(function (song) {
           return song.country === parsedString[0][j];
         })[0].id).update({
-          sf3pointset: {
-            cv: true,
-            points: pointsarray,
-          }
+          pointsets: [{
+            1: {
+              cv: false,
+              points: pointsarray,
+            }
+          }]
         })
     }
   }

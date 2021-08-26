@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
-import { Contest, Edition, Song } from 'src/app/shared/datatypes';
+import { Contest, Draw, Edition, Pointsets, Song } from 'src/app/shared/datatypes';
 import { AngularFireStorage } from '@angular/fire/storage'
 
 @Component({
@@ -19,8 +19,8 @@ export class ContestScreenComponent implements OnInit {
   eds: Edition[] = [];
   id: string;
 
-  winners: Song[] = [];
-  winnderEds: Edition[] = [];
+  winners: SongWithUrl[] = [];
+  winnerEds: Edition[] = [];
 
   logos: string[] = []
 
@@ -52,12 +52,20 @@ export class ContestScreenComponent implements OnInit {
 
     this.database.firestore.collection('contests').doc(this.id).collection('newsongs')
       .where('winner', '==', true).get().then(docs => {
-        docs.forEach(doc => {
-          this.winners.push(doc.data() as Song)
-        })
+
+        for(let i = 0; i < docs.docs.length; ++i) {
+          let data = docs.docs[i].data() as Song;
+          this.winners.push({flagurl: "", ...data});
+        }
         this.winners.sort((a, b) => a.edval > b.edval ? 1 : -1);
+        for(let i = 0; i < this.winners.length; ++i) {
+          storage.storage.ref('contests/' + this.id + '/flags/' + this.winners[i].country + ' Flag.png')
+          .getDownloadURL().then(url => {
+            this.winners[i].flagurl = url;
+          })
+        }
         this.winners.forEach(w => {
-          this.winnderEds.push(this.eds.filter(ed => ed.edition == w.edition)[0])
+          this.winnerEds.push(this.eds.filter(ed => ed.edition == w.edition)[0])
         })
       })
   }
@@ -65,4 +73,15 @@ export class ContestScreenComponent implements OnInit {
   ngOnInit(): void {
   }
 
+}
+
+interface SongWithUrl {
+	artist: string;
+	country: string;
+	edition: string;
+	edval: number;
+  flagurl: string; //for the url of the country's flag
+	language: string;
+	song: string;
+	user: string;
 }

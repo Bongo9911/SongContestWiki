@@ -91,7 +91,7 @@ interface Pointset {
 	points: string[]; //Lists the countries the user gave points to (1-8, 10, 12)
 }
 
-interface Pointsets {
+export interface Pointsets {
 	1?: Pointset;
 	2?: Pointset;
 	3?: Pointset;
