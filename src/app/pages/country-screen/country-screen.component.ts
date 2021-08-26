@@ -3,7 +3,7 @@ import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
 import { firestore } from 'firebase';
-import { Contest, Song, NewSong } from 'src/app/shared/datatypes';
+import { Contest, Song, } from 'src/app/shared/datatypes';
 
 @Component({
   selector: 'app-country-screen',
@@ -21,8 +21,8 @@ export class CountryScreenComponent implements OnInit {
   id: string;
   country: string;
 
-  songs: NewSong[] = [];
-  sortedData: NewSong[];
+  songs: Song[] = [];
+  sortedData: Song[];
 
   numEntries: number = 0;
   numQualifiers: number = 0;
@@ -53,7 +53,7 @@ export class CountryScreenComponent implements OnInit {
     this.database.firestore.collection('contests').doc(this.id)
       .collection('newsongs').where('country', '==', this.country).get().then(docs => {
         docs.forEach((doc) => {
-          this.songs.push(doc.data() as NewSong);
+          this.songs.push(doc.data() as Song);
           this.songs = this.songs.sort((a, b) => (a.edval > b.edval) ? 1 : -1);
           this.numEntries = this.songs.length;
           this.numQualifiers = this.songs.filter(function (song) {
@@ -107,32 +107,6 @@ export class CountryScreenComponent implements OnInit {
             break;
           }
         }
-
-        // let songsort = [...this.songs].filter(song => song.fplace !== -1)
-        // if (songsort.length) {
-        //   songsort.sort((a, b) => a.fplace > b.fplace ? 1 : -1)
-        //   this.bestPlace = this.numToRankString(songsort[0].fplace);
-        //   this.bestEd = songsort[0].edition;
-        // }
-        // else {
-        //   let songsort = [...this.songs].filter(song => song.sfplace !== -1)
-        //   songsort.sort((a, b) => a.sfplace > b.sfplace ? 1 : -1)
-        //   this.bestPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
-        //   this.bestEd = songsort[0].edition;
-        // }
-
-        // songsort = [...this.songs].filter(song => song.sfplace !== -1 && song.fplace === -1)
-        // if (songsort.length) {
-        //   songsort.sort((a, b) => a.sfplace < b.sfplace ? 1 : -1)
-        //   this.worstPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
-        //   this.worstEd = songsort[0].edition;
-        // }
-        // else {
-        //   let songsort = [...this.songs].filter(song => song.fplace !== -1)
-        //   songsort.sort((a, b) => a.fplace < b.fplace ? 1 : -1)
-        //   this.worstPlace = this.numToRankString(songsort[0].fplace);
-        //   this.worstEd = songsort[0].edition;
-        // }
       });
 
     // this.database.firestore.collection('contests')
@@ -172,7 +146,7 @@ export class CountryScreenComponent implements OnInit {
     return place;
   }
 
-  getStyle(song: NewSong): object {
+  getStyle(song: Song): object {
     if (song.dqphase + 1 === song.draws.length) {
       return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
     }

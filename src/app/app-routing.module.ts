@@ -7,14 +7,12 @@ import { UserScreenComponent } from './pages/user-screen/user-screen.component';
 import { ReallocatorScreenComponent } from './pages/reallocator-screen/reallocator-screen.component';
 import { CountryScreenComponent } from './pages/country-screen/country-screen.component';
 import { PotGeneratorComponent } from './pages/pot-generator/pot-generator.component';
-import { NewEditionScreenComponent } from './pages/new-edition-screen/new-edition-screen.component';
 
 const routes: Routes = [
   { path: "", component: StartScreenComponent },
   { path: "contest/:id", component: ContestScreenComponent },
   { path: "contest/:id/ed/:num", component: EditionScreenComponent },
   { path: "contest/:id/edition/:num", redirectTo: "/contest/:id/ed/:num"},
-  { path: "contest/:id/newed/:num", component: NewEditionScreenComponent },
   { path: "contest/:id/user/:user", component: UserScreenComponent },
   { path: "contest/:id/country/:country", component: CountryScreenComponent },
   { path: "contest/:id/pot-generator", component: PotGeneratorComponent },

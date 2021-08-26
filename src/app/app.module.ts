@@ -18,7 +18,6 @@ import { UserScreenComponent } from './pages/user-screen/user-screen.component';
 import { ReallocatorScreenComponent } from './pages/reallocator-screen/reallocator-screen.component';
 import { CountryScreenComponent } from './pages/country-screen/country-screen.component';
 import { PotGeneratorComponent } from './pages/pot-generator/pot-generator.component';
-import { NewEditionScreenComponent } from './pages/new-edition-screen/new-edition-screen.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +29,6 @@ import { NewEditionScreenComponent } from './pages/new-edition-screen/new-editio
     ReallocatorScreenComponent,
     CountryScreenComponent,
     PotGeneratorComponent,
-    NewEditionScreenComponent
   ],
   imports: [
     BrowserModule,

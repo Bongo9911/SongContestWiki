@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import * as math from 'mathjs';
-import { Song } from '../../shared/datatypes';
+import { OldSong } from '../../shared/datatypes';
 
 @Component({
   selector: 'app-pot-generator',
@@ -89,7 +89,7 @@ export class PotGeneratorComponent implements OnInit {
             .where('user', '==', filteredUsers[i]).get();
 
           if (docs.docs.length) {
-            let data = docs.docs[0].data() as Song;
+            let data = docs.docs[0].data() as OldSong;
             if (data.fpointset && data.fpointset.points) {
               pointsets[i].push(data.fpointset.points);
             }

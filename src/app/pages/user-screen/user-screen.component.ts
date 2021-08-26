@@ -21,7 +21,6 @@ export class UserScreenComponent implements OnInit {
   user: string;
 
   songs: Song[] = [];
-  sortedData: Song[];
 
   numEntries: number = 0;
   numQualifiers: number = 0;
@@ -31,7 +30,9 @@ export class UserScreenComponent implements OnInit {
   worstPlace: string = "";
   worstEd: string = "";
 
-  songlist: any[] = []
+  songlist: any[] = [];
+
+  phases: number = 2;
 
   constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
@@ -40,47 +41,70 @@ export class UserScreenComponent implements OnInit {
     });
 
     this.database.firestore.collection('contests').where('id', '==', this.id).get()
-    .then(docs => {
-      docs.forEach((doc) => {
-        this.con = doc.data() as Contest;
+      .then(docs => {
+        docs.forEach((doc) => {
+          this.con = doc.data() as Contest;
+        });
       });
-    });
 
     //get all the songs sent for that user
+    //get all the songs sent for that country
     this.database.firestore.collection('contests').doc(this.id)
-      .collection('songs').where('user', '==', this.user).get().then(docs => {
+      .collection('newsongs').where('user', '==', this.user).get().then(docs => {
         docs.forEach((doc) => {
           this.songs.push(doc.data() as Song);
           this.songs = this.songs.sort((a, b) => (a.edval > b.edval) ? 1 : -1);
           this.numEntries = this.songs.length;
           this.numQualifiers = this.songs.filter(function (song) {
-            return song.qualifier !== 'NQ';
+            return song.draws.length === song.phases;
           }).length;
+
+          this.phases = [...this.songs].sort((a, b) => a.phases > b.phases ? 1 : -1)[0].phases
         });
-        let songsort = [...this.songs].filter(song => song.fplace !== -1)
-        if (songsort.length) {
-          songsort.sort((a, b) => a.fplace > b.fplace ? 1 : -1)
-          this.bestPlace = this.numToRankString(songsort[0].fplace);
-          this.bestEd = songsort[0].edition;
-        }
-        else {
-          let songsort = [...this.songs].filter(song => song.sfplace !== -1)
-          songsort.sort((a, b) => a.sfplace > b.sfplace ? 1 : -1)
-          this.bestPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
-          this.bestEd = songsort[0].edition;
+
+        for (let i = 0; i <= 3; ++i) {
+          let songsort = [...this.songs].filter(song => song.draws.length === 2 - i &&
+            'place' in song.draws[2 - i - 1])
+          if (songsort.length) {
+            songsort.sort((a, b) => a.draws[a.phases - i - 1].place > b.draws[b.phases - i - 1].place
+              ? 1 : -1)
+            this.bestPlace = this.numToRankString(songsort[0].draws[songsort[0].phases - i - 1].place);
+            switch (i) {
+              case 1:
+                this.bestPlace += ' (SF)'
+                break;
+              case 2:
+                this.bestPlace += ' (QF)'
+                break;
+              case 3:
+                this.bestPlace += ' (OF)'
+                break;
+            }
+            this.bestEd = songsort[0].edition;
+            break;
+          }
         }
 
-        songsort = [...this.songs].filter(song => song.sfplace !== -1 && song.fplace === -1)
-        if (songsort.length) {
-          songsort.sort((a, b) => a.sfplace < b.sfplace ? 1 : -1)
-          this.worstPlace = this.numToRankString(songsort[0].sfplace) + " (SF)";
-          this.worstEd = songsort[0].edition;
-        }
-        else {
-          let songsort = [...this.songs].filter(song => song.fplace !== -1)
-          songsort.sort((a, b) => a.fplace < b.fplace ? 1 : -1)
-          this.worstPlace = this.numToRankString(songsort[0].fplace);
-          this.worstEd = songsort[0].edition;
+        for (let i = 3; i >= 0; --i) {
+          let songsort = [...this.songs].filter(song => song.draws.length === 2 - i &&
+            'place' in song.draws[2 - i - 1])
+          if (songsort.length) {
+            songsort.sort((a, b) => a.draws[2 - i - 1].place < b.draws[2 - i - 1].place ? 1 : -1)
+            this.worstPlace = this.numToRankString(songsort[0].draws[2 - i - 1].place);
+            switch (i) {
+              case 1:
+                this.worstPlace += ' (SF)'
+                break;
+              case 2:
+                this.worstPlace += ' (QF)'
+                break;
+              case 3:
+                this.worstPlace += ' (OF)'
+                break;
+            }
+            this.worstEd = songsort[0].edition;
+            break;
+          }
         }
       });
 
@@ -90,16 +114,6 @@ export class UserScreenComponent implements OnInit {
           this.songlist.push({ id: doc.id, ...doc.data() });
         });
       });
-
-    // this.database.firestore.collection('contests').doc(this.id)
-    // .collection('songs').where('edition','==','44').where('sfnum','==','3').get().then(docs => {
-    //   docs.forEach(doc => {
-    //     this.database.firestore.collection('contests').doc(this.id)
-    //     .collection('songs').doc(doc.id).update({
-    //       sf2pointset: firebase.firestore.FieldValue.delete()
-    //     })
-    //   })
-    // })
   }
 
   //Converts the number to a string in the form of "nth"
@@ -131,22 +145,21 @@ export class UserScreenComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  getStyle(dq: string, q: string, place: number): object {
-    switch (place) {
-      case 1:
-        return { 'background-color': '#ffd700' };
-      case 2:
-        return { 'background-color': '#c0c0c0' };
-      case 3:
-        return { 'background-color': '#cc9966' };
-      case 4:
-      case 5:
-      case 6:
-        return { 'background-color': '#bae8ff' };
-      default:
-        if ((dq === 'FWD' || dq == 'FDQ') && (q !== 'NQ')) return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
-        else return { 'background-color': 'ghostwhite' };
+  getStyle(song: Song): object {
+    if (song.dqphase + 1 === song.draws.length) {
+      return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
     }
+    else {
+      if (song.phases === song.draws.length) {
+        if (song.draws[song.phases - 1].place === 1) return { 'background-color': '#ffd700' };
+        else if (song.draws[song.phases - 1].place === 2) return { 'background-color': '#c0c0c0' };
+        else if (song.draws[song.phases - 1].place === 3) return { 'background-color': '#cc9966' };
+        else if (song.draws[song.phases - 1].qualifier === 'FAQ')
+          return { 'background-color': '#bae8ff' }; //AQ
+      }
+    }
+    //default return
+    return { 'background-color': 'ghostwhite' };
   }
 
   getSFStyle(place: number): object {
@@ -162,38 +175,53 @@ export class UserScreenComponent implements OnInit {
     }
   }
 
-  sortData(sort: Sort, sf: string) {
+  sortData(sort: Sort) {
     let data = this.songs;
 
     if (!sort.active || sort.direction === '') {
-      this.sortedData = data;
       return;
     }
 
-    this.sortedData = data.sort((a, b) => {
+    let sortedData = data.sort((a, b) => {
       const isAsc = sort.direction === 'asc';
+      let num = 0;
       switch (sort.active) {
-        case 'draw':
-          if (sf === 'f') {
-            return compare(a.fro, b.fro, isAsc);
-          }
-          else {
-            return compare(a.sfro, b.sfro, isAsc);
-          }
         case 'edition': return compare(a.edval, b.edval, isAsc);
         case 'country': return compare(a.country, b.country, isAsc);
         case 'language': return compare(a.language, b.language, isAsc);
         case 'artist': return compare(a.artist.toLowerCase(), b.artist.toLowerCase(), isAsc);
         case 'song': return compare(a.song.toLowerCase(), b.song.toLowerCase(), isAsc);
-        case 'fplace': return compare(a.fplace, b.fplace, isAsc);
-        case 'fpoints': return compare(a.fpoints, b.fpoints, isAsc);
-        case 'sfplace': return compare(a.sfplace, b.sfplace, isAsc);
-        case 'sfpoints': return compare(a.sfpoints, b.sfpoints, isAsc);
+        case 'fplace':
+        case 'sfplace':
+        case 'qfplace':
+        case 'ofplace':
+          if (sort.active == 'sfplace') num = 1;
+          else if (sort.active == 'qfplace') num = 2;
+          else if (sort.active == 'ofplace') num = 3;
+          return compare(a.draws.length >= a.phases - num && a.phases >= (num + 1)
+            && 'place' in a.draws[a.phases - (1 + num)]
+            ? a.draws[a.phases - (1 + num)].place : Number.MAX_VALUE,
+            b.draws.length >= b.phases - num && b.phases >= (num + 1)
+              && 'place' in b.draws[b.phases - (1 + num)] ?
+              b.draws[b.phases - (1 + num)].place : Number.MAX_VALUE, isAsc);
+        case 'fpoints':
+        case 'sfpoints':
+        case 'qfpoints':
+        case 'ofpoints':
+          if (sort.active == 'sfpoints') num = 1;
+          else if (sort.active == 'qfpoints') num = 2;
+          else if (sort.active == 'ofpoints') num = 3;
+          return compare(a.draws.length >= a.phases - num && a.phases >= (num + 1)
+            && 'points' in a.draws[a.phases - (1 + num)]
+            ? a.draws[a.phases - (1 + num)].points : Number.MIN_VALUE,
+            b.draws.length >= b.phases - num && b.phases >= (num + 1)
+              && 'points' in b.draws[b.phases - (1 + num)] ?
+              b.draws[b.phases - (1 + num)].points : Number.MIN_VALUE, isAsc);
         default: return 0;
       }
     });
 
-    this.songs = this.sortedData;
+    this.songs = sortedData;
   }
 
   async uploadPoints(points: string) {

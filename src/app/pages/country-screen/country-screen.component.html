@@ -104,49 +104,6 @@
 						<td class="dqrow" colspan="2"> No octo-finals</td>
 					</ng-container>
 				</ng-container>
-
-
-				<!-- <ng-container *ngIf="song.dqphase === -1 && song.draws.length === song.phases">
-					<ng-container *ngIf="'place' in song.draws[song.phases - 1]">
-						<td>{{song.draws[song.phases - 1].place}}</td>
-						<td>{{song.draws[song.phases - 1].points}}</td>
-					</ng-container>
-					<ng-container *ngIf="song.fplace === -1">
-						<td></td>
-						<td></td>
-					</ng-container>
-				</ng-container>
-				<ng-container *ngIf="song.dqphase === (song.phases - 1) && song.draws.length === song.phases
-					&& song.dqreason === 'DQ'">
-					<td class="dqrow" colspan="2">Disqualified</td>
-				</ng-container>
-				<ng-container *ngIf="song.dqphase === (song.phases - 1) && song.draws.length === song.phases
-					&& song.dqreason === 'WD'">
-					<td class="dqrow" colspan="2">Withdrawn</td>
-				</ng-container>
-				<ng-container *ngIf="song.draws.length !== song.phases">
-					<td class="dqrow" colspan="2">Did not qualify</td>
-				</ng-container>
-				<ng-container *ngIf="(song.disqualified == 'N' || song.disqualified == 'FDQ' || 
-						song.disqualified == 'FWD') && song.qualifier != 'AQ'">
-					<ng-container *ngIf="song.sfplace !== -1">
-						<td [ngStyle]="getSFStyle(song.sfplace)">{{song.sfplace}}</td>
-						<td [ngStyle]="getSFStyle(song.sfplace)">{{song.sfpoints}}</td>
-					</ng-container>
-					<ng-container *ngIf="song.sfplace === -1">
-						<td></td>
-						<td></td>
-					</ng-container>
-				</ng-container>
-				<ng-container *ngIf="song.disqualified == 'SFDQ'">
-					<td class="dqrow" colspan="2">Disqualified</td>
-				</ng-container>
-				<ng-container *ngIf="song.disqualified == 'SFWD'">
-					<td class="dqrow" colspan="2">Withdrawn</td>
-				</ng-container>
-				<ng-container *ngIf="song.qualifier == 'AQ'">
-					<td class="dqrow" colspan="2">Automatic qualifier</td>
-				</ng-container> -->
 			</tr>
 		</ng-container>
 	</table>

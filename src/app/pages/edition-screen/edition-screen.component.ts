@@ -7,7 +7,7 @@ import { Contest, Edition, Song } from 'src/app/shared/datatypes';
 @Component({
   selector: 'app-edition-screen',
   templateUrl: './edition-screen.component.html',
-  styleUrls: ['./edition-screen.component.css']
+  styleUrls: ['./edition-screen.component.scss']
 })
 export class EditionScreenComponent implements OnInit {
   readonly pointset: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
@@ -17,13 +17,14 @@ export class EditionScreenComponent implements OnInit {
     id: ''
   };
   edition: Edition = {
-    crossvoting: false,
     edition: '0',
     edval: 0,
     entries: 0,
     hostcountries: [],
     hostusers: [],
+    phases: [],
     slogan: '',
+    aqnum: 6,
   };
   id: string;
   num: string;
@@ -32,23 +33,11 @@ export class EditionScreenComponent implements OnInit {
   nexted: string = "";
   preved: string = "";
 
-  songs: Song[] = [];
-  sfsongs: Song[][] = new Array(3);
-  fsongs: Song[] = [];
-
-  sfsongtables: any[] = new Array(3);
-
-  sbsfsongs: Song[][] = new Array(3);
-  sbfsongs: Song[] = [];
-
-  sfvoters: Song[][] = new Array(3);
-  fvoters: Song[] = [];
-
-  sfcrossvoters: Song[][] = new Array(3);
-
-  sfptsongs: Song[][] = new Array(3); //for the point tables in scoreboard section
-
-  sortedData: Song[] = [];
+  songsbyphase: Song[][][] = [];
+  votersbyphase: Song[][][] = [];
+  crossvotersbyphase: Song[][][] = [];
+  songtablesbyphase: Song[][][] = [];
+  pointtablesbyphase: Song[][][] = [];
 
   constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
@@ -62,70 +51,161 @@ export class EditionScreenComponent implements OnInit {
         this.con = doc.data() as Contest;
       });
 
-    this.updateData(this.num);
+    // this.database.firestore
+    //   .collection('contests').doc(this.id)
+    //   .collection('newsongs').where('edition', '==', this.num).get().then(docs => {
+    //     docs.forEach(doc => {
+    //       let data = doc.data() as NewSong;
+    //       for (let i = 0; i < data.draws.length; ++i) {
+    //         data.draws[i].num = parseInt(data.draws[i].num.toString())
+    //       }
+    //       this.database.firestore
+    //         .collection('contests').doc(this.id)
+    //         .collection('newsongs').doc(doc.id).set(data);
+    //     })
+    //   })
 
-    // this.database.firestore.collection('contests').doc(this.id).collection('songs')
-    //   .where('edition','==','44').get().then(docs => {
+    // this.database.firestore.collection('contests').doc(this.id)
+    //    .collection('newsongs').where('edition', '==', this.num).get().then(docs => {
+    //     docs.forEach(doc => {
+    //       let data = doc.data() as any;
+    //       if(data.pointsets.length === 2) {
+    //         data.pointsets[1] = {1: data.pointsets[1]}
+    //         this.database.firestore.collection('contests').doc(this.id)
+    //         .collection('newsongs').doc(doc.id).set(data);
+    //       }
+    //     })
+    //   })
+
+    // this.database.firestore.collection('contests').doc(this.id)
+    //   .collection('songs').where('edition', '==', this.num).get().then(docs => {
     //     docs.forEach(doc => {
     //       let data = doc.data() as Song;
-    //       let song: any = {
+    //       let dqphase = -1;
+    //       if (data.disqualified === 'SFDQ' || data.disqualified === 'SFWD') {
+    //         dqphase = 0;
+    //       }
+    //       else if (data.disqualified === 'FDQ' || data.disqualified === 'FWD') {
+    //         dqphase = 1;
+    //       }
+
+    //       let song: NewSong = {
     //         artist: data.artist,
     //         country: data.country,
-    //         disqualified: data.disqualified,
+    //         draws: [],
+    //         dqphase: dqphase,
     //         edition: data.edition,
     //         edval: data.edval,
     //         language: data.language,
+    //         pointsets: [],
     //         song: data.song,
     //         user: data.user,
-    //         pointsets: [{}],
-    //         draws: [
-    //           {
-    //             num: data.sfnum,
-    //             qualifier: data.qualifier
-    //           }
-    //         ]
+    //       };
+
+
+
+    //       if (data.disqualified === 'SFDQ' || data.disqualified === 'FDQ') {
+    //         song.dqreason = 'DQ';
+    //       }
+    //       else if (data.disqualified === 'SFWD' || data.disqualified === 'FWD') {
+    //         song.dqreason = 'WD';
     //       }
 
-    //       if(data.sfro !== -1) {
-    //         song.draws[0] = {
-    //           ro: data.sfro,
-    //           place: data.sfplace,
-    //           points: data.sfpoints,
-    //           intpoints: data.intpoints,
-    //           extpoints: data.extpoints,
-    //           rawextpoints: data.rawextpoints,
-    //           ...song.draws[0]
+    //       let sfdraw: Draw = {
+    //         num: parseInt(data.sfnum),
+    //         qualifier: data.qualifier,
+    //         ro: data.sfro,
+    //       }
+    //       if (data.sfplace !== -1) {
+    //         sfdraw.place = data.sfplace;
+    //         sfdraw.points = data.sfpoints;
+    //         if ('extpoints' in data) {
+    //           sfdraw.extpoints = data.extpoints;
+    //           sfdraw.intpoints = data.intpoints;
+    //           sfdraw.rawextpoints = data.rawextpoints
+    //         }
+    //       }
+    //       // song.draws.push(sfdraw);
+    //       // if(data.qualifier == 'AQ') {
+    //       //   song.draws.push({
+    //       //     ro: 0,
+    //       //     num: 1
+    //       //   })
+    //       // }
+    //       if (data.fro !== -1) {
+    //         let fdraw: Draw = {
+    //           num: 1,
+    //           ro: data.fro,
+    //           qualifier: (data.fplace !== -1 && data.fplace <= 6) ? 'FAQ' : 'NQ'
+    //         }
+    //         if (data.fplace !== -1) {
+    //           fdraw.points = data.fpoints;
+    //           fdraw.place = data.fplace;
+    //         }
+    //         song.draws.push(fdraw);
+    //       }
+
+    //       if (song.dqphase !== 0) {
+    //         song.pointsets.push({})
+    //         for (let i = 0; i < 3; ++i) {
+    //           if ('sf' + (i + 1).toString() + 'pointset' in data) {
+    //             song.pointsets[0][i + 1] = data['sf' + (i + 1).toString() + 'pointset']
+    //           }
+    //         }
+    //         if (song.dqphase !== 1) {
+    //           song.pointsets.push({})
+    //           song.pointsets[1][1] = data.fpointset;
     //         }
     //       }
 
-    //       if('sf1pointset' in data) {
-    //         song.pointsets[0]['1'] = data.sf1pointset;
-    //       }
-    //       if('sf2pointset' in data) {
-    //         song.pointsets[0]['2'] = data.sf2pointset;
-    //       }
-    //       if('sf3pointset' in data) {
-    //         song.pointsets[0]['3'] = data.sf3pointset;
-    //       }
-    //       if('fpointset' in data) {
-    //         song.pointsets.push(data.fpointset);
-    //         song.pointsets[1].cv = false;
-    //       }
-
-    //       if(data.fro !== -1) {
-    //         song.draws.push({
-    //           ro: data.fro,
-    //           num: 1,
-    //           place: data.fplace,
-    //           points: data.fpoints,
-    //         })
-    //       }
-
-    //       console.log(song)
-
-    //       //this.database.firestore.collection('contests').doc(this.id).collection('newsongs').add(song)
+    //       this.database.firestore.collection('contests').doc(this.id)
+    //         .collection('newsongs').add(song);
+    //       console.log(song);
     //     })
     //   })
+
+    // this.database.firestore.collection('contests').doc(this.id)
+    //   .collection('newsongs').where('edition', '==', '45').get().then(docs => {
+    //     docs.forEach(doc => {
+    //       this.database.firestore.collection('contests').doc(this.id)
+    //   .collection('newsongs').doc(doc.id).delete();
+    //     })
+    //   })
+
+    //  this.database.firestore.collection('contests').doc(this.id)
+    //   .collection('newsongs').get().then(docs => {
+    //     docs.forEach(doc => {
+    //       let data = doc.data() as NewSong;
+    //       if(data.draws.length == 2 && data.draws[1].qualifier === 'NQ') {
+    //         data.draws[1].qualifier = 'NAQ'
+    //         this.database.firestore.collection('contests').doc(this.id)
+    //           .collection('newsongs').doc(doc.id).set(data);
+    //       }
+    //     })
+    //   })
+
+    //    this.database.firestore.collection('contests').doc(this.id)
+    // .collection('newsongs').get().then(docs => {
+    //   docs.forEach(doc => {
+    //     let data = doc.data() as NewSong;
+    //     data.phases = 2;
+    //       this.database.firestore.collection('contests').doc(this.id)
+    //         .collection('newsongs').doc(doc.id).set(data);
+    //   })
+    // })
+
+  //  this.database.firestore.collection('contests').doc(this.id)
+  //   .collection('newsongs').where('edition', '==', '4').get().then(docs => {
+  //     docs.forEach(doc => {
+  //       this.database.firestore.collection('contests').doc(this.id)
+  //   .collection('newsongs').doc(doc.id).delete();
+  //     })
+  //   })
+
+    this.updateData(this.num);
+
+    // let str = "English, Korean"
+    // console.log(str.split(/\s*,\s*/))
   }
 
   ngOnInit(): void {
@@ -135,17 +215,12 @@ export class EditionScreenComponent implements OnInit {
     this.num = edition;
     this.preved = "";
     this.nexted = "";
-    this.songs = [];
-    this.sfsongs = new Array(3);
-    this.fsongs = [];
-    this.sfsongtables = new Array(3);
-    this.sbsfsongs = new Array(3);
-    this.sbfsongs = [];
-    this.sfvoters = new Array(3);
-    this.fvoters = [];
-    this.sfcrossvoters = new Array(3);
-    this.sfptsongs = new Array(3);
-    this.sortedData = [];
+
+    this.songsbyphase = [];
+    this.votersbyphase = [];
+    this.crossvotersbyphase = [];
+    this.songtablesbyphase = [];
+    this.pointtablesbyphase = [];
 
     //gets the info on the edition
     this.database.firestore.collection('contests').doc(this.id)
@@ -167,93 +242,97 @@ export class EditionScreenComponent implements OnInit {
               this.preved = data.edition
             }
           })
-      });
 
-    //get all the songs sent to that edition
-    this.database.firestore
-      .collection('contests').doc(this.id)
-      .collection('songs').where('edition', '==', this.num).get().then(docs => {
-        docs.forEach((doc) => {
-          this.songs.push(doc.data() as Song);
-        });
-        //Populates the arrays for each semi-finals respective arrays
-        for (let i = 1; i <= 3; ++i) {
-          //Separates songs into their respective semi-finals
-          this.sfsongs[i - 1] = this.songs.filter(x => x.sfnum == i.toString())
-            .filter(x => x.qualifier !== 'AQ').sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
+        //get all the songs sent to that edition
+        this.database.firestore
+          .collection('contests').doc(this.id)
+          .collection('newsongs').where('edition', '==', this.num).get().then(docs => {
+            let songs: Song[] = []
+            docs.forEach((doc) => {
+              songs.push(doc.data() as Song);
+            });
+            this.entries = songs.length;
 
-          //I have no idea why, but this makes table sorting work in an ngFor
-          this.sfsongtables[i - 1] = {
-            songs: [...this.sfsongs[i - 1]],
-          }
+            for (let i = 0; i < this.edition.phases.length; ++i) {
+              this.songsbyphase.push(new Array(this.edition.phases[i].num));
+              this.votersbyphase.push(new Array(this.edition.phases[i].num));
+              this.crossvotersbyphase.push(new Array(this.edition.phases[i].num));
+              this.songtablesbyphase.push(new Array(this.edition.phases[i].num));
+              this.pointtablesbyphase.push(new Array(this.edition.phases[i].num));
+              for (let j = 0; j < this.edition.phases[i].num; ++j) {
+                this.songsbyphase[i][j] = songs.filter(x =>
+                  x.draws.length > i && 
+                  (x.draws[i].num === j + 1 || (!('num' in x.draws[i]) && j === 0)) &&
+                  (!('qualifier' in x.draws[i]) || x.draws[i].qualifier !== 'AQ')
+                ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1);
+                this.songtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
+                this.pointtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
+                  .sort((a, b) => a.draws[i].place > b.draws[i].place ? 1 : -1)
+                this.votersbyphase[i][j] = songs.filter(x =>
+                  x.draws.length > i && 'ro' in x.draws[i] &&
+                  x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
+                  && !x.pointsets[i][(j + 1).toString()].cv
+                ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1).concat(
+                  songs.filter(x =>
+                    (x.draws.length <= i || !('ro' in x.draws[i])) &&
+                    x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
+                    && !x.pointsets[i][(j + 1).toString()].cv
+                  ).sort((a, b) => a.country > b.country ? 1 : -1)
+                );
+                if (this.edition.phases[i].cv) {
+                  this.crossvotersbyphase[i][j] = songs.filter(x =>
+                    x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
+                    && x.pointsets[i][(j + 1).toString()].cv
+                  )
+                }
+              }
+            }
 
-          //Gets all users who succesfully internally voted in the semi-final
-          this.sfvoters[i - 1] = this.songs.filter(x => x.sfnum == i.toString())
-            .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD' &&
-            'sf' + i.toString() + 'pointset' in x && !x['sf' + i.toString() + 'pointset'].cv)
-            .sort((a, b) => (a.sfro > b.sfro) ? 1 : -1);
-
-          if (this.edition.crossvoting) {
-            //Gets all users who cross-voted into that semi-final
-            this.sfcrossvoters[i - 1] =
-              this.songs.filter(x => 'sf' + i.toString() + 'pointset' in x)
-                .filter(x => x.disqualified !== 'SFDQ' && x.disqualified !== 'SFWD' &&
-                  x['sf' + i.toString() + 'pointset'].cv)
-                .sort((a, b) => (a.country > b.country) ? 1 : -1);
-          }
-
-          //Separate arrays so that the arrays are not effected by sorting of the song table
-          this.sbsfsongs[i - 1] = [...this.sfsongs[i - 1]];
-
-          this.sfptsongs[i - 1] = [...this.sfsongs[i - 1]];
-          this.sfptsongs[i - 1].sort((a, b) => (a.sfplace > b.sfplace) ? 1 : -1);
-        }
-        //Counts the number of entries to display in the infobox
-        this.entries = this.songs.length;
-
-        //Filters out all the songs that qualified for the finals
-        this.fsongs = this.songs.filter(x => x.fro !== -1).sort((a, b) => (a.fro > b.fro) ? 1 : -1);
-
-        //Filters out all the users who succesfully voted in the final
-        this.fvoters = this.songs.filter(x => 'fpointset' in x && x.qualifier !== 'NQ')
-          .sort((a, b) => (a.fro > b.fro) ? 1 : -1).concat(
-            this.songs.filter(x => 'fpointset' in x && x.qualifier === 'NQ')
-              .sort((a, b) => (a.country > b.country) ? 1 : -1)
-          );
-
-        //Copies the final songs array for the scoreboard so it isn't effected by table sorting
-        this.sbfsongs = [...this.fsongs];
+            console.log(this.songsbyphase);
+            console.log(this.votersbyphase);
+          });
       });
   }
 
-  //Returns the style for a semi row based on whether the song qualified and if it was disqualified.
-  getSFStyle(dq: string, qualifier: string): object {
-    switch (dq) {
-      case 'SFDQ':
-      case 'SFWD':
-        return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
-      default:
-        if (qualifier === 'Q') return { 'background-color': '#ffdead', 'font-weight': 'bold' };
-        else return { 'background-color': 'ghostwhite' };
+  //Returns the styling for rows in the song tables
+  getRowStyle(phase: number, dqphase: number, place: number, qualifier?: string) {
+    if (dqphase === phase) {
+      return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
     }
+    //Grand final styling
+    if (phase + 1 === this.edition.phases.length) {
+      if (place === 1) {
+        return { 'background-color': '#ffd700', 'font-weight': 'bold' };
+      }
+      else if (place === 2) {
+        return { 'background-color': '#c0c0c0' };
+      }
+      else if (place === 3) {
+        return { 'background-color': '#cc9966' };
+      }
+      else if (qualifier === 'FAQ') {
+        return { 'background-color': '#bae8ff' };
+      }
+    }
+    //All other styling
+    else {
+      if (qualifier === 'Q') {
+        return { 'background-color': '#ffdead', 'font-weight': 'bold' };
+      }
+    }
+
+    return { 'background-color': 'ghostwhite' }; //default return
   }
 
-  //Returns the style for a final row based on the song's placement and disqualification status
-  getFStyle(place: number, dq: string): object {
-    switch (place) {
-      case 1:
-        return { 'background-color': '#ffd700', 'font-weight': 'bold' };
-      case 2:
-        return { 'background-color': '#c0c0c0' };
-      case 3:
-        return { 'background-color': '#cc9966' };
-      case 4:
-      case 5:
-      case 6:
-        return { 'background-color': '#bae8ff' };
-      default:
-        if (dq === 'FWD' || dq == 'FDQ') return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
-        else return { 'background-color': 'ghostwhite' };
+  getDQReason(reason: string) {
+    if (reason === 'DQ') {
+      return 'Disqualified'
+    }
+    else if (reason === 'WD') {
+      return 'Withdrawn'
+    }
+    else {
+      return reason;
     }
   }
 
@@ -285,6 +364,36 @@ export class EditionScreenComponent implements OnInit {
     })
   }
 
+  uploadSongNew(song: string): void {
+    console.log(song);
+    const parsedString = song.split('\n').map((line) => line.split('\t'))
+    console.log(parsedString);
+    parsedString.forEach(song => {
+      let songObj: Song = {
+        edition: song[0],
+        edval: parseInt(song[0]) + Math.floor((parseInt(song[0]) - 1) / 10),
+        dqphase: parseInt(song[1]),
+        user: song[3],
+        country: song[4],
+        language: song[5],
+        artist: song[6],
+        song: song[7],
+        draws: [
+          {
+            ro: parseInt(song[8]),
+            place: parseInt(song[9]),
+            points: parseInt(song[10]),
+            qualifier: parseInt(song[9]) <= 6 ? 'FAQ' : 'NAQ'
+          }
+        ],
+        pointsets: [],
+        phases: 1
+      }
+      this.database.firestore
+        .collection('contests').doc(this.id).collection('newsongs').add(songObj)
+    })
+  }
+
   deleteSongs(song: string) {
     const parsedString = song.split('\n');
     parsedString.forEach(s => {
@@ -300,8 +409,8 @@ export class EditionScreenComponent implements OnInit {
   }
 
   //Returns the semi-final points given from voter to receiver, returns nothing if no points given.
-  getSFPoints(voter: Song, receiver: string, sfnum: number) {
-    let index = voter['sf' + (sfnum + 1).toString() + 'pointset'].points.indexOf(receiver);
+  getPoints(voter: Song, receiver: string, phase: number, num: number) {
+    let index = voter.pointsets[phase][(num + 1).toString()].points.indexOf(receiver);
     if (index != -1) {
       if (index < 8) {
         return (index + 1).toString();
@@ -312,89 +421,85 @@ export class EditionScreenComponent implements OnInit {
     }
   }
 
-  //Returns the styling for semi-final scoreboards based on qualification and disqualification status
-  getSFPointStyle(song: Song) {
-    if (song.qualifier === 'Q') return { 'background-color': '#fbdead' };
-    else if (song.disqualified === 'SFDQ' || song.disqualified === 'SFWD') {
+  //Returns the styling for scoreboards based on qualification and disqualification status
+  getPointStyle(song: Song, phase: number) {
+    if (song.dqphase === phase) {
       return { 'background-color': '#cdb8d8' };
     }
-    else return {};
-  }
-
-  //Returns the final points given from voter to receiver, returns nothing if no points given.
-  getFPoints(voter: Song, receiver: string) {
-    let index = voter.fpointset.points.indexOf(receiver);
-    if (index != -1) {
-      if (index < 8) {
-        return (index + 1).toString();
+    if (phase + 1 === this.edition.phases.length) {
+      if (song.draws[phase].place === 1) {
+        return { 'background-color': '#ffd700' };
       }
-      else {
-        return ((index - 8) * 2 + 10).toString();
+      else if (song.draws[phase].place === 2) {
+        return { 'background-color': '#c0c0c0' };
+      }
+      else if (song.draws[phase].place === 3) {
+        return { 'background-color': '#cc9966' };
       }
     }
-  }
-
-  //Returns the styling for final scoreboards based on placement and disqualification status
-  getFPointStyle(song: Song) {
-    switch (song.fplace) {
-      case 1:
-        return { 'background-color': '#ffd700' }
-      case 2:
-        return { 'background-color': '#c0c0c0' };
-      case 3:
-        return { 'background-color': '#cc9966' };
-      default:
-        if (song.disqualified != 'N') return { 'background-color': '#cdb8d8' };
-        else return {};
+    else {
+      if (song.draws[phase].qualifier === 'Q') return { 'background-color': '#fbdead' };
+      else return {};
     }
   }
 
   //Sorts the data in the song list tables
-  sortData(sort: Sort, sfnum: number, isSf: boolean) {
-    let data = [];
+  sortData(sort: Sort, phase: number, num: number) {
+    let data = [...this.songtablesbyphase[phase][num]];
 
-    data = isSf ? [...this.sfsongtables[sfnum].songs] : [...this.fsongs];
+    let sortedData = []
 
     if (!sort.active || sort.direction === '') {
-      this.sortedData = data;
+      // sortedData = data;
       return;
     }
 
-    this.sortedData = data.sort((a, b) => {
+    sortedData = data.sort((a, b) => {
       let isAsc = sort.direction === 'asc';
 
       switch (sort.active) {
         case 'draw':
-          if (!isSf) {
-            return compare(a.fro, b.fro, isAsc);
-          }
-          else {
-            return compare(a.sfro, b.sfro, isAsc);
-          }
+          return compare(a.draws[phase].ro, b.draws[phase].ro, isAsc);
         case 'country': return compare(a.country, b.country, isAsc);
         case 'user': return compare(a.user, b.user, isAsc);
         case 'language': return compare(a.language, b.language, isAsc);
         case 'artist': return compare(a.artist.toLowerCase(), b.artist.toLowerCase(), isAsc);
         case 'song': return compare(a.song.toLowerCase(), b.song.toLowerCase(), isAsc);
         case 'place':
-          if (!isSf) {
-            return compare(a.fplace, b.fplace, isAsc);
-          }
-          else {
-            return compare(a.sfplace, b.sfplace, isAsc);
-          }
+          return compare(a.draws[phase].place, b.draws[phase].place, isAsc);
         case 'points':
-          if (!isSf) {
-            return compare(a.fpoints, b.fpoints, isAsc);
-          }
-          else {
-            return compare(a.sfpoints, b.sfpoints, isAsc);
-          }
+          return compare(a.draws[phase].points, b.draws[phase].points, isAsc);
         default: return 0;
       }
     });
 
-    isSf ? this.sfsongtables[sfnum].songs = this.sortedData : this.fsongs = this.sortedData;
+    this.songtablesbyphase[phase][num] = [...sortedData]
+  }
+
+  //Converts the number to a string in the form of "nth"
+  numToRankString(num: number): string {
+    let place = num.toString();
+    if (place.length === 1 || (place.length >= 2 && place[place.length - 2] !== "1")) {
+      switch (place[place.length - 1]) {
+        case "1":
+          place += "st";
+          break;
+        case "2":
+          place += "nd";
+          break;
+        case "3":
+          place += "rd";
+          break;
+        default:
+          place += "th";
+          break;
+      }
+    }
+    else {
+      place += "th";
+    }
+
+    return place;
   }
 }
 

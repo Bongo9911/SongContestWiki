@@ -4,16 +4,17 @@ export interface Contest {
 }
 
 export interface Edition {
-	crossvoting: boolean;
 	edition: string;
 	edval: number;
 	entries: number;
     hostcountries: string[];
 	hostusers: string[];
+	phases: Phase[];
 	slogan: string;
+	aqnum: number; //Number of Automatic Qualifiers (usually 6 in eds. with semi-finals)
 }
 
-export interface Song {
+export interface OldSong {
 	artist: string;
 	country: string;
 	disqualified: string;
@@ -51,17 +52,6 @@ export interface Song {
 	user: string;
 }
 
-export interface NewEdition {
-	edition: string;
-	edval: number;
-	entries: number;
-    hostcountries: string[];
-	hostusers: string[];
-	phases: Phase[];
-	slogan: string;
-	aqnum: number; //Number of Automatic Qualifiers (usually 6 in eds. with semi-finals)
-}
-
 export interface Phase {
 	name: string; //Name in singular form
 	plural: string; //Name in plural form
@@ -69,7 +59,7 @@ export interface Phase {
 	num: number; //Number of that phase (ex. 3 semi-finals, 1 grand final)
 }
 
-export interface NewSong {
+export interface Song {
 	artist: string;
 	country: string;
 	draws: Draw[];
