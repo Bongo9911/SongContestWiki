@@ -60,7 +60,7 @@ export class CountryScreenComponent implements OnInit {
             return song.draws.length === song.phases;
           }).length;
 
-          this.phases = [...this.songs].sort((a,b) => a.phases > b.phases ? 1 : -1)[0].phases
+          this.phases = [...this.songs].sort((a, b) => a.phases > b.phases ? 1 : -1)[0].phases
         });
 
         for (let i = 0; i <= 3; ++i) {
@@ -173,15 +173,15 @@ export class CountryScreenComponent implements OnInit {
   }
 
   getStyle(song: NewSong): object {
-    if(song.dqphase + 1 === song.draws.length) {
+    if (song.dqphase + 1 === song.draws.length) {
       return { 'background-color': '#cdb8d8', 'font-style': 'italic' };
     }
     else {
-      if(song.phases === song.draws.length) {
-        if(song.draws[song.phases - 1].place === 1) return { 'background-color': '#ffd700' };
-        else if(song.draws[song.phases - 1].place === 2) return { 'background-color': '#c0c0c0' };
-        else if(song.draws[song.phases - 1].place === 3) return { 'background-color': '#cc9966' };
-        else if(song.draws[song.phases - 1].qualifier === 'FAQ') 
+      if (song.phases === song.draws.length) {
+        if (song.draws[song.phases - 1].place === 1) return { 'background-color': '#ffd700' };
+        else if (song.draws[song.phases - 1].place === 2) return { 'background-color': '#c0c0c0' };
+        else if (song.draws[song.phases - 1].place === 3) return { 'background-color': '#cc9966' };
+        else if (song.draws[song.phases - 1].qualifier === 'FAQ')
           return { 'background-color': '#bae8ff' }; //AQ
       }
     }
@@ -202,7 +202,7 @@ export class CountryScreenComponent implements OnInit {
     }
   }
 
-  sortData(sort: Sort, sf: string) {
+  sortData(sort: Sort) {
     let data = this.songs;
 
     if (!sort.active || sort.direction === '') {
@@ -210,28 +210,44 @@ export class CountryScreenComponent implements OnInit {
       return;
     }
 
-    // this.sortedData = data.sort((a, b) => {
-    //   const isAsc = sort.direction === 'asc';
-    //   switch (sort.active) {
-    //     case 'draw':
-    //       if (sf === 'f') {
-    //         return compare(a.fro, b.fro, isAsc);
-    //       }
-    //       else {
-    //         return compare(a.sfro, b.sfro, isAsc);
-    //       }
-    //     case 'edition': return compare(a.edition, b.edition, isAsc);
-    //     case 'user': return compare(a.user, b.user, isAsc);
-    //     case 'language': return compare(a.language, b.language, isAsc);
-    //     case 'artist': return compare(a.artist.toLowerCase(), b.artist.toLowerCase(), isAsc);
-    //     case 'song': return compare(a.song.toLowerCase(), b.song.toLowerCase(), isAsc);
-    //     case 'fplace': return compare(a.fplace, b.fplace, isAsc);
-    //     case 'fpoints': return compare(a.fpoints, b.fpoints, isAsc);
-    //     case 'sfplace': return compare(a.sfplace, b.sfplace, isAsc);
-    //     case 'sfpoints': return compare(a.sfpoints, b.sfpoints, isAsc);
-    //     default: return 0;
-    //   }
-    // });
+    this.sortedData = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      let num = 0;
+      switch (sort.active) {
+        case 'edition': return compare(a.edval, b.edval, isAsc);
+        case 'user': return compare(a.user, b.user, isAsc);
+        case 'language': return compare(a.language, b.language, isAsc);
+        case 'artist': return compare(a.artist.toLowerCase(), b.artist.toLowerCase(), isAsc);
+        case 'song': return compare(a.song.toLowerCase(), b.song.toLowerCase(), isAsc);
+        case 'fplace':
+        case 'sfplace':
+        case 'qfplace':
+        case 'ofplace':
+          if (sort.active == 'sfplace') num = 1;
+          else if (sort.active == 'qfplace') num = 2;
+          else if (sort.active == 'ofplace') num = 3;
+          return compare(a.draws.length >= a.phases - num && a.phases >= (num + 1)
+            && 'place' in a.draws[a.phases - (1 + num)]
+            ? a.draws[a.phases - (1 + num)].place : Number.MAX_VALUE,
+            b.draws.length >= b.phases - num && b.phases >= (num + 1)
+              && 'place' in b.draws[b.phases - (1 + num)] ?
+              b.draws[b.phases - (1 + num)].place : Number.MAX_VALUE, isAsc);
+        case 'fpoints':
+        case 'sfpoints':
+        case 'qfpoints':
+        case 'ofpoints':
+          if (sort.active == 'sfpoints') num = 1;
+          else if (sort.active == 'qfpoints') num = 2;
+          else if (sort.active == 'ofpoints') num = 3;
+          return compare(a.draws.length >= a.phases - num && a.phases >= (num + 1)
+            && 'points' in a.draws[a.phases - (1 + num)]
+            ? a.draws[a.phases - (1 + num)].points : Number.MIN_VALUE,
+            b.draws.length >= b.phases - num && b.phases >= (num + 1)
+              && 'points' in b.draws[b.phases - (1 + num)] ?
+              b.draws[b.phases - (1 + num)].points : Number.MIN_VALUE, isAsc);
+        default: return 0;
+      }
+    });
 
     this.songs = this.sortedData;
   }

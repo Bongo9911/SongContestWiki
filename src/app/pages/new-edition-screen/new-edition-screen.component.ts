@@ -301,7 +301,7 @@ export class NewEditionScreenComponent implements OnInit {
       else if (place === 3) {
         return { 'background-color': '#cc9966' };
       }
-      else if (place <= this.edition.aqnum) {
+      else if (qualifier === 'FAQ') {
         return { 'background-color': '#bae8ff' };
       }
     }
