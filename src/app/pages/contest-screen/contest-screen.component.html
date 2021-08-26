@@ -14,17 +14,19 @@
           </div>
 
           <div style="display: flex; flex-wrap: wrap; margin: 7px; justify-content: center;">
-            <div *ngFor="let ed of eds; index as i">
+            <ng-container *ngFor="let ed of eds; index as i">
               <ng-container *ngIf="i !== 0">
-                <span style="font-size: 20px; line-height: 20px; vertical-align: middle;">&nbsp;• </span>
+                <span style="font-size: 20px; line-height: 20px; vertical-align: middle;">&nbsp;•&nbsp;</span>
               </ng-container>
-              <ng-container *ngFor="let country of ed.hostcountries">
-                <a routerLink="/contest/{{id}}/country/{{country}}">
-                  <img class="flag" src="./assets/flags/{{country}} Flag.png">
-                </a>
-              </ng-container>
-              <a routerLink="/contest/RSC/ed/{{ ed.edition }}">{{ ed.edition }}</a>
-            </div>
+              <div>
+                <ng-container *ngFor="let country of ed.hostcountries">
+                  <a routerLink="/contest/{{id}}/country/{{country}}">
+                    <img class="flag" src="./assets/flags/{{country}} Flag.png">
+                  </a>
+                </ng-container>
+                <a routerLink="/contest/RSC/ed/{{ ed.edition }}">{{ ed.edition }}</a>
+              </div>
+            </ng-container>
           </div>
         </div>
       </div>
