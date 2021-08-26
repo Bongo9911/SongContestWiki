@@ -62,7 +62,7 @@ export class UserScreenComponent implements OnInit {
           this.phases = [...this.songs].sort((a, b) => a.phases < b.phases ? 1 : -1)[0].phases
         });
 
-        for (let i = 0; i <= 3; ++i) {
+        for (let i = 0; i <= this.phases; ++i) {
           let songsort = [...this.songs].filter(song => song.draws.length === song.phases - i &&
             'place' in song.draws[song.phases - i - 1])
           if (songsort.length) {
@@ -85,7 +85,7 @@ export class UserScreenComponent implements OnInit {
           }
         }
 
-        for (let i = 3; i >= 0; --i) {
+        for (let i = this.phases; i >= 0; --i) {
           let songsort = [...this.songs].filter(song => song.draws.length === song.phases - i &&
             'place' in song.draws[song.phases - i - 1])
           if (songsort.length) {
