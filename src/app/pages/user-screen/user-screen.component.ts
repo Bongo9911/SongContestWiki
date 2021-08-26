@@ -63,8 +63,8 @@ export class UserScreenComponent implements OnInit {
         });
 
         for (let i = 0; i <= 3; ++i) {
-          let songsort = [...this.songs].filter(song => song.draws.length === 2 - i &&
-            'place' in song.draws[2 - i - 1])
+          let songsort = [...this.songs].filter(song => song.draws.length === song.phases - i &&
+            'place' in song.draws[song.phases - i - 1])
           if (songsort.length) {
             songsort.sort((a, b) => a.draws[a.phases - i - 1].place > b.draws[b.phases - i - 1].place
               ? 1 : -1)
@@ -86,8 +86,8 @@ export class UserScreenComponent implements OnInit {
         }
 
         for (let i = 3; i >= 0; --i) {
-          let songsort = [...this.songs].filter(song => song.draws.length === 2 - i &&
-            'place' in song.draws[2 - i - 1])
+          let songsort = [...this.songs].filter(song => song.draws.length === song.phases - i &&
+            'place' in song.draws[song.phases - i - 1])
           if (songsort.length) {
             songsort.sort((a, b) => a.draws[2 - i - 1].place < b.draws[2 - i - 1].place ? 1 : -1)
             this.worstPlace = this.numToRankString(songsort[0].draws[2 - i - 1].place);
