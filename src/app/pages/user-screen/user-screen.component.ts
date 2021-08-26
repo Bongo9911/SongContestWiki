@@ -59,7 +59,7 @@ export class UserScreenComponent implements OnInit {
             return song.draws.length === song.phases;
           }).length;
 
-          this.phases = [...this.songs].sort((a, b) => a.phases > b.phases ? 1 : -1)[0].phases
+          this.phases = [...this.songs].sort((a, b) => a.phases < b.phases ? 1 : -1)[0].phases
         });
 
         for (let i = 0; i <= 3; ++i) {
