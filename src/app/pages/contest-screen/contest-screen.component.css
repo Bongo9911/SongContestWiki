@@ -41,7 +41,9 @@ a:hover {
 }
 
 .edlogo {
-	width: 100%;
+	max-width: 275px;
+	width: auto;
+	max-height: 275px;
 	height: auto;
 }
 
@@ -57,6 +59,7 @@ a:hover {
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
+	align-items: center;
 	background-color: #ffd9b3;
 }
 

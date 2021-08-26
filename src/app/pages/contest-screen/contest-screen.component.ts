@@ -22,11 +22,17 @@ export class ContestScreenComponent implements OnInit {
   winners: SongWithUrl[] = [];
   winnerEds: Edition[] = [];
 
-  logos: string[] = []
+  logos: string[] = []; //For edition logo urls
+  mainLogo: string = ""; //For the contest logo
 
   constructor(private database: AngularFirestore, storage: AngularFireStorage, private router: Router,
     private route: ActivatedRoute) {
     this.route.params.subscribe(params => this.id = params.id);
+
+    storage.storage.ref('contests/' + this.id + '/logo.png')
+      .getDownloadURL().then(url => {
+        this.mainLogo = url;
+      })
 
     this.database.firestore.collection('contests').doc(this.id)
       .get().then((doc) => {
@@ -53,16 +59,16 @@ export class ContestScreenComponent implements OnInit {
     this.database.firestore.collection('contests').doc(this.id).collection('newsongs')
       .where('winner', '==', true).get().then(docs => {
 
-        for(let i = 0; i < docs.docs.length; ++i) {
+        for (let i = 0; i < docs.docs.length; ++i) {
           let data = docs.docs[i].data() as Song;
-          this.winners.push({flagurl: "", ...data});
+          this.winners.push({ flagurl: "", ...data });
         }
         this.winners.sort((a, b) => a.edval > b.edval ? 1 : -1);
-        for(let i = 0; i < this.winners.length; ++i) {
+        for (let i = 0; i < this.winners.length; ++i) {
           storage.storage.ref('contests/' + this.id + '/flags/' + this.winners[i].country + ' Flag.png')
-          .getDownloadURL().then(url => {
-            this.winners[i].flagurl = url;
-          })
+            .getDownloadURL().then(url => {
+              this.winners[i].flagurl = url;
+            })
         }
         this.winners.forEach(w => {
           this.winnerEds.push(this.eds.filter(ed => ed.edition == w.edition)[0])
@@ -76,12 +82,12 @@ export class ContestScreenComponent implements OnInit {
 }
 
 interface SongWithUrl {
-	artist: string;
-	country: string;
-	edition: string;
-	edval: number;
+  artist: string;
+  country: string;
+  edition: string;
+  edval: number;
   flagurl: string; //for the url of the country's flag
-	language: string;
-	song: string;
-	user: string;
+  language: string;
+  song: string;
+  user: string;
 }
