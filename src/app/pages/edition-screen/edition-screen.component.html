@@ -48,12 +48,12 @@
       <div class="infoboxheader"><a routerLink="/contest/{{id}}">{{con.name}}</a></div>
       <div style="display: flex; justify-content: center;">
         <span *ngIf="preved.length">
-          <a routerLink="/contest/{{id}}/newed/{{preved}}" (click)="updateData(preved)">◄ {{preved}}</a>
+          <a routerLink="/contest/{{id}}/ed/{{preved}}" (click)="updateData(preved)">◄ {{preved}}</a>
           &nbsp;&nbsp;•&nbsp;&nbsp;
         </span>
         <b>{{edition.edition}}</b>
         <span *ngIf="nexted.length">&nbsp;&nbsp;•&nbsp;&nbsp;
-          <a routerLink="/contest/{{id}}/newed/{{nexted}}" (click)="updateData(nexted)">{{nexted}} ►</a>
+          <a routerLink="/contest/{{id}}/ed/{{nexted}}" (click)="updateData(nexted)">{{nexted}} ►</a>
         </span>
       </div>
     </div>
