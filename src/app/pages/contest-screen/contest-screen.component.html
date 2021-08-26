@@ -3,115 +3,119 @@
     <img class="logo" src="./assets/contestlogos/{{id}}.png">
   </div>
 
-  <div style="display: flex; justify-content: space-evenly; flex-wrap: wrap;">
-    <div class="halfcontainer">
-      <div style="border-radius: 6px; border: 1px solid #ffa64d; background-color: #fff9e6;">
-        <div style="background-color: #ffd9b3; border-radius: 3px; border: 1px solid #ffa64d; margin: 6px;">
-          <div style="margin: 6px 5px;">
-            <b>Editions</b>
+  <div style="display: flex; width: 96%; margin: 0 2%; justify-content: center; flex-direction: column;">
+    <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+      <div class="halfcontainer">
+        <div style="border-radius: 6px; border: 1px solid #ffa64d; background-color: #fff9e6;">
+          <div style="background-color: #ffd9b3; border-radius: 3px; border: 1px solid #ffa64d; margin: 6px;">
+            <div style="margin: 6px 5px;">
+              <b>Editions</b>
+            </div>
           </div>
-        </div>
 
-        <div style="display: flex; flex-wrap: wrap; margin: 7px; justify-content: center;">
-          <div *ngFor="let ed of eds; index as i">
-            <ng-container *ngIf="i !== 0">
-              <span style="font-size: 20px; line-height: 20px; vertical-align: middle;">&nbsp;• </span>
-            </ng-container>
-            <ng-container *ngFor="let country of ed.hostcountries">
-              <a routerLink="/contest/{{id}}/country/{{country}}">
-                <img class="flag" src="./assets/flags/{{country}} Flag.png">
-              </a>
-            </ng-container>
-            <a routerLink="/contest/RSC/ed/{{ ed.edition }}">{{ ed.edition }}</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="halfcontainer">
-      <div style=" border-radius: 6px; border: 1px solid #ffa64d; background-color: #fff9e6;">
-        <div style="background-color: #ffd9b3; border-radius: 3px; border: 1px solid #ffa64d; margin: 6px;">
-          <div style="margin: 6px 5px;">
-            <b>{{con.name}}</b>
-          </div>
-        </div>
-
-        <div style="margin: 6px 10px;">
-          <b>Tools:</b>
-          <ul style="margin-top: 0px;">
-            <li>
-              <a routerLink="contest/{{con.id}}/pot-generator">Pot Generator</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div style="border-radius: 6px; border: 1px solid #ffa64d; background-color: #fff9e6; margin: 10px calc(4%/3);">
-    <div style="background-color: #ffd9b3; border-radius: 3px; border: 1px solid #ffa64d; margin: 6px;">
-      <div style="margin: 6px 5px;">
-        <b>Winners</b>
-      </div>
-    </div>
-
-    <div style="margin: 6px 10px; display: flex; justify-content: center;">
-      <table>
-        <tr>
-          <th>Edition</th>
-          <th>Host</th>
-          <th>Winner</th>
-          <th>User</th>
-          <th>Artist</th>
-          <th>Song</th>
-        </tr>
-        <ng-container *ngFor="let winner of winners; index as i;">
-          <tr>
-            <td style="text-align: center; background-color: #eee;">
-              <a routerLink="/contest/{{con.id}}/ed/{{winner.edition}}">{{winner.edition}}</a>
-            </td>
-            <td>
-              <div style="display: flex; flex-direction: column;">
-                <div *ngFor="let country of winnderEds[i].hostcountries">
+          <div style="display: flex; flex-wrap: wrap; margin: 7px; justify-content: center;">
+            <div *ngFor="let ed of eds; index as i">
+              <ng-container *ngIf="i !== 0">
+                <span style="font-size: 20px; line-height: 20px; vertical-align: middle;">&nbsp;• </span>
+              </ng-container>
+              <ng-container *ngFor="let country of ed.hostcountries">
+                <a routerLink="/contest/{{id}}/country/{{country}}">
                   <img class="flag" src="./assets/flags/{{country}} Flag.png">
-                  <a routerLink="/contest/{{con.id}}/country/{{country}}">{{country}}</a>
-                </div>
-              </div>
-            </td>
-            <td>
-              <img class="flag" src="./assets/flags/{{winner.country}} Flag.png">
-              <a routerLink="/contest/{{con.id}}/country/{{winner.country}}">{{winner.country}}</a>
-            </td>
-            <td>
-              <a routerLink="/contest/{{con.id}}/user/{{winner.user}}">{{winner.user}}</a>
-            </td>
-            <td>
-              {{winner.artist}}
-            </td>
-            <td>
-              "{{winner.song}}"
-            </td>
-          </tr>
-        </ng-container>
-      </table>
-    </div>
-  </div>
+                </a>
+              </ng-container>
+              <a routerLink="/contest/RSC/ed/{{ ed.edition }}">{{ ed.edition }}</a>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  <div style="border-radius: 6px; border: 1px solid #ffa64d; background-color: #fff9e6; margin: 10px calc(4%/3);">
-    <div style="background-color: #ffd9b3; border-radius: 3px; border: 1px solid #ffa64d; margin: 6px;">
-      <div style="margin: 6px 5px;">
-        <b>Logo Gallery</b>
+      <div class="halfcontainer">
+        <div style=" border-radius: 6px; border: 1px solid #ffa64d; background-color: #fff9e6;">
+          <div style="background-color: #ffd9b3; border-radius: 3px; border: 1px solid #ffa64d; margin: 6px;">
+            <div style="margin: 6px 5px;">
+              <b>{{con.name}}</b>
+            </div>
+          </div>
+
+          <div style="margin: 6px 10px;">
+            <b>Tools:</b>
+            <ul style="margin-top: 0px;">
+              <li>
+                <a routerLink="contest/{{con.id}}/pot-generator">Pot Generator</a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div style="margin: 6px 10px;">
-      <div style="display: flex; justify-content: space-evenly; align-items: center; flex-wrap: wrap;">
-        <div *ngFor="let ed of eds; index as i" class="logoBox" routerLink="/contest/{{con.id}}/ed/{{ed.edition}}">
-          <div style="height: 100%; display: flex; align-items: center;">
-            <img class="edlogo" src="./assets/logos/{{ed.edition}}.png">
-          </div>
-          <div style="padding-top: 4px">
-            {{con.name}} {{ed.edition}}
+    <div style="border-radius: 6px; border: 1px solid #ffa64d; background-color: #fff9e6; margin: 10px 0;">
+      <div style="background-color: #ffd9b3; border-radius: 3px; border: 1px solid #ffa64d; margin: 6px;">
+        <div style="margin: 6px 5px;">
+          <b>Winners</b>
+        </div>
+      </div>
+
+      <div style="margin: 6px 10px; display: flex; justify-content: center;">
+        <div style="overflow-x: auto;">
+          <table>
+            <tr>
+              <th>Edition</th>
+              <th>Host</th>
+              <th>Winner</th>
+              <th>User</th>
+              <th>Artist</th>
+              <th>Song</th>
+            </tr>
+            <ng-container *ngFor="let winner of winners; index as i;">
+              <tr>
+                <td style="text-align: center; background-color: #eee;">
+                  <a routerLink="/contest/{{con.id}}/ed/{{winner.edition}}">{{winner.edition}}</a>
+                </td>
+                <td>
+                  <div style="display: flex; flex-direction: column;">
+                    <div *ngFor="let country of winnderEds[i].hostcountries">
+                      <img class="flag" src="./assets/flags/{{country}} Flag.png">
+                      <a routerLink="/contest/{{con.id}}/country/{{country}}">{{country}}</a>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <img class="flag" src="./assets/flags/{{winner.country}} Flag.png">
+                  <a routerLink="/contest/{{con.id}}/country/{{winner.country}}">{{winner.country}}</a>
+                </td>
+                <td>
+                  <a routerLink="/contest/{{con.id}}/user/{{winner.user}}">{{winner.user}}</a>
+                </td>
+                <td>
+                  {{winner.artist}}
+                </td>
+                <td>
+                  "{{winner.song}}"
+                </td>
+              </tr>
+            </ng-container>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div style="border-radius: 6px; border: 1px solid #ffa64d; background-color: #fff9e6; margin: 10px 0;">
+      <div style="background-color: #ffd9b3; border-radius: 3px; border: 1px solid #ffa64d; margin: 6px;">
+        <div style="margin: 6px 5px;">
+          <b>Logo Gallery</b>
+        </div>
+      </div>
+
+      <div style="margin: 6px 10px;">
+        <div style="display: flex; justify-content: space-evenly; align-items: center; flex-wrap: wrap;">
+          <div *ngFor="let ed of eds; index as i" class="logoBox" routerLink="/contest/{{con.id}}/ed/{{ed.edition}}">
+            <div style="height: 100%; display: flex; align-items: center;">
+              <img class="edlogo" src="./assets/logos/{{ed.edition}}.png">
+            </div>
+            <div style="padding-top: 4px">
+              {{con.name}} {{ed.edition}}
+            </div>
           </div>
         </div>
       </div>

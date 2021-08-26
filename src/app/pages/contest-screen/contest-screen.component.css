@@ -30,12 +30,12 @@ a:hover {
 }
 
 .halfcontainer {
-	width: 48%;
+	width: 49%;
 }
 
 @media only screen and (max-width: 600px) {
 	.halfcontainer {
-		width: 96%;
+		width: 100%;
 		margin-bottom: 10px;
 	}
 }
