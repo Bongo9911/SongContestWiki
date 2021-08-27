@@ -1,6 +1,6 @@
 <div class="container">
   <div style="display: flex; width: 96%; margin: 0 2%; justify-content: center; align-items: center; flex-direction: column;">
-    <div style="width: 50%;">
+    <div>
       <img class="logo" src="{{mainLogo}}">
     </div>
     
@@ -77,8 +77,8 @@
                 </td>
                 <td>
                   <div style="display: flex; flex-direction: column;">
-                    <div *ngFor="let country of winnerEds[i].hostcountries; index as j;">
-                      <img class="flag" src="{{winnerEds[i].flagurls[j]}}">
+                    <div *ngFor="let country of eds[i].hostcountries; index as j;">
+                      <img class="flag" src="{{eds[i].flagurls[j]}}">
                       <a routerLink="/contest/{{con.id}}/country/{{country}}">{{country}}</a>
                     </div>
                   </div>
@@ -94,7 +94,7 @@
                   {{winner.artist}}
                 </td>
                 <td>
-                  "{{winner.song}}"
+                  <ng-container *ngIf="winner.song">"{{winner.song}}"</ng-container>
                 </td>
               </tr>
             </ng-container>

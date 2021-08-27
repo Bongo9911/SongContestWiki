@@ -20,7 +20,6 @@ export class ContestScreenComponent implements OnInit {
   id: string;
 
   winners: SongWithUrl[] = [];
-  winnerEds: EditionWithUrl[] = [];
 
   logos: string[] = []; //For edition logo urls
   edflags: string[][] = []; //Flags for each ed host
@@ -64,37 +63,38 @@ export class ContestScreenComponent implements OnInit {
               })
           }
         }
+
+        this.database.firestore.collection('contests').doc(this.id).collection('newsongs')
+          .where('winner', '==', true).get().then(docs => {
+
+            let winners: SongWithUrl[] = []
+            for (let i = 0; i < docs.docs.length; ++i) {
+              let data = docs.docs[i].data() as Song;
+              winners.push({ flagurl: "", ...data });
+            }
+
+            for (let i = 0; i < this.eds.length; ++i) {
+              let filtered = winners.filter(w => w.edition === this.eds[i].edition)
+              if (filtered.length) {
+                this.winners.push(filtered[0])
+              }
+              else {
+                this.winners.push({
+                  edition: this.eds[i].edition,
+                  edval: this.eds[i].edval,
+                })
+              }
+            }
+            for (let i = 0; i < this.winners.length; ++i) {
+              if ("country" in this.winners[i]) {
+                storage.storage.ref('contests/' + this.id + '/flags/' + this.winners[i].country + ' Flag.png')
+                  .getDownloadURL().then(url => {
+                    this.winners[i].flagurl = url;
+                  })
+              }
+            }
+          })
       });
-
-    this.database.firestore.collection('contests').doc(this.id).collection('newsongs')
-      .where('winner', '==', true).get().then(docs => {
-
-        for (let i = 0; i < docs.docs.length; ++i) {
-          let data = docs.docs[i].data() as Song;
-          this.winners.push({ flagurl: "", ...data });
-        }
-        this.winners.sort((a, b) => a.edval > b.edval ? 1 : -1);
-        for (let i = 0; i < this.winners.length; ++i) {
-          storage.storage.ref('contests/' + this.id + '/flags/' + this.winners[i].country + ' Flag.png')
-            .getDownloadURL().then(url => {
-              this.winners[i].flagurl = url;
-            })
-        }
-        this.winners.forEach(w => {
-          this.winnerEds.push(this.eds.filter(ed => ed.edition == w.edition)[0])
-        })
-
-        // for (let i = 0; i < this.winnerEds.length; ++i) {
-        //   this.winnerEds[i].flagurls = new Array(this.winnerEds[i].hostcountries.length);
-        //   for (let j = 0; j < this.winnerEds[i].flagurls.length; ++j) {
-        //     storage.storage.ref('contests/' + this.id + '/flags/' + this.winnerEds[i].hostcountries[j]
-        //       + ' Flag.png')
-        //       .getDownloadURL().then(url => {
-        //         this.winnerEds[i].flagurls[j] = url;
-        //       })
-        //   }
-        // }
-      })
   }
 
   ngOnInit(): void {
@@ -103,19 +103,19 @@ export class ContestScreenComponent implements OnInit {
 }
 
 interface SongWithUrl {
-  artist: string;
-  country: string;
+  artist?: string;
+  country?: string;
   edition: string;
   edval: number;
-  flagurl: string; //for the url of the country's flag
-  language: string;
-  song: string;
-  user: string;
+  flagurl?: string; //for the url of the country's flag
+  language?: string;
+  song?: string;
+  user?: string;
 }
 
 interface EditionWithUrl {
-	edition: string;
-	edval: number;
+  edition: string;
+  edval: number;
   hostcountries: string[];
   flagurls: string[];
 }
