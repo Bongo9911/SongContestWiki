@@ -17,6 +17,7 @@ export class StartScreenComponent implements OnInit {
       docs.forEach(doc => {
         this.contests.push(doc.data() as Contest);
       })
+      this.contests.sort((a,b) => a.name > b.name ? 1 : -1)
     })
   }
 
