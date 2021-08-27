@@ -19,9 +19,9 @@
                 <span style="font-size: 20px; line-height: 20px; vertical-align: middle;">&nbsp;•&nbsp;</span>
               </ng-container>
               <div>
-                <ng-container *ngFor="let country of ed.hostcountries">
+                <ng-container *ngFor="let country of ed.hostcountries; index as j;">
                   <a routerLink="/contest/{{id}}/country/{{country}}">
-                    <img class="flag" src="./assets/flags/{{country}} Flag.png">
+                    <img class="flag" src="{{ed.flagurls[j]}}">
                   </a>
                 </ng-container>
                 <a routerLink="/contest/RSC/ed/{{ ed.edition }}">{{ ed.edition }}</a>
@@ -77,8 +77,8 @@
                 </td>
                 <td>
                   <div style="display: flex; flex-direction: column;">
-                    <div *ngFor="let country of winnerEds[i].hostcountries">
-                      <img class="flag" src="./assets/flags/{{country}} Flag.png">
+                    <div *ngFor="let country of winnerEds[i].hostcountries; index as j;">
+                      <img class="flag" src="{{winnerEds[i].flagurls[j]}}">
                       <a routerLink="/contest/{{con.id}}/country/{{country}}">{{country}}</a>
                     </div>
                   </div>
