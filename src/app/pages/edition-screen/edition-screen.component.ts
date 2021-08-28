@@ -3,6 +3,7 @@ import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
 import { Contest, Edition, Song } from 'src/app/shared/datatypes';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 @Component({
   selector: 'app-edition-screen',
@@ -29,6 +30,7 @@ export class EditionScreenComponent implements OnInit {
   id: string;
   num: string;
   entries: number;
+  logourl: string;
 
   nexted: string = "";
   preved: string = "";
@@ -39,7 +41,8 @@ export class EditionScreenComponent implements OnInit {
   songtablesbyphase: Song[][][] = [];
   pointtablesbyphase: Song[][][] = [];
 
-  constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
+  constructor(private database: AngularFirestore, private storage: AngularFireStorage, 
+    private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
       this.id = params.id;
       this.num = params.num;
@@ -226,6 +229,11 @@ export class EditionScreenComponent implements OnInit {
     this.database.firestore.collection('contests').doc(this.id)
       .collection('editions').doc(this.num).get().then(doc => {
         this.edition = doc.data() as Edition;
+
+        this.storage.storage.ref('contests/' + this.id + '/logos/' + this.edition.edition + '.png')
+            .getDownloadURL().then(url => {
+              this.logourl = url;
+            })
 
         this.database.firestore.collection('contests').doc(this.id)
           .collection('editions').where('edval', '==', this.edition.edval + 1).get().then(docs => {

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
-import { Contest, Draw, Edition, Pointsets, Song } from 'src/app/shared/datatypes';
+import { Contest, Song } from 'src/app/shared/datatypes';
 import { AngularFireStorage } from '@angular/fire/storage'
 
 @Component({
@@ -25,8 +25,8 @@ export class ContestScreenComponent implements OnInit {
   edflags: string[][] = []; //Flags for each ed host
   mainLogo: string = ""; //For the contest logo
 
-  constructor(private database: AngularFirestore, storage: AngularFireStorage, private router: Router,
-    private route: ActivatedRoute) {
+  constructor(private database: AngularFirestore, private storage: AngularFireStorage, 
+    private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => this.id = params.id);
 
     storage.storage.ref('contests/' + this.id + '/logo.png')
