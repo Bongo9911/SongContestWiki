@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import * as math from 'mathjs';
-import { OldSong } from '../../shared/datatypes';
+import { Song } from '../../shared/datatypes';
 
 @Component({
   selector: 'app-pot-generator',
@@ -22,7 +22,7 @@ export class PotGeneratorComponent implements OnInit {
       this.id = params.id;
     });
 
-    // this.database.firestore.collection("contests").doc('RSC').collection('songs').get().then(docs => {
+    // this.database.firestore.collection("contests").doc('RSC').collection('newsongs').get().then(docs => {
     //   docs.forEach(doc => {
     //     let data = doc.data() as Song;
     //     this.database.firestore.collection('contests').doc('RSC').collection('users').doc(data.user).set({
@@ -33,13 +33,13 @@ export class PotGeneratorComponent implements OnInit {
     //   })
     // })
 
-    this.database.firestore.collection("contests").doc('RSC').collection('songs').where('qualifier', '==', 'NQ').where('edition', '==', '45').get().then(docs => {
-      docs.forEach(doc => {
-        this.database.firestore.collection("contests").doc('RSC').collection('songs').doc(doc.id).update({
-          qualifier: 'TBD'
-        })
-      })
-    })
+    // this.database.firestore.collection("contests").doc('RSC').collection('songs').where('qualifier', '==', 'NQ').where('edition', '==', '45').get().then(docs => {
+    //   docs.forEach(doc => {
+    //     this.database.firestore.collection("contests").doc('RSC').collection('songs').doc(doc.id).update({
+    //       qualifier: 'TBD'
+    //     })
+    //   })
+    // })
   }
 
   ngOnInit(): void {
@@ -60,38 +60,38 @@ export class PotGeneratorComponent implements OnInit {
       let docs = await this.database.firestore.collection('contests').doc(this.id).collection('users')
         .where('lower', '==', usersArray[i].toLowerCase()).get()
       if (!docs.docs.length) {
-        this.invalid.push(usersArray[i]);
+        //this.invalid.push(usersArray[i]);
       }
       else {
         usersArray[i] = docs.docs[0].data()['username'];
       }
     }
 
-    let filteredUsers: string[] = [...usersArray]
+    let sansInvalidUsers: string[] = [...usersArray]
     for (let i = 0; i < this.invalid.length; ++i) {
-      let index = filteredUsers.indexOf(this.invalid[i]);
-      filteredUsers.splice(index, 1)
+      let index = sansInvalidUsers.indexOf(this.invalid[i]);
+      sansInvalidUsers.splice(index, 1)
     }
 
-    console.log(filteredUsers)
+    console.log(sansInvalidUsers)
 
 
-    if (filteredUsers.length > 1 && this.pots) {
+    if (sansInvalidUsers.length > 1 && this.pots) {
 
       let pointsets: string[][][] = [];
 
       //Get all the pointsets from the grand final for each user
-      for (let i = 0; i < filteredUsers.length; ++i) {
+      for (let i = 0; i < sansInvalidUsers.length; ++i) {
         pointsets.push([]);
         for (let j = 0; j < edArray.length; ++j) {
           let docs = await this.database.firestore.collection('contests').doc(this.id)
-            .collection('songs').where('edition', '==', edArray[j])
-            .where('user', '==', filteredUsers[i]).get();
+            .collection('newsongs').where('edition', '==', edArray[j])
+            .where('user', '==', sansInvalidUsers[i]).get();
 
           if (docs.docs.length) {
-            let data = docs.docs[0].data() as OldSong;
-            if (data.fpointset && data.fpointset.points) {
-              pointsets[i].push(data.fpointset.points);
+            let data = docs.docs[0].data() as Song;
+            if (data.phases === data.pointsets.length) {
+              pointsets[i].push(data.pointsets[data.phases - 1][1].points);
             }
             else {
               pointsets[i].push(null);
@@ -103,6 +103,19 @@ export class PotGeneratorComponent implements OnInit {
         }
       }
       console.log(pointsets);
+
+      let filteredUsers: string[] = [...sansInvalidUsers]
+      for(let i = 0; i < filteredUsers.length; ++i) {
+        //Check if there are any non-null pointsets
+        if(pointsets[i].filter(x => x).length === 0) {
+          this.invalid.push(filteredUsers[i])
+          let index = filteredUsers.indexOf(filteredUsers[i]);
+          filteredUsers.splice(index, 1);
+          pointsets.splice(index, 1)
+          --i;
+          console.log(i);
+        }
+      }
 
       let similarities: number[][] = [];
       let sharededs: number[][] = [];

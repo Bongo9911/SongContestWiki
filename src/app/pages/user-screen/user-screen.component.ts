@@ -108,12 +108,22 @@ export class UserScreenComponent implements OnInit {
         }
       });
 
-    this.database.firestore.collection('contests').doc(this.id)
-      .collection('newsongs').where('edition', '==', '4').get().then(docs => {
-        docs.forEach((doc) => {
-          this.songlist.push({ id: doc.id, ...doc.data() });
-        });
-      });
+    // this.database.firestore.collection('contests').doc(this.id)
+    //   .collection('newsongs').where('edition', '==', '4').get().then(docs => {
+    //     docs.forEach((doc) => {
+    //       this.songlist.push({ id: doc.id, ...doc.data() });
+    //     });
+    //   });
+
+    // this.database.firestore.collection('contests').doc(this.id).collection('newsongs')
+    // .where('edition', '==', '41').get().then(docs => {
+    //   docs.forEach(doc => {
+    //     let data = doc.data() as Song;
+    //     data.pointsets = [];
+    //     this.database.firestore.collection('contests').doc(this.id).collection('newsongs')
+    //     .doc(doc.id).set(data)
+    //   })
+    // })
   }
 
   //Converts the number to a string in the form of "nth"
@@ -295,16 +305,17 @@ export class UserScreenComponent implements OnInit {
     const parsedString = points.split('\n').map((line) => line.split('\t'))
 
     parsedString.forEach(x => {
-      let data = {
-        intpoints: parseInt(x[1]),
-        rawextpoints: parseInt(x[2]),
-        extpoints: parseInt(x[3]),
-      }
-
       this.database.firestore.collection('contests').doc(this.id)
-        .collection('songs').doc(this.songlist.filter(function (song) {
-          return song.country === x[0];
-        })[0].id).update(data)
+        .collection('newsongs').where('country', '==', x[0]).where('edition','==','41').get().then(docs => {
+          if(docs.docs.length) {
+            let song = docs.docs[0].data() as Song;
+            song.draws[0].intpoints = parseInt(x[1]),
+            song.draws[0].rawextpoints = parseInt(x[2]),
+            song.draws[0].extpoints = parseInt(x[3]),
+            this.database.firestore.collection('contests').doc(this.id)
+            .collection('newsongs').doc(docs.docs[0].id).update(song);
+          }
+        })
     })
   }
 
@@ -321,15 +332,24 @@ export class UserScreenComponent implements OnInit {
       console.log(pointsarray);
 
       this.database.firestore.collection('contests').doc(this.id)
-        .collection('newsongs').doc(this.songlist.filter(function (song) {
-          return song.country === parsedString[0][j];
-        })[0].id).update({
-          pointsets: [{
-            1: {
-              cv: false,
-              points: pointsarray,
+        .collection('newsongs').where('country', '==', parsedString[0][j])
+        .where('edition','==','41').get().then(docs => {
+          if(docs.docs.length) {
+            let data = docs.docs[0].data() as Song;
+            if(data.pointsets.length !== 2) {
+              data.pointsets.push({});
             }
-          }]
+            data.pointsets[1][1] = {
+              cv: false,
+              points: pointsarray
+            }
+
+            this.database.firestore.collection('contests').doc(this.id)
+            .collection('newsongs').doc(docs.docs[0].id).set(data)
+          }
+          else {
+            console.log(parsedString[0][j] + " Not Found!")
+          }
         })
     }
   }

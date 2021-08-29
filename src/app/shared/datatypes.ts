@@ -12,44 +12,7 @@ export interface Edition {
 	phases: Phase[];
 	slogan: string;
 	aqnum: number; //Number of Automatic Qualifiers (usually 6 in eds. with semi-finals)
-}
-
-export interface OldSong {
-	artist: string;
-	country: string;
-	disqualified: string;
-	edition: string;
-	edval: number;
-	extpoints: number;
-	fpointset: {
-		cv: boolean;
-		points: string[];
-	};
-	fplace: number;
-	fpoints: number;
-	fro: number;
-	intpoints: number;
-	language: string;
-	qualifier: string;
-	rawextpoints: number;
-	sf1pointset: {
-		cv: boolean;
-		points: string[10];
-	};
-	sf2pointset: {
-		cv: boolean;
-		points: string[10];
-	};
-	sf3pointset: {
-		cv: boolean;
-		points: string[10];
-	};
-	sfnum: string;
-	sfplace: number;
-	sfpoints: number;
-	sfro: number;
-	song: string;
-	user: string;
+	pots?: Pot[];
 }
 
 export interface Phase {
@@ -57,6 +20,11 @@ export interface Phase {
 	plural: string; //Name in plural form
 	cv: boolean; //Whether or not there's crossvoting in that phase
 	num: number; //Number of that phase (ex. 3 semi-finals, 1 grand final)
+}
+
+export interface Pot {
+	name: string; //Typically a number or 'N' for Newcomers
+	members;
 }
 
 export interface Song {
@@ -76,7 +44,7 @@ export interface Song {
 }
 
 export interface Draw {
-	ro: number;
+	ro?: number;
 	num?: number; //Which number final they're in (Semi-final 1, Quarter-final 5, etc.)
 	place?: number;
 	points?: number;

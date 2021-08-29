@@ -64,7 +64,8 @@
           <ng-container *ngIf="song.phases >= (p + 1)">
             <ng-container *ngIf="(song.dqphase === -1 || song.dqphase >= (song.phases - p)) 
 							&& song.draws.length >= (song.phases - p) &&
-							song.draws[song.phases - p - 1].qualifier !== 'AQ'">
+							song.draws[song.phases - p - 1].qualifier !== 'AQ' &&
+							song.draws[song.phases - p - 1].qualifier !== 'XAQ'">
               <ng-container *ngIf="song.draws[song.phases - p - 1].place">
                 <td [ngStyle]="p !== 0 ? getSFStyle(song.draws[song.phases - p - 1].place) : {}">
                   {{song.draws[song.phases - p - 1].place}}
@@ -90,7 +91,8 @@
               <td class="dqrow" colspan="2 * (song.phases - song.dqphase)">Withdrawn</td>
             </ng-container>
             <ng-container *ngIf="song.draws.length >= (song.phases - p) &&
-							song.draws[song.phases - p - 1].qualifier === 'AQ'">
+							(song.draws[song.phases - p - 1].qualifier === 'AQ' ||
+              song.draws[song.phases - p - 1].qualifier === 'XAQ')">
               <td class="dqrow" colspan="2">Automatic qualifier</td>
             </ng-container>
           </ng-container>

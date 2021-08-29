@@ -41,7 +41,7 @@ export class EditionScreenComponent implements OnInit {
   songtablesbyphase: Song[][][] = [];
   pointtablesbyphase: Song[][][] = [];
 
-  constructor(private database: AngularFirestore, private storage: AngularFireStorage, 
+  constructor(private database: AngularFirestore, private storage: AngularFireStorage,
     private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
       this.id = params.id;
@@ -197,13 +197,13 @@ export class EditionScreenComponent implements OnInit {
     //   })
     // })
 
-  //  this.database.firestore.collection('contests').doc(this.id)
-  //   .collection('newsongs').where('edition', '==', '4').get().then(docs => {
-  //     docs.forEach(doc => {
-  //       this.database.firestore.collection('contests').doc(this.id)
-  //   .collection('newsongs').doc(doc.id).delete();
-  //     })
-  //   })
+    //  this.database.firestore.collection('contests').doc(this.id)
+    //   .collection('newsongs').where('edition', '==', '4').get().then(docs => {
+    //     docs.forEach(doc => {
+    //       this.database.firestore.collection('contests').doc(this.id)
+    //   .collection('newsongs').doc(doc.id).delete();
+    //     })
+    //   })
 
     this.updateData(this.num);
 
@@ -231,9 +231,9 @@ export class EditionScreenComponent implements OnInit {
         this.edition = doc.data() as Edition;
 
         this.storage.storage.ref('contests/' + this.id + '/logos/' + this.edition.edition + '.png')
-            .getDownloadURL().then(url => {
-              this.logourl = url;
-            })
+          .getDownloadURL().then(url => {
+            this.logourl = url;
+          })
 
         this.database.firestore.collection('contests').doc(this.id)
           .collection('editions').where('edval', '==', this.edition.edval + 1).get().then(docs => {
@@ -269,12 +269,13 @@ export class EditionScreenComponent implements OnInit {
               this.pointtablesbyphase.push(new Array(this.edition.phases[i].num));
               for (let j = 0; j < this.edition.phases[i].num; ++j) {
                 this.songsbyphase[i][j] = songs.filter(x =>
-                  x.draws.length > i && 
+                  x.draws.length > i &&
                   (x.draws[i].num === j + 1 || (!('num' in x.draws[i]) && j === 0)) &&
                   (!('qualifier' in x.draws[i]) || x.draws[i].qualifier !== 'AQ')
                 ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1);
                 this.songtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
                 this.pointtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
+                  .filter(x => 'place' in x.draws[i])
                   .sort((a, b) => a.draws[i].place > b.draws[i].place ? 1 : -1)
                 this.votersbyphase[i][j] = songs.filter(x =>
                   x.draws.length > i && 'ro' in x.draws[i] &&
@@ -327,6 +328,9 @@ export class EditionScreenComponent implements OnInit {
       if (qualifier === 'Q') {
         return { 'background-color': '#ffdead', 'font-weight': 'bold' };
       }
+      else if (qualifier === 'XAQ') {
+        return { 'background-color': '#bae8ff' };
+      }
     }
 
     return { 'background-color': 'ghostwhite' }; //default return
@@ -372,6 +376,36 @@ export class EditionScreenComponent implements OnInit {
     })
   }
 
+  // uploadSongNew(song: string): void {
+  //   console.log(song);
+  //   const parsedString = song.split('\n').map((line) => line.split('\t'))
+  //   console.log(parsedString);
+  //   parsedString.forEach(song => {
+  //     let songObj: Song = {
+  //       edition: song[0],
+  //       edval: parseInt(song[0]) + Math.floor((parseInt(song[0]) - 1) / 10),
+  //       dqphase: parseInt(song[1]),
+  //       user: song[3],
+  //       country: song[4],
+  //       language: song[5],
+  //       artist: song[6],
+  //       song: song[7],
+  //       draws: [
+  //         {
+  //           ro: parseInt(song[8]),
+  //           place: parseInt(song[9]),
+  //           points: parseInt(song[10]),
+  //           qualifier: parseInt(song[9]) <= 6 ? 'FAQ' : 'NAQ'
+  //         }
+  //       ],
+  //       pointsets: [],
+  //       phases: 1
+  //     }
+  //     this.database.firestore
+  //       .collection('contests').doc(this.id).collection('newsongs').add(songObj)
+  //   })
+  // }
+
   uploadSongNew(song: string): void {
     console.log(song);
     const parsedString = song.split('\n').map((line) => line.split('\t'))
@@ -380,23 +414,48 @@ export class EditionScreenComponent implements OnInit {
       let songObj: Song = {
         edition: song[0],
         edval: parseInt(song[0]) + Math.floor((parseInt(song[0]) - 1) / 10),
-        dqphase: parseInt(song[1]),
-        user: song[3],
-        country: song[4],
-        language: song[5],
-        artist: song[6],
-        song: song[7],
-        draws: [
-          {
-            ro: parseInt(song[8]),
-            place: parseInt(song[9]),
-            points: parseInt(song[10]),
-            qualifier: parseInt(song[9]) <= 6 ? 'FAQ' : 'NAQ'
-          }
-        ],
+        dqphase: parseInt(song[3]),
+        user: song[6],
+        country: song[7],
+        language: song[8],
+        artist: song[9],
+        song: song[10],
+        draws: [],
         pointsets: [],
-        phases: 1
+        phases: 2
       }
+
+      if (songObj.dqphase !== -1) {
+        songObj.dqreason = song[4]
+      }
+      songObj.draws.push({
+        num: parseInt(song[5]),
+        qualifier: song[1]
+      })
+      if (song[14] !== "-1") {
+        songObj.draws[0].ro = parseInt(song[14])
+        if (song[15] !== "-1") {
+          songObj.draws[0].place = parseInt(song[15])
+          songObj.draws[0].points = parseInt(song[16])
+        }
+      }
+
+      if (song[11] !== "-1") {
+        songObj.draws.push({
+          num: 1,
+          ro: parseInt(song[11]),
+          qualifier: song[2]
+        })
+        if (song[12] !== "-1") {
+          songObj.draws[1].place = parseInt(song[12])
+          songObj.draws[1].points = parseInt(song[13])
+        }
+        if (songObj.draws[1].place === 1) {
+          songObj.winner = true;
+        }
+      }
+
+
       this.database.firestore
         .collection('contests').doc(this.id).collection('newsongs').add(songObj)
     })
@@ -447,6 +506,7 @@ export class EditionScreenComponent implements OnInit {
     }
     else {
       if (song.draws[phase].qualifier === 'Q') return { 'background-color': '#fbdead' };
+      else if(song.draws[phase].qualifier === 'XAQ') return { 'background-color': '#bae8ff' };
       else return {};
     }
   }
@@ -474,9 +534,13 @@ export class EditionScreenComponent implements OnInit {
         case 'artist': return compare(a.artist.toLowerCase(), b.artist.toLowerCase(), isAsc);
         case 'song': return compare(a.song.toLowerCase(), b.song.toLowerCase(), isAsc);
         case 'place':
-          return compare(a.draws[phase].place, b.draws[phase].place, isAsc);
+          return compare(
+            'place' in a.draws[phase] ? a.draws[phase].place : Number.MAX_VALUE,
+            'place' in b.draws[phase] ? b.draws[phase].place : Number.MAX_VALUE, isAsc);
         case 'points':
-          return compare(a.draws[phase].points, b.draws[phase].points, isAsc);
+          return compare(
+            'points' in a.draws[phase] ? a.draws[phase].points : Number.MIN_VALUE,
+            'points' in b.draws[phase] ? b.draws[phase].points : Number.MIN_VALUE, isAsc);
         default: return 0;
       }
     });

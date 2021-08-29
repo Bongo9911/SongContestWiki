@@ -94,7 +94,7 @@
                 <td>{{song.language}}</td>
                 <td>{{song.artist}}</td>
                 <td>"{{song.song}}"</td>
-                <ng-container *ngIf="song.dqphase !== p">
+                <ng-container *ngIf="song.dqphase !== p && song.draws[p].qualifier !== 'XAQ'">
                   <ng-container *ngIf="song.draws[p].place !== -1">
                     <td>{{song.draws[p].place}}</td>
                     <td>{{song.draws[p].points}}</td>
@@ -106,6 +106,9 @@
                 </ng-container>
                 <ng-container *ngIf="song.dqphase === p">
                   <td class="dqrow" colspan="2" [innerHTML]="getDQReason(song.dqreason)"></td>
+                </ng-container>
+                <ng-container *ngIf="song.draws[p].qualifier === 'XAQ'">
+                  <td class="dqrow" colspan="2">Automatic qualifier</td>
                 </ng-container>
               </tr>
             </ng-container>
@@ -170,7 +173,9 @@
                 <th>Place</th>
               </tr>
               <tr *ngFor="let song of songsbyphase[p][f]" [ngStyle]="getPointStyle(song, p)">
-                <td><b>{{song.country}}</b></td>
+                <td [ngStyle]="p + 1 === edition.phases.length ? {	'white-space': 'nowrap' } : { }">
+                  <b>{{song.country}}</b>
+                </td>
                 <ng-container *ngFor="let voter of votersbyphase[p][f]">
                   <td [ngStyle]="(voter.country == song.country) ? { 'background-color': '#aaa' } : { }"
                     [innerHTML]="getPoints(voter, song.country, p, f)"></td>

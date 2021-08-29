@@ -34,7 +34,7 @@
 	<button (click)="generate(users.value, editions.value)">Generate</button>
 
 	<div *ngIf="invalid.length">
-		The following users were not found in the database and will be treated as debutants:
+		The following users do not have votes for the selected editions:
 		<div *ngFor="let inv of invalid">
 			{{inv}}
 		</div>
