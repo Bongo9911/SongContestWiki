@@ -62,14 +62,15 @@ export class CountryScreenComponent implements OnInit {
       .collection('newsongs').where('country', '==', this.country).get().then(docs => {
         docs.forEach((doc) => {
           this.songs.push(doc.data() as Song);
-          this.songs = this.songs.sort((a, b) => (a.edval > b.edval) ? 1 : -1);
-          this.numEntries = this.songs.length;
-          this.numQualifiers = this.songs.filter(function (song) {
-            return song.draws.length === song.phases;
-          }).length;
-
-          this.phases = [...this.songs].sort((a, b) => a.phases < b.phases ? 1 : -1)[0].phases
         });
+
+        this.songs = this.songs.sort((a, b) => (a.edval > b.edval) ? 1 : -1);
+        this.numEntries = this.songs.length;
+        this.numQualifiers = this.songs.filter(function (song) {
+          return song.draws.length === song.phases;
+        }).length;
+
+        this.phases = [...this.songs].sort((a, b) => a.phases < b.phases ? 1 : -1)[0].phases
 
         for (let i = 0; i <= this.phases; ++i) {
           let songsort = [...this.songs].filter(song => song.draws.length === song.phases - i &&

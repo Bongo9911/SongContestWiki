@@ -53,7 +53,7 @@
       <tr [ngStyle]="getStyle(song)">
         <td><a routerLink="/contest/{{id}}/ed/{{song.edition}}">{{song.edition}}</a></td>
         <td>
-          <img class="flag" src="./assets/flags/{{song.country}} Flag.png">
+          <img class="flag" src="{{flagUrls[song.country]}}">
           <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a>
         </td>
         <td>{{song.language}}</td>

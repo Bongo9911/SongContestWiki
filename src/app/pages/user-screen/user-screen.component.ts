@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
 import { Contest, Song } from 'src/app/shared/datatypes';
 import firebase from 'firebase';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 @Component({
   selector: 'app-user-screen',
@@ -19,6 +20,7 @@ export class UserScreenComponent implements OnInit {
   };
   id: string;
   user: string;
+  flagUrls: any = {};
 
   songs: Song[] = [];
 
@@ -34,7 +36,8 @@ export class UserScreenComponent implements OnInit {
 
   phases: number = 2;
 
-  constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
+  constructor(private database: AngularFirestore, private storage: AngularFireStorage,
+    private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
       this.id = params.id;
       this.user = params.user;
@@ -48,19 +51,29 @@ export class UserScreenComponent implements OnInit {
       });
 
     //get all the songs sent for that user
-    //get all the songs sent for that country
     this.database.firestore.collection('contests').doc(this.id)
       .collection('newsongs').where('user', '==', this.user).get().then(docs => {
         docs.forEach((doc) => {
           this.songs.push(doc.data() as Song);
-          this.songs = this.songs.sort((a, b) => (a.edval > b.edval) ? 1 : -1);
-          this.numEntries = this.songs.length;
-          this.numQualifiers = this.songs.filter(function (song) {
-            return song.draws.length === song.phases;
-          }).length;
-
-          this.phases = [...this.songs].sort((a, b) => a.phases < b.phases ? 1 : -1)[0].phases
         });
+
+        this.songs = this.songs.sort((a, b) => (a.edval > b.edval) ? 1 : -1);
+        this.numEntries = this.songs.length;
+        this.numQualifiers = this.songs.filter(function (song) {
+          return song.draws.length === song.phases;
+        }).length;
+
+        this.phases = [...this.songs].sort((a, b) => a.phases < b.phases ? 1 : -1)[0].phases
+
+        this.songs.forEach(song => {
+          if (!(song.country in this.flagUrls)) {
+            this.flagUrls[song.country] = "";
+            storage.storage.ref('contests/' + this.id + '/flags/' + song.country + ' Flag.png')
+              .getDownloadURL().then(url => {
+                this.flagUrls[song.country] = url;
+              })
+          }
+        })
 
         for (let i = 0; i <= this.phases; ++i) {
           let songsort = [...this.songs].filter(song => song.draws.length === song.phases - i &&
@@ -306,14 +319,14 @@ export class UserScreenComponent implements OnInit {
 
     parsedString.forEach(x => {
       this.database.firestore.collection('contests').doc(this.id)
-        .collection('newsongs').where('country', '==', x[0]).where('edition','==','41').get().then(docs => {
-          if(docs.docs.length) {
+        .collection('newsongs').where('country', '==', x[0]).where('edition', '==', '41').get().then(docs => {
+          if (docs.docs.length) {
             let song = docs.docs[0].data() as Song;
             song.draws[0].intpoints = parseInt(x[1]),
-            song.draws[0].rawextpoints = parseInt(x[2]),
-            song.draws[0].extpoints = parseInt(x[3]),
-            this.database.firestore.collection('contests').doc(this.id)
-            .collection('newsongs').doc(docs.docs[0].id).update(song);
+              song.draws[0].rawextpoints = parseInt(x[2]),
+              song.draws[0].extpoints = parseInt(x[3]),
+              this.database.firestore.collection('contests').doc(this.id)
+                .collection('newsongs').doc(docs.docs[0].id).update(song);
           }
         })
     })
@@ -333,10 +346,10 @@ export class UserScreenComponent implements OnInit {
 
       this.database.firestore.collection('contests').doc(this.id)
         .collection('newsongs').where('country', '==', parsedString[0][j])
-        .where('edition','==','41').get().then(docs => {
-          if(docs.docs.length) {
+        .where('edition', '==', '41').get().then(docs => {
+          if (docs.docs.length) {
             let data = docs.docs[0].data() as Song;
-            if(data.pointsets.length !== 2) {
+            if (data.pointsets.length !== 2) {
               data.pointsets.push({});
             }
             data.pointsets[1][1] = {
@@ -345,7 +358,7 @@ export class UserScreenComponent implements OnInit {
             }
 
             this.database.firestore.collection('contests').doc(this.id)
-            .collection('newsongs').doc(docs.docs[0].id).set(data)
+              .collection('newsongs').doc(docs.docs[0].id).set(data)
           }
           else {
             console.log(parsedString[0][j] + " Not Found!")
