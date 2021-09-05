@@ -21,7 +21,7 @@
               <div>
                 <ng-container *ngFor="let country of ed.hostcountries; index as j;">
                   <a routerLink="/contest/{{id}}/country/{{country}}">
-                    <img class="flag" src="{{ed.flagurls[j]}}">
+                    <img class="flag" src="{{flagUrls[country]}}">
                   </a>
                 </ng-container>
                 <a routerLink="/contest/RSC/ed/{{ ed.edition }}">{{ ed.edition }}</a>
@@ -78,13 +78,13 @@
                 <td>
                   <div style="display: flex; flex-direction: column;">
                     <div *ngFor="let country of eds[i].hostcountries; index as j;">
-                      <img class="flag" src="{{eds[i].flagurls[j]}}">
+                      <img class="flag" src="{{flagUrls[country]}}">
                       <a routerLink="/contest/{{con.id}}/country/{{country}}">{{country}}</a>
                     </div>
                   </div>
                 </td>
                 <td>
-                  <img class="flag" src="{{winner.flagurl}}">
+                  <img class="flag" src="{{flagUrls[winner.country]}}">
                   <a routerLink="/contest/{{con.id}}/country/{{winner.country}}">{{winner.country}}</a>
                 </td>
                 <td>

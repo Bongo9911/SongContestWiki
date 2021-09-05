@@ -51,7 +51,9 @@ export interface Draw {
 	intpoints?: number;
 	extpoints?: number; //External points (from cross-voting)
 	rawextpoints?: number; // external points without scaling
-	qualifier?: string; //'Q', 'NQ', or 'AQ' for SFs, 'FAQ' or 'NAQ' for F
+	qualifier?: string; //'Q', 'NQ', 'XAQ' or 'AQ' for SFs, 'FAQ' or 'NAQ' for F
+						//Q = Qualifier, NQ = Non-qualifer, XAQ = Extra AQ, 
+						//AQ = Automaitc Qualifier, FAQ = Final AQ, NAQ = Non-AQ
 }
 
 interface Pointset {

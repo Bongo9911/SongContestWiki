@@ -16,16 +16,18 @@ export class ContestScreenComponent implements OnInit {
     name: '',
     id: ''
   };
-  eds: EditionWithUrl[] = [];
+  eds: SmallEdition[] = [];
   id: string;
 
-  winners: SongWithUrl[] = [];
+  winners: SmallSong[] = [];
 
   logos: string[] = []; //For edition logo urls
   edflags: string[][] = []; //Flags for each ed host
   mainLogo: string = ""; //For the contest logo
 
-  constructor(private database: AngularFirestore, private storage: AngularFireStorage, 
+  flagUrls: any = {};
+
+  constructor(private database: AngularFirestore, private storage: AngularFireStorage,
     private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => this.id = params.id);
 
@@ -43,7 +45,7 @@ export class ContestScreenComponent implements OnInit {
     this.database.firestore.collection('contests').doc(this.id).collection('editions').get()
       .then(docs => {
         docs.forEach((doc) => {
-          this.eds.push(doc.data() as EditionWithUrl);
+          this.eds.push(doc.data() as SmallEdition);
           console.log(doc.data());
         });
         this.eds.sort((a, b) => a.edval > b.edval ? 1 : -1);
@@ -54,23 +56,14 @@ export class ContestScreenComponent implements OnInit {
             .getDownloadURL().then(url => {
               this.logos[i] = url;
             })
-          this.eds[i].flagurls = new Array(this.eds[i].hostcountries.length);
-          for (let j = 0; j < this.eds[i].flagurls.length; ++j) {
-            storage.storage.ref('contests/' + this.id + '/flags/' + this.eds[i].hostcountries[j]
-              + ' Flag.png')
-              .getDownloadURL().then(url => {
-                this.eds[i].flagurls[j] = url;
-              })
-          }
         }
 
         this.database.firestore.collection('contests').doc(this.id).collection('newsongs')
           .where('winner', '==', true).get().then(docs => {
 
-            let winners: SongWithUrl[] = []
+            let winners: SmallSong[] = []
             for (let i = 0; i < docs.docs.length; ++i) {
-              let data = docs.docs[i].data() as Song;
-              winners.push({ flagurl: "", ...data });
+              winners.push(docs.docs[i].data() as Song);
             }
 
             for (let i = 0; i < this.eds.length; ++i) {
@@ -85,13 +78,25 @@ export class ContestScreenComponent implements OnInit {
                 })
               }
             }
-            for (let i = 0; i < this.winners.length; ++i) {
-              if ("country" in this.winners[i]) {
-                storage.storage.ref('contests/' + this.id + '/flags/' + this.winners[i].country + ' Flag.png')
-                  .getDownloadURL().then(url => {
-                    this.winners[i].flagurl = url;
-                  })
+
+            for (let i = 0; i < this.eds.length; ++i) {
+              for (let j = 0; j < this.eds[i].hostcountries.length; ++j) {
+                if (!(this.eds[i].hostcountries[j] in this.flagUrls)) {
+                  this.flagUrls[this.eds[i].hostcountries[j]] = "";
+                  storage.storage.ref('contests/' + this.id + '/flags/' + this.eds[i].hostcountries[j] + ' Flag.png')
+                    .getDownloadURL().then(url => {
+                      this.flagUrls[this.eds[i].hostcountries[j]] = url;
+                    })
+                }
               }
+            }
+
+            for (let i = 0; i < winners.length; ++i) {
+              this.flagUrls[winners[i].country] = "";
+              storage.storage.ref('contests/' + this.id + '/flags/' + winners[i].country + ' Flag.png')
+                .getDownloadURL().then(url => {
+                  this.flagUrls[winners[i].country] = url;
+                })
             }
           })
       });
@@ -102,20 +107,18 @@ export class ContestScreenComponent implements OnInit {
 
 }
 
-interface SongWithUrl {
+interface SmallSong {
   artist?: string;
   country?: string;
   edition: string;
   edval: number;
-  flagurl?: string; //for the url of the country's flag
   language?: string;
   song?: string;
   user?: string;
 }
 
-interface EditionWithUrl {
+interface SmallEdition {
   edition: string;
   edval: number;
   hostcountries: string[];
-  flagurls: string[];
 }

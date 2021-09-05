@@ -69,10 +69,9 @@
       <hr />
     </div>
     <div *ngFor="let num of [].constructor(phase.num); index as i">
-      <h3 *ngIf="phase.num > 1">{{phase.name}} {{i + 1}}</h3>
-
       <ng-container *ngIf="songtablesbyphase.length">
-        <div style="overflow-x: auto">
+        <div style="overflow-x: auto; min-width: 300px;">
+          <h3 *ngIf="phase.num > 1">{{phase.name}} {{i + 1}}</h3>
           <table matSort (matSortChange)="sortData($event, p, i)">
             <tr>
               <th mat-sort-header="draw">Draw</th>
@@ -118,7 +117,7 @@
     </div>
   </div>
 
-  <div *ngIf="votersbyphase[0][0].length">
+  <div *ngIf="votersbyphase.length && votersbyphase[0].length">
     <div class="sectionheader">
       <h2>Scoreboard<ng-container *ngIf="edition.phases.length > 1">s</ng-container>
       </h2>
