@@ -2,128 +2,128 @@
 
 <div class="container">
 
-  <a routerLink="/contest/{{id}}">&#60; {{con.name}}</a>
+	<a routerLink="/contest/{{id}}">&#60; {{con.name}}</a>
 
-  <h1>{{user}}</h1>
-  <hr />
+	<h1>{{user}}</h1>
+	<hr />
 
-  <div class="infoboxcon">
-    <div class="infobox">
-      <div class="infoboxheader">
-        {{user}}
-      </div>
-      <div class="infoboxheader">
-        Appearances
-      </div>
-      <div class="infoboxsection">
-        <div><b>Appearances</b></div>
-        <div>{{numEntries}} ({{numQualifiers}} final<ng-container *ngIf="numQualifiers !== 1">s</ng-container>)</div>
-      </div>
-      <div class="infoboxsection" *ngIf="bestPlace">
-        <div><b>Best Result</b></div>
-        <div>{{bestPlace}}: <a routerLink="/contest/{{id}}/ed/{{bestEd}}">{{bestEd}}</a></div>
-      </div>
-      <div class="infoboxsection" *ngIf="worstPlace">
-        <div><b>Worst Result</b></div>
-        <div>{{worstPlace}}: <a routerLink="/contest/{{id}}/ed/{{worstEd}}">{{worstEd}}</a></div>
-      </div>
-    </div>
-  </div>
+	<div class="infoboxcon">
+		<div class="infobox">
+			<div class="infoboxheader">
+				{{user}}
+			</div>
+			<div class="infoboxheader">
+				Appearances
+			</div>
+			<div class="infoboxsection">
+				<div><b>Appearances</b></div>
+				<div>{{numEntries}} ({{numQualifiers}} final<ng-container *ngIf="numQualifiers !== 1">s</ng-container>)</div>
+			</div>
+			<div class="infoboxsection" *ngIf="bestPlace">
+				<div><b>Best Result</b></div>
+				<div>{{bestPlace}}: <a routerLink="/contest/{{id}}/ed/{{bestEd}}">{{bestEd}}</a></div>
+			</div>
+			<div class="infoboxsection" *ngIf="worstPlace">
+				<div><b>Worst Result</b></div>
+				<div>{{worstPlace}}: <a routerLink="/contest/{{id}}/ed/{{worstEd}}">{{worstEd}}</a></div>
+			</div>
+		</div>
+	</div>
 
-  <div class="sectionheader">
-    <h2>Entries</h2>
-    <hr />
-  </div>
+	<div class="sectionheader">
+		<h2>Entries</h2>
+		<hr />
+	</div>
 
-  <div class="tablecon">
-    <table matSort (matSortChange)="sortData($event)">
-      <tr>
-        <th mat-sort-header="edition">Edition</th>
-        <th mat-sort-header="country">Country</th>
-        <th mat-sort-header="language">Language</th>
-        <th mat-sort-header="artist">Artist</th>
-        <th mat-sort-header="song">Song</th>
-        <th mat-sort-header="fplace">Final</th>
-        <th mat-sort-header="fpoints">Points</th>
-        <th mat-sort-header="sfplace" *ngIf="phases >= 2">Semi</th>
-        <th mat-sort-header="sfpoints" *ngIf="phases >= 2">Points</th>
-        <th mat-sort-header="qfplace" *ngIf="phases >= 3">Qtr</th>
-        <th mat-sort-header="qfpoints" *ngIf="phases >= 3">Points</th>
-        <th mat-sort-header="ofplace" *ngIf="phases >= 4">Octo</th>
-        <th mat-sort-header="ofpoints" *ngIf="phases >= 4">Points</th>
-      </tr>
-      <ng-container *ngFor="let song of songs">
-        <tr [ngStyle]="getStyle(song)">
-          <td><a routerLink="/contest/{{id}}/ed/{{song.edition}}">{{song.edition}}</a></td>
-          <td>
-            <img class="flag" src="{{flagUrls[song.country]}}">
-            <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a>
-          </td>
-          <td>{{song.language}}</td>
-          <td>{{song.artist}}</td>
-          <td>"{{song.song}}"</td>
+	<div class="tablecon">
+		<table matSort (matSortChange)="sortData($event)">
+			<tr>
+				<th mat-sort-header="edition">Edition</th>
+				<th mat-sort-header="country">Country</th>
+				<th mat-sort-header="language">Language</th>
+				<th mat-sort-header="artist">Artist</th>
+				<th mat-sort-header="song">Song</th>
+				<th mat-sort-header="fplace">Final</th>
+				<th mat-sort-header="fpoints">Points</th>
+				<th mat-sort-header="sfplace" *ngIf="phases >= 2">Semi</th>
+				<th mat-sort-header="sfpoints" *ngIf="phases >= 2">Points</th>
+				<th mat-sort-header="qfplace" *ngIf="phases >= 3">Qtr</th>
+				<th mat-sort-header="qfpoints" *ngIf="phases >= 3">Points</th>
+				<th mat-sort-header="ofplace" *ngIf="phases >= 4">Octo</th>
+				<th mat-sort-header="ofpoints" *ngIf="phases >= 4">Points</th>
+			</tr>
+			<ng-container *ngFor="let song of songs">
+				<tr [ngStyle]="getStyle(song)">
+					<td><a routerLink="/contest/{{id}}/ed/{{song.edition}}">{{song.edition}}</a></td>
+					<td>
+						<img class="flag" src="{{flagUrls[song.country]}}">
+						<a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a>
+					</td>
+					<td>{{song.language}}</td>
+					<td>{{song.artist}}</td>
+					<td>"{{song.song}}"</td>
 
-          <ng-container *ngFor="let num of [].constructor(phases); index as p">
-            <ng-container *ngIf="song.phases >= (p + 1)">
-              <ng-container *ngIf="(song.dqphase === -1 || song.dqphase >= (song.phases - p)) 
+					<ng-container *ngFor="let num of [].constructor(phases); index as p">
+						<ng-container *ngIf="song.phases >= (p + 1)">
+							<ng-container *ngIf="(song.dqphase === -1 || song.dqphase >= (song.phases - p)) 
 							&& song.draws.length >= (song.phases - p) &&
 							song.draws[song.phases - p - 1].qualifier !== 'AQ' &&
 							song.draws[song.phases - p - 1].qualifier !== 'XAQ'">
-                <ng-container *ngIf="song.draws[song.phases - p - 1].place">
-                  <td [ngStyle]="p !== 0 ? getSFStyle(song.draws[song.phases - p - 1].place) : {}">
-                    {{song.draws[song.phases - p - 1].place}}
-                  </td>
-                  <td [ngStyle]="p !== 0 ? getSFStyle(song.draws[song.phases - p - 1].place) : {}">
-                    {{song.draws[song.phases - p - 1].points}}
-                  </td>
-                </ng-container>
-                <ng-container *ngIf="!(song.draws[song.phases - p - 1].place)">
-                  <td></td>
-                  <td></td>
-                </ng-container>
-              </ng-container>
-              <ng-container *ngIf="song.draws.length < (song.phases - p) && p == 0 && song.draws[p].qualifier === 'NQ'">
-                <td class="dqrow" colspan="2 * (p + 1)">Did not qualify</td>
-              </ng-container>
-              <ng-container *ngIf="song.draws.length < (song.phases - p) && p == 0 && song.draws[p].qualifier !== 'NQ'">
-                <td></td>
-                <td></td>
-              </ng-container>
-              <ng-container *ngIf="song.draws.length > song.dqphase &&
+								<ng-container *ngIf="song.draws[song.phases - p - 1].place">
+									<td [ngStyle]="p !== 0 ? getSFStyle(song.draws[song.phases - p - 1].place) : {}">
+										{{song.draws[song.phases - p - 1].place}}
+									</td>
+									<td [ngStyle]="p !== 0 ? getSFStyle(song.draws[song.phases - p - 1].place) : {}">
+										{{song.draws[song.phases - p - 1].points}}
+									</td>
+								</ng-container>
+								<ng-container *ngIf="!(song.draws[song.phases - p - 1].place)">
+									<td></td>
+									<td></td>
+								</ng-container>
+							</ng-container>
+							<ng-container *ngIf="song.draws.length < (song.phases - p) && p == 0 && song.draws[p].qualifier === 'NQ'">
+								<td class="dqrow" colspan="2 * (p + 1)">Did not qualify</td>
+							</ng-container>
+							<ng-container *ngIf="song.draws.length < (song.phases - p) && p == 0 && song.draws[p].qualifier !== 'NQ'">
+								<td></td>
+								<td></td>
+							</ng-container>
+							<ng-container *ngIf="song.draws.length > song.dqphase &&
 							song.dqphase !== -1 && p == 0 && song.dqreason === 'DQ'">
-                <td class="dqrow" colspan="2 * (song.phases - song.dqphase)">Disqualified</td>
-              </ng-container>
-              <ng-container *ngIf="song.draws.length > song.dqphase &&
+								<td class="dqrow" colspan="2 * (song.phases - song.dqphase)">Disqualified</td>
+							</ng-container>
+							<ng-container *ngIf="song.draws.length > song.dqphase &&
 							song.dqphase !== -1 && p == 0 && song.dqreason === 'WD'">
-                <td class="dqrow" colspan="2 * (song.phases - song.dqphase)">Withdrawn</td>
-              </ng-container>
-              <ng-container *ngIf="song.draws.length >= (song.phases - p) &&
+								<td class="dqrow" colspan="2 * (song.phases - song.dqphase)">Withdrawn</td>
+							</ng-container>
+							<ng-container *ngIf="song.draws.length >= (song.phases - p) &&
 							(song.draws[song.phases - p - 1].qualifier === 'AQ' ||
               song.draws[song.phases - p - 1].qualifier === 'XAQ')">
-                <td class="dqrow" colspan="2">Automatic qualifier</td>
-              </ng-container>
-            </ng-container>
-            <ng-container *ngIf="song.phases < (p + 1) && p === 1">
-              <td class="dqrow" colspan="2"> No semi-finals</td>
-            </ng-container>
-            <ng-container *ngIf="song.phases < (p + 1) && p === 2">
-              <td class="dqrow" colspan="2"> No quarter-finals</td>
-            </ng-container>
-            <ng-container *ngIf="song.phases < (p + 1) && p === 2">
-              <td class="dqrow" colspan="2"> No octo-finals</td>
-            </ng-container>
-          </ng-container>
-        </tr>
-      </ng-container>
-    </table>
-  </div>
+								<td class="dqrow" colspan="2">Automatic qualifier</td>
+							</ng-container>
+						</ng-container>
+						<ng-container *ngIf="song.phases < (p + 1) && p === 1">
+							<td class="dqrow" colspan="2"> No semi-finals</td>
+						</ng-container>
+						<ng-container *ngIf="song.phases < (p + 1) && p === 2">
+							<td class="dqrow" colspan="2"> No quarter-finals</td>
+						</ng-container>
+						<ng-container *ngIf="song.phases < (p + 1) && p === 2">
+							<td class="dqrow" colspan="2"> No octo-finals</td>
+						</ng-container>
+					</ng-container>
+				</tr>
+			</ng-container>
+		</table>
+	</div>
 
-  <textarea #points></textarea>
+	<textarea #points></textarea>
 
-  <button (click)="uploadPoints(points.value)">Upload</button>
-  <button (click)="uploadTablePoints(points.value)">Upload From Table</button>
-  <button (click)="uploadPointTotals(points.value)">Upload Totals</button>
-  <button (click)="uploadPointsFromSpreadsheet(points.value)">Upload From Spreadsheet</button>
+	<button (click)="uploadPoints(points.value)">Upload</button>
+	<button (click)="uploadTablePoints(points.value)">Upload From Table</button>
+	<button (click)="uploadPointTotals(points.value)">Upload Totals</button>
+	<button (click)="uploadPointsFromSpreadsheet(points.value)">Upload From Spreadsheet</button>
 
-  <!-- <button (click)="deleteSongs()">Delete</button> -->
+	<!-- <button (click)="deleteSongs()">Delete</button> -->
 </div>

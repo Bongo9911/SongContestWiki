@@ -1,5 +1,6 @@
 .container {
-	margin: 0px 30px 0px 30px;
+	margin: 0px 2vw;
+	padding-bottom: 30px;
 }
 
 th, td {
@@ -22,7 +23,8 @@ table, th, td {
 .infobox {
 	border: 1px solid gray;
 	background-color: #f5f5f5;
-	padding: 5px 5px 5px 5px
+	padding: 5px 5px 5px 5px;
+	margin-bottom: 5px;
 }
 
 @media (min-width: 500px) {
@@ -32,10 +34,28 @@ table, th, td {
 		width: 315px;
 	}
 }
+
 @media (max-width: 500px) {
 	.infobox {
 		width: 100%;
 	}
+	.infoboxcon {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: row;
+		width: 96vw;
+	}
+	.tablecon {
+		overflow-x: auto;
+		min-width: 300px;
+	}
+}
+
+.tablecon {
+	width: fit-content;
+	max-width: 100%;
+	overflow-x: auto;
 }
 
 .infoboxheader {
