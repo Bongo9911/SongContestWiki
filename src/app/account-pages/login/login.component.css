@@ -1,3 +1,19 @@
 .container {
 	padding: 30px 2vw;
+	display: flex;
+	justify-content: center;
+	background-color: #ffd9b3;
+	height: calc(100% - 60px);
+	align-items: center;
+}
+
+.card {
+	background-color: #fff9e6;
+	border: 2px solid #ffa64d;
+	border-radius: 10px;
+	width: 300px;
+	max-width: 100%;
+	padding: 80px 20px;
+	height: fit-content;
+	box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
 }
