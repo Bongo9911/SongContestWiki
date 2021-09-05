@@ -1,7 +1,18 @@
-<h1>Login</h1>
+<div class="container">
+	<h1 style="text-align: center;">Login</h1>
 
-<form ng-form (ngSubmit)="loginUser()">
-	<input type="email" autocomplete="email" [(ngModel)]="email" name="email"/>
-	<input type="password" autocomplete="password" [(ngModel)]="password" name="password"/>
-	<button mat-button type="submit">Login</button>
-</form>
+	<form ng-form (ngSubmit)="loginUser()">
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<mat-form-field appearance="fill">
+				<mat-label>Email</mat-label>
+				<input matInput type="email" autocomplete="email" [(ngModel)]="email" name="email" required />
+			</mat-form-field>
+			<mat-form-field appearance="fill">
+				<mat-label>Password</mat-label>
+				<input matInput type="password" autocomplete="password" [(ngModel)]="password" name="password"
+					required />
+			</mat-form-field>
+			<button mat-raised-button type="submit" color="primary">Login</button>
+		</div>
+	</form>
+</div>

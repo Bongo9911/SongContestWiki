@@ -10,7 +10,8 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSortModule } from '@angular/material/sort';
-import { MatButtonModule } from '@angular/material/button'
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
 
 import { ContestScreenComponent } from './pages/contest-screen/contest-screen.component';
 import { StartScreenComponent } from './pages/start-screen/start-screen.component';
@@ -41,7 +42,8 @@ import { LoginComponent } from './account-pages/login/login.component';
     CommonModule,
     BrowserAnimationsModule,
     MatSortModule,
-    MatButtonModule
+    MatButtonModule,
+    MatInputModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
