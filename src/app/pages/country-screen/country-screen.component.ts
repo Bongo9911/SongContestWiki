@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
 import { firestore } from 'firebase';
 import { Contest, Song, } from 'src/app/shared/datatypes';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 @Component({
   selector: 'app-country-screen',
@@ -20,6 +21,7 @@ export class CountryScreenComponent implements OnInit {
   };
   id: string;
   country: string;
+  flagUrl: string = "";
 
   songs: Song[] = [];
   sortedData: Song[];
@@ -36,7 +38,8 @@ export class CountryScreenComponent implements OnInit {
 
   phases: number = 2;
 
-  constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) {
+  constructor(private database: AngularFirestore, private storage: AngularFireStorage,
+    private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
       this.id = params.id;
       this.country = params.country;
@@ -48,6 +51,11 @@ export class CountryScreenComponent implements OnInit {
           this.con = doc.data() as Contest;
         });
       });
+
+    storage.storage.ref('contests/' + this.id + '/flags/' + this.country + ' Flag.png')
+      .getDownloadURL().then(url => {
+        this.flagUrl = url;
+      })
 
     //get all the songs sent for that country
     this.database.firestore.collection('contests').doc(this.id)
