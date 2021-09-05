@@ -1,5 +1,5 @@
 .container {
-	margin: 0px 30px 0px 30px;
+	margin: 0px 2vw;
 }
 
 th, td {
@@ -33,10 +33,28 @@ table, th, td {
 		width: 315px;
 	}
 }
+
 @media (max-width: 500px) {
 	.infobox {
 		width: 100%;
 	}
+	.infoboxcon {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: row;
+		width: 96vw;
+	}
+	.tablecon {
+		overflow-x: auto;
+		min-width: 300px;
+	}
+}
+
+.tablecon {
+	width: fit-content;
+	max-width: 100%;
+	overflow-x: auto;
 }
 
 .infoboxheader {
@@ -55,8 +73,8 @@ table, th, td {
 	flex-wrap: nowrap;
 }
 
-.infoboxsection> div {
-  min-width: 45%;
+.infoboxsection>div {
+	min-width: 45%;
 }
 
 a {
@@ -85,8 +103,8 @@ h2 {
 }
 
 ::ng-deep .mat-sort-header-container {
-	display:flex;
-	justify-content:center;
+	display: flex;
+	justify-content: center;
 }
 
 .dqrow {
