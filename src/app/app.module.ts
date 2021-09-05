@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSortModule } from '@angular/material/sort';
+import { MatButtonModule } from '@angular/material/button'
 
 import { ContestScreenComponent } from './pages/contest-screen/contest-screen.component';
 import { StartScreenComponent } from './pages/start-screen/start-screen.component';
@@ -18,6 +19,7 @@ import { UserScreenComponent } from './pages/user-screen/user-screen.component';
 import { ReallocatorScreenComponent } from './pages/reallocator-screen/reallocator-screen.component';
 import { CountryScreenComponent } from './pages/country-screen/country-screen.component';
 import { PotGeneratorComponent } from './pages/pot-generator/pot-generator.component';
+import { LoginComponent } from './account-pages/login/login.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +31,7 @@ import { PotGeneratorComponent } from './pages/pot-generator/pot-generator.compo
     ReallocatorScreenComponent,
     CountryScreenComponent,
     PotGeneratorComponent,
+    LoginComponent,
   ],
   imports: [
     BrowserModule,
@@ -38,6 +41,7 @@ import { PotGeneratorComponent } from './pages/pot-generator/pot-generator.compo
     CommonModule,
     BrowserAnimationsModule,
     MatSortModule,
+    MatButtonModule
   ],
   providers: [],
   bootstrap: [AppComponent]

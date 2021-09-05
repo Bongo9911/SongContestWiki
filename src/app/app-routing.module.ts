@@ -7,6 +7,7 @@ import { UserScreenComponent } from './pages/user-screen/user-screen.component';
 import { ReallocatorScreenComponent } from './pages/reallocator-screen/reallocator-screen.component';
 import { CountryScreenComponent } from './pages/country-screen/country-screen.component';
 import { PotGeneratorComponent } from './pages/pot-generator/pot-generator.component';
+import { LoginComponent } from './account-pages/login/login.component';
 
 const routes: Routes = [
   { path: "", component: StartScreenComponent },
@@ -17,6 +18,7 @@ const routes: Routes = [
   { path: "contest/:id/country/:country", component: CountryScreenComponent },
   { path: "contest/:id/pot-generator", component: PotGeneratorComponent },
   { path: "tools/reallocator", component: ReallocatorScreenComponent },
+  { path: "login", component: LoginComponent },
   { path: "**", redirectTo: ''}
 ];
 
