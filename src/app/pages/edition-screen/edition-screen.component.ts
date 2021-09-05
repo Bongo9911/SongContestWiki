@@ -41,6 +41,8 @@ export class EditionScreenComponent implements OnInit {
   songtablesbyphase: Song[][][] = [];
   pointtablesbyphase: Song[][][] = [];
 
+  flagUrls: any = {};
+
   constructor(private database: AngularFirestore, private storage: AngularFireStorage,
     private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
@@ -260,6 +262,18 @@ export class EditionScreenComponent implements OnInit {
               songs.push(doc.data() as Song);
             });
             this.entries = songs.length;
+
+            songs.forEach(song => {
+              if (!(song.country in this.flagUrls)) {
+                this.storage.storage.ref('contests/' + this.id + '/flags/' + song.country + ' Flag.png')
+                  .getDownloadURL().then(url => {
+                    this.flagUrls[song.country] = url;
+                  }).catch(() => {
+                    //Set it to a string so that it shows the image not found image
+                    this.flagUrls[song.country] = "/" 
+                  })
+              }
+            })
 
             for (let i = 0; i < this.edition.phases.length; ++i) {
               this.songsbyphase.push(new Array(this.edition.phases[i].num));
@@ -506,7 +520,7 @@ export class EditionScreenComponent implements OnInit {
     }
     else {
       if (song.draws[phase].qualifier === 'Q') return { 'background-color': '#fbdead' };
-      else if(song.draws[phase].qualifier === 'XAQ') return { 'background-color': '#bae8ff' };
+      else if (song.draws[phase].qualifier === 'XAQ') return { 'background-color': '#bae8ff' };
       else return {};
     }
   }

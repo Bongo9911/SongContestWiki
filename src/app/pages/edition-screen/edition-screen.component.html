@@ -24,8 +24,7 @@
         <div *ngIf="edition.hostcountries.length === 1"><b>Host country</b></div>
         <div *ngIf="edition.hostcountries.length > 1"><b>Host countries</b></div>
         <div>
-          <div *ngFor="let country of edition.hostcountries"><img class="flag"
-              src="./assets/flags/{{country}} Flag.png">
+          <div *ngFor="let country of edition.hostcountries"><img class="flag" src="{{flagUrls[country]}}">
             <a routerLink="/contest/{{id}}/country/{{country}}">{{country}}</a>
           </div>
         </div>
@@ -87,8 +86,10 @@
               <tr [ngStyle]="getRowStyle(p, song.dqphase, song.draws[p].place, song.draws[p].qualifier)">
                 <td *ngIf="song.draws[p].ro >= 1">{{song.draws[p].ro}}</td>
                 <td *ngIf="song.draws[p].ro < 1"></td>
-                <td><img class="flag" src="./assets/flags/{{song.country}} Flag.png"> <a
-                    routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
+                <td>
+                  <img class="flag" src="{{flagUrls[song.country]}}">
+                  <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a>
+                </td>
                 <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
                 <td>{{song.language}}</td>
                 <td>{{song.artist}}</td>
@@ -148,7 +149,7 @@
                 <tr [ngStyle]="getPointStyle(song, p)" *ngIf="song.draws[p].place !== -1">
                   <td>{{song.draws[p].place}}</td>
                   <td>
-                    <img class="flag" src="./assets/flags/{{song.country}} Flag.png">
+                    <img class="flag" src="{{flagUrls[song.country]}}">
                     <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a>
                   </td>
                   <td>{{song.draws[p].intpoints}}</td>
@@ -166,7 +167,7 @@
                   <th></th>
                   <th *ngFor="let voter of votersbyphase[p][f]">
                     <a routerLink="/contest/{{id}}/country/{{voter.country}}">
-                      <img class="smallflag" src="./assets/flags/{{voter.country}} Flag.png">
+                      <img class="smallflag" src="{{flagUrls[voter.country]}}">
                     </a>
                   </th>
                   <th>Total</th>
@@ -209,7 +210,7 @@
                 <th></th>
                 <th *ngFor="let voter of crossvotersbyphase[p][f]">
                   <a routerLink="/contest/{{id}}/country/{{voter.country}}">
-                    <img class="smallflag" src="./assets/flags/{{voter.country}} Flag.png">
+                    <img class="smallflag" src="{{flagUrls[voter.country]}}">
                   </a>
                 </th>
                 <th>Raw Total</th>
