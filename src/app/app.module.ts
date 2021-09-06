@@ -21,6 +21,7 @@ import { ReallocatorScreenComponent } from './pages/reallocator-screen/reallocat
 import { CountryScreenComponent } from './pages/country-screen/country-screen.component';
 import { PotGeneratorComponent } from './pages/pot-generator/pot-generator.component';
 import { LoginComponent } from './account-pages/login/login.component';
+import { RegisterComponent } from './account-pages/register/register.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { LoginComponent } from './account-pages/login/login.component';
     CountryScreenComponent,
     PotGeneratorComponent,
     LoginComponent,
+    RegisterComponent,
   ],
   imports: [
     BrowserModule,

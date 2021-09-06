@@ -8,6 +8,7 @@ import { ReallocatorScreenComponent } from './pages/reallocator-screen/reallocat
 import { CountryScreenComponent } from './pages/country-screen/country-screen.component';
 import { PotGeneratorComponent } from './pages/pot-generator/pot-generator.component';
 import { LoginComponent } from './account-pages/login/login.component';
+import { RegisterComponent } from './account-pages/register/register.component';
 
 const routes: Routes = [
   { path: "", component: StartScreenComponent },
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: "contest/:id/pot-generator", component: PotGeneratorComponent },
   { path: "tools/reallocator", component: ReallocatorScreenComponent },
   { path: "login", component: LoginComponent },
+  { path: "register", component: RegisterComponent },
   { path: "**", redirectTo: ''}
 ];
 

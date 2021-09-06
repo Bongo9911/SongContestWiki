@@ -1,0 +1,31 @@
+<div class="container">
+	<div class="card">
+		<h1 style="text-align: center;">Register</h1>
+
+		<form ng-form (ngSubmit)="registerUser()">
+			<div style="display: flex; flex-direction: column; align-items: center;">
+				<mat-form-field appearance="fill">
+					<mat-label>Display Name</mat-label>
+					<input matInput type="text" autocomplete="username" [(ngModel)]="displayName" name="displayName" required />
+				</mat-form-field>
+				<mat-form-field appearance="fill">
+					<mat-label>Email</mat-label>
+					<input matInput type="email" autocomplete="email" [(ngModel)]="email" name="email" required />
+				</mat-form-field>
+				<mat-form-field appearance="fill">
+					<mat-label>Password</mat-label>
+					<input matInput type="password" autocomplete="password" [(ngModel)]="password" name="password" required />
+				</mat-form-field>
+				<mat-form-field appearance="fill">
+					<mat-label>Confirm Password</mat-label>
+					<input matInput type="password" autocomplete="password" [(ngModel)]="confirmpassword" name="confirmpassword"
+						required />
+				</mat-form-field>
+				<button mat-raised-button type="submit" color="primary">Register</button>
+				<div style="margin-top: 10px">
+					<a routerLink='/login'>Already have an account?</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

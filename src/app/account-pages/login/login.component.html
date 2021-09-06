@@ -5,8 +5,8 @@
 		<form ng-form (ngSubmit)="loginUser()">
 			<div style="display: flex; flex-direction: column; align-items: center;">
 				<mat-form-field appearance="fill">
-					<mat-label>Email</mat-label>
-					<input matInput type="email" autocomplete="email" [(ngModel)]="email" name="email" required />
+					<mat-label>Username/Email</mat-label>
+					<input matInput type="text" autocomplete="username" [(ngModel)]="username" name="username" required />
 				</mat-form-field>
 				<mat-form-field appearance="fill">
 					<mat-label>Password</mat-label>
@@ -14,6 +14,9 @@
 						required />
 				</mat-form-field>
 				<button mat-raised-button type="submit" color="primary">Login</button>
+				<div style="margin-top: 10px">
+					<a routerLink='/register'>Don't have an account?</a>
+				</div>
 			</div>
 		</form>
 	</div>
