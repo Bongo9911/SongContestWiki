@@ -28,22 +28,26 @@ export class LoginComponent implements OnInit {
   async loginUser(): Promise<void> {
     if (this.username != "" && this.password != "") {
       this.error_message = "";
-      this.database.firestore.collection('users').doc(this.username).get().then(async (doc) => {
+      let email = this.username;
+      if(this.username.indexOf('@') === -1) {
+        let doc = await this.database.firestore.collection('users').doc(this.username).get();
         if(doc.exists) {
           let data = doc.data() as {email: string}
-          await this.authService.login(data.email, this.password).then(async num => {
-            await num;
-            if (num == 0) {
-              this.error_message = "Credentials not found in our records. Try again.";
-            } else {
-            }
-          })
+          email = data.email;
         }
         else {
-          //Username is invalid
+          email = null;
         }
-      })
-      
+      }
+      if(email) {
+        await this.authService.login(email, this.password).then(async num => {
+          await num;
+          if (num == 0) {
+            this.error_message = "Credentials not found in our records. Try again.";
+          } else {
+          }
+        })
+      }
     } else {
       this.error_message = "Please input email and password"
     }
