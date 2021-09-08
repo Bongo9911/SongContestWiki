@@ -2,24 +2,68 @@
 	<div class="card">
 		<h1 style="text-align: center;">Register</h1>
 
-		<form ng-form (ngSubmit)="registerUser()">
+		<form [formGroup]="registerForm" (ngSubmit)="registerUser()">
 			<div style="display: flex; flex-direction: column; align-items: center;">
 				<mat-form-field appearance="fill">
 					<mat-label>Display Name</mat-label>
-					<input matInput type="text" autocomplete="username" [(ngModel)]="displayName" name="displayName" required />
+					<input matInput type="text" [errorStateMatcher]="matcher" formControlName="username"
+						name="displayName" (input)="onUsernameInput()" required />
+					<mat-error *ngIf="registerForm.get('username').hasError('required')">
+						Display Name is <strong>required</strong>
+					</mat-error>
+					<mat-error *ngIf="registerForm.get('username').hasError('pattern')">
+						Display Name must only contain alphanumeric chatacters, underscores, and dashes.
+					</mat-error>
+					<mat-error *ngIf="registerForm.get('username').hasError('minlength')
+					&& !registerForm.get('username').hasError('pattern')">
+						Display Name must have at least {{minUn}} characters
+					</mat-error>
+					<mat-error *ngIf="registerForm.get('username').hasError('maxlength')
+					&& !registerForm.get('username').hasError('pattern')">
+						Display Name must have at most {{maxUn}} characters
+					</mat-error>
+					<mat-error *ngIf="registerForm.get('username').invalid &&
+					!registerForm.get('username').hasError('required')
+					&& !registerForm.get('username').hasError('pattern')
+					&& !registerForm.get('username').hasError('minlength')
+					&& !registerForm.get('username').hasError('maxlength')">
+						Display Name already taken
+					</mat-error>
 				</mat-form-field>
 				<mat-form-field appearance="fill">
 					<mat-label>Email</mat-label>
-					<input matInput type="email" autocomplete="email" [(ngModel)]="email" name="email" required />
+					<input matInput type="email" autocomplete="email" [errorStateMatcher]="matcher" name="email"
+						formControlName="email" placeholder="Ex. jdoe@example.com" required />
+					<mat-error *ngIf="registerForm.get('email').hasError('email') 
+						&& !registerForm.get('email').hasError('required')">
+						Please enter a valid email address
+					</mat-error>
+					<mat-error *ngIf="registerForm.get('email').hasError('required')">
+						Email is <strong>required</strong>
+					</mat-error>
 				</mat-form-field>
 				<mat-form-field appearance="fill">
 					<mat-label>Password</mat-label>
-					<input matInput type="password" autocomplete="new-password" [(ngModel)]="password" name="password" required />
+					<input matInput type="password" autocomplete="new-password" formControlName="password"
+						[errorStateMatcher]="matcher" name="password" (input)="onPasswordInput()" required />
+					<mat-error *ngIf="registerForm.get('password').hasError('required')">
+						Password is <strong>required</strong>
+					</mat-error>
+					<mat-error *ngIf="registerForm.get('password').hasError('minlength')">
+						Password must have at least {{minPw}} characters
+					</mat-error>
 				</mat-form-field>
 				<mat-form-field appearance="fill">
 					<mat-label>Confirm Password</mat-label>
-					<input matInput type="password" autocomplete="new-password" [(ngModel)]="confirmpassword" name="confirmpassword"
-						required />
+					<input matInput type="password" autocomplete="new-password" formControlName="confirmpassword"
+						[errorStateMatcher]="matcher" name="confirmpassword" (input)="onPasswordInput()" required />
+					<mat-error *ngIf="registerForm.get('confirmpassword').hasError('required')">
+						Please confirm your password
+					</mat-error>
+					<mat-error *ngIf="registerForm.get('confirmpassword').invalid && 
+						!registerForm.get('confirmpassword').hasError('required')">
+						Passwords don't match
+					</mat-error>
 				</mat-form-field>
 				<button mat-raised-button type="submit" color="primary">Register</button>
 				<div style="margin-top: 10px">

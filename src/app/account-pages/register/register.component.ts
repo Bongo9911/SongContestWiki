@@ -1,14 +1,51 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { FormControl, FormGroup, FormGroupDirective, NgForm, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { ErrorStateMatcher } from '@angular/material/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
+
+/** Error when invalid control is dirty, touched, or submitted. */
+export class MyErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
+  }
+}
+
+export const passwordMatchValidator: ValidatorFn = (formGroup: FormGroup): ValidationErrors | null => {
+  if (formGroup.get('password').value === formGroup.get('confirmpassword').value)
+    return null;
+  else
+    return { passwordMismatch: true };
+};
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+  styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit {
+  minPw = 8; //Minimum password length
+  minUn = 3; //Minimum username length
+  maxUn = 20; //Maximum username length
+
+  registerForm = new FormGroup({
+    username: new FormControl('', [Validators.required, Validators.pattern('^[a-zA-Z0-9_-]+$'),
+    Validators.minLength(this.minUn), Validators.maxLength(this.maxUn)]),
+    email: new FormControl('', [
+      Validators.required,
+      Validators.email,
+    ]),
+    password: new FormControl('', [Validators.required, Validators.minLength(this.minPw)]),
+    confirmpassword: new FormControl('', [Validators.required])
+  }, { validators: passwordMatchValidator })
+  emailFormControl = new FormControl('', [
+    Validators.required,
+    Validators.email,
+  ]);
+
+  matcher = new MyErrorStateMatcher();
 
   displayName: string = '';
   email: string = '';
@@ -28,54 +65,32 @@ export class RegisterComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  /* Called on each input in either password field */
+  onPasswordInput() {
+    if (this.registerForm.hasError('passwordMismatch'))
+      this.registerForm.controls['confirmpassword'].setErrors([{ 'passwordMismatch': true }]);
+    else
+      this.registerForm.controls['confirmpassword'].setErrors(null);
+  }
+
+  /* Called on each input in the username field */
+  onUsernameInput() {
+    if (this.registerForm.hasError('usernameTaken'))
+      this.registerForm.controls['username'].setErrors(null);
+  }
+
   async registerUser(): Promise<void> {
-    if (this.displayName.match(/^[a-zA-Z0-9_-]+$/)) {
-      //Valid Display Name
-      this.database.firestore.collection('users').doc(this.displayName).get().then(doc => {
-        if(!doc.exists) {
+    this.database.firestore.collection('users').doc(this.registerForm.controls['username'].value)
+      .get().then(doc => {
+        if (!doc.exists) {
           //Username available
-          if (this.email.match(/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/)) {
-            //Valid email under rfc2822 standard
-            if(this.password === this.confirmpassword) {
-              //Passwords match
-              if(this.password.length >= 8) {
-                //Password is at least 8 character long
-                this.authService.register(this.email, this.password, this.displayName);
-              }
-              else {
-                //Password is too short
-              }
-            }
-            else {
-              //Passwords don't match
-            }
-          }
-          else {
-            //Invalid email
-          }
+          this.authService.register(this.registerForm.controls['email'].value,
+          this.registerForm.controls['password'].value, this.registerForm.controls['username'].value);
         }
         else {
           //Username unavailable
+          this.registerForm.controls['username'].setErrors([{ 'usernameTaken': true }]);
         }
       })
-    }
-    else {
-      //Invalid Display Name
-    }
-  }
-
-  async loginUser(): Promise<void> {
-    if (this.email != "" && this.password != "") {
-      this.error_message = "";
-      await this.authService.login(this.email, this.password).then(async num => {
-        await num;
-        if (num == 0) {
-          this.error_message = "Credentials not found in our records. Try again.";
-        } else {
-        }
-      })
-    } else {
-      this.error_message = "Please input email and password"
-    }
   }
 }
