@@ -86,11 +86,11 @@ a:hover {
 }
 
 .flag {
-	width: 23px;
-	height: auto;
-	border: 1px solid lightgray;
-	margin-right: 3px;
-	vertical-align: bottom;
+	width: auto;
+	height: 15px;
+	margin-right: 5px;
+	vertical-align: middle;
+	box-shadow: 1px 1px 1px 1px rgba(100, 100, 100, .7);
 }
 
 .edlogo {

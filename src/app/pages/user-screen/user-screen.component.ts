@@ -68,7 +68,7 @@ export class UserScreenComponent implements OnInit {
         this.songs.forEach(song => {
           if (!(song.country in this.flagUrls)) {
             this.flagUrls[song.country] = "";
-            storage.storage.ref('contests/' + this.id + '/flags/' + song.country + ' Flag.png')
+            storage.storage.ref('contests/' + this.id + '/flagicons/' + song.country + '.png')
               .getDownloadURL().then(url => {
                 this.flagUrls[song.country] = url;
               })

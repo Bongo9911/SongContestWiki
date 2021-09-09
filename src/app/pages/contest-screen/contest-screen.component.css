@@ -9,7 +9,7 @@ h1 {
 }
 
 .flag {
-	width: 23px;
+	width: auto;
 	height: 15px;
 	margin-right: 5px;
 	vertical-align: middle;
