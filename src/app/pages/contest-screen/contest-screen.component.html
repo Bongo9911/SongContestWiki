@@ -1,9 +1,10 @@
 <div class="container">
-  <div style="display: flex; width: 96%; margin: 0 2%; justify-content: center; align-items: center; flex-direction: column;">
+  <div
+    style="display: flex; width: 96%; margin: 0 2%; justify-content: center; align-items: center; flex-direction: column;">
     <div>
       <img class="logo" src="{{mainLogo}}">
     </div>
-    
+
     <div style="display: flex; justify-content: space-between; flex-wrap: wrap; width: 100%;">
       <div class="halfcontainer">
         <div style="border-radius: 6px; border: 1px solid #ffa64d; background-color: #fff9e6;">
@@ -83,9 +84,11 @@
                     </div>
                   </div>
                 </td>
-                <td *ngIf="winner.country">
-                  <img class="flag" src="{{flagUrls[winner.country]}}">
-                  <a routerLink="/contest/{{con.id}}/country/{{winner.country}}">{{winner.country}}</a>
+                <td>
+                  <ng-container *ngIf="winner.country">
+                    <img class="flag" src="{{flagUrls[winner.country]}}">
+                    <a routerLink="/contest/{{con.id}}/country/{{winner.country}}">{{winner.country}}</a>
+                  </ng-container>
                 </td>
                 <td>
                   <a routerLink="/contest/{{con.id}}/user/{{winner.user}}">{{winner.user}}</a>
