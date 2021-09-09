@@ -9,6 +9,8 @@ h1 {
 }
 
 .flag {
+	width: 23px;
+	height: 15px;
 	margin-right: 3px;
 	vertical-align: middle;
 	box-shadow: 1px 1px 1px 1px rgba(100, 100, 100, .7);

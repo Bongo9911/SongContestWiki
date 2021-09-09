@@ -83,7 +83,7 @@
                     </div>
                   </div>
                 </td>
-                <td>
+                <td *ngIf="winner.country">
                   <img class="flag" src="{{flagUrls[winner.country]}}">
                   <a routerLink="/contest/{{con.id}}/country/{{winner.country}}">{{winner.country}}</a>
                 </td>
