@@ -265,7 +265,7 @@ export class EditionScreenComponent implements OnInit {
 
             songs.forEach(song => {
               if (!(song.country in this.flagUrls)) {
-                this.storage.storage.ref('contests/' + this.id + '/flags/' + song.country + ' Flag.png')
+                this.storage.storage.ref('contests/' + this.id + '/flagicons/' + song.country + '.png')
                   .getDownloadURL().then(url => {
                     this.flagUrls[song.country] = url;
                   }).catch(() => {

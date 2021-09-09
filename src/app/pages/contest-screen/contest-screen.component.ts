@@ -83,7 +83,7 @@ export class ContestScreenComponent implements OnInit {
               for (let j = 0; j < this.eds[i].hostcountries.length; ++j) {
                 if (!(this.eds[i].hostcountries[j] in this.flagUrls)) {
                   this.flagUrls[this.eds[i].hostcountries[j]] = "";
-                  storage.storage.ref('contests/' + this.id + '/flags/' + this.eds[i].hostcountries[j] + ' Flag.png')
+                  storage.storage.ref('contests/' + this.id + '/flagicons/' + this.eds[i].hostcountries[j] + '.png')
                     .getDownloadURL().then(url => {
                       this.flagUrls[this.eds[i].hostcountries[j]] = url;
                     })
@@ -93,7 +93,7 @@ export class ContestScreenComponent implements OnInit {
 
             for (let i = 0; i < winners.length; ++i) {
               this.flagUrls[winners[i].country] = "";
-              storage.storage.ref('contests/' + this.id + '/flags/' + winners[i].country + ' Flag.png')
+              storage.storage.ref('contests/' + this.id + '/flagicons/' + winners[i].country + '.png')
                 .getDownloadURL().then(url => {
                   this.flagUrls[winners[i].country] = url;
                 })

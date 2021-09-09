@@ -123,5 +123,8 @@
       }
     }
   },
-  "defaultProject": "FanSongContestWiki"
+  "defaultProject": "FanSongContestWiki",
+  "cli": {
+    "analytics": "3fd51cf7-dc3f-467c-8a53-1427a99ef9cb"
+  }
 }

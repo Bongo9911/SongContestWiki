@@ -74,11 +74,9 @@ a:hover {
 }
 
 .flag {
-	width: 23px;
-	height: auto;
-	border: 1px solid lightgray;
 	margin-right: 3px;
-	vertical-align: bottom;
+	vertical-align: middle;
+	box-shadow: 1px 1px 1px 1px rgba(100, 100, 100, .7);
 }
 
 .smallflag {
