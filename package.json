@@ -24,7 +24,7 @@
     "@angular/router": "10.2.4",
     "firebase": "7.24.0",
     "mathjs": "9.4.4",
-    "rxjs": "6.6.6",
+    "rxjs": "6.6.7",
     "tslib": "2.1.0",
     "zone.js": "0.10.3"
   },
