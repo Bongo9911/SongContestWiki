@@ -71,6 +71,19 @@
       <ng-container *ngIf="songtablesbyphase.length">
         <div style="overflow-x: auto; min-width: 300px;">
           <h3 *ngIf="phase.num > 1">{{phase.name}} {{i + 1}}</h3>
+          <div style="margin-bottom: 10px;">
+            <ng-container *ngIf="aqsbyphase.length && aqsbyphase[p][i].length">
+              <ng-container *ngFor="let song of aqsbyphase[p][i]; index as j">
+                <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a>
+                <span *ngIf="j < aqsbyphase[p][i].length - 1 && aqsbyphase[p][i].length > 2">,</span>
+                <span *ngIf="j === aqsbyphase[p][i].length - 2">
+                  and
+                </span>
+              </ng-container>
+              voted in this {{phase.name}}.
+            </ng-container>
+          </div>
+
           <table matSort (matSortChange)="sortData($event, p, i)">
             <tr>
               <th mat-sort-header="draw">Draw</th>
