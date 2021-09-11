@@ -5,6 +5,7 @@ import { Sort } from '@angular/material/sort';
 import { Contest, Song } from 'src/app/shared/datatypes';
 import firebase from 'firebase';
 import { AngularFireStorage } from '@angular/fire/storage';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-user-screen',
@@ -37,7 +38,7 @@ export class UserScreenComponent implements OnInit {
   phases: number = 2;
 
   constructor(private database: AngularFirestore, private storage: AngularFireStorage,
-    private router: Router, private route: ActivatedRoute) {
+    private router: Router, private route: ActivatedRoute, private authService: AuthService) {
     this.route.params.subscribe(params => {
       this.id = params.id;
       this.user = params.user;
@@ -346,7 +347,7 @@ export class UserScreenComponent implements OnInit {
 
       this.database.firestore.collection('contests').doc(this.id)
         .collection('newsongs').where('country', '==', parsedString[0][j])
-        .where('edition', '==', '41').get().then(docs => {
+        .where('edition', '==', '45').get().then(docs => {
           if (docs.docs.length) {
             let data = docs.docs[0].data() as Song;
             if (data.pointsets.length !== 2) {

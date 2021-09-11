@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
 import { Contest, Edition, Song } from 'src/app/shared/datatypes';
 import { AngularFireStorage } from '@angular/fire/storage';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-edition-screen',
@@ -44,7 +45,7 @@ export class EditionScreenComponent implements OnInit {
   flagUrls: any = {};
 
   constructor(private database: AngularFirestore, private storage: AngularFireStorage,
-    private router: Router, private route: ActivatedRoute) {
+    private router: Router, private route: ActivatedRoute, private authService: AuthService) {
     this.route.params.subscribe(params => {
       this.id = params.id;
       this.num = params.num;
