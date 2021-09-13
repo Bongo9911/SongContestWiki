@@ -76,7 +76,7 @@ export class PotGeneratorComponent implements OnInit {
     console.log(sansInvalidUsers)
 
 
-    if (sansInvalidUsers.length > 1 && this.pots) {
+    if (sansInvalidUsers.length > 1 && this.pots > 1) {
 
       let pointsets: string[][][] = [];
 
