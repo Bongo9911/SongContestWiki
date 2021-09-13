@@ -46,6 +46,9 @@
               <li>
                 <a routerLink="pot-generator">Pot Generator (WIP)</a>
               </li>
+              <li>
+                <a routerLink="/tools/reallocator">Reallocator</a>
+              </li>
             </ul>
           </div>
         </div>
@@ -80,7 +83,14 @@
                   <div style="display: flex; flex-direction: column;">
                     <div *ngFor="let country of eds[i].hostcountries; index as j;">
                       <img class="flag" src="{{flagUrls[country]}}">
-                      <a routerLink="/contest/{{con.id}}/country/{{country}}">{{country}}</a>
+                      <a routerLink="/contest/{{con.id}}/country/{{country}}">
+                        <ng-container *ngIf="eds[i].hostcities; else elseBlock">
+                          {{eds[i].hostcities[j]}}
+                        </ng-container>
+                        <ng-template #elseBlock>
+                          {{country}}
+                        </ng-template>
+                      </a>
                     </div>
                   </div>
                 </td>

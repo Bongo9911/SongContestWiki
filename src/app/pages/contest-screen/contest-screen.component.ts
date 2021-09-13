@@ -3,6 +3,7 @@ import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Contest, Song } from 'src/app/shared/datatypes';
 import { AngularFireStorage } from '@angular/fire/storage'
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-contest-screen',
@@ -28,7 +29,7 @@ export class ContestScreenComponent implements OnInit {
   flagUrls: any = {};
 
   constructor(private database: AngularFirestore, private storage: AngularFireStorage,
-    private router: Router, private route: ActivatedRoute) {
+    private router: Router, private route: ActivatedRoute, private authService: AuthService) {
     this.route.params.subscribe(params => this.id = params.id);
 
     storage.storage.ref('contests/' + this.id + '/logo.png')

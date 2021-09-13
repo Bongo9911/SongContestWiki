@@ -7,6 +7,7 @@ export interface Edition {
 	edition: string;
 	edval: number;
 	entries: number;
+	hostcities: string[];
     hostcountries: string[];
 	hostusers: string[];
 	phases: Phase[];

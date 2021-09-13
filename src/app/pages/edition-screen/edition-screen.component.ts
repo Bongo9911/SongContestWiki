@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
 import { Contest, Edition, Song } from 'src/app/shared/datatypes';
 import { AngularFireStorage } from '@angular/fire/storage';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-edition-screen',
@@ -21,6 +22,7 @@ export class EditionScreenComponent implements OnInit {
     edition: '0',
     edval: 0,
     entries: 0,
+    hostcities: [],
     hostcountries: [],
     hostusers: [],
     phases: [],
@@ -36,6 +38,7 @@ export class EditionScreenComponent implements OnInit {
   preved: string = "";
 
   songsbyphase: Song[][][] = [];
+  aqsbyphase: Song[][][] = [];
   votersbyphase: Song[][][] = [];
   crossvotersbyphase: Song[][][] = [];
   songtablesbyphase: Song[][][] = [];
@@ -44,7 +47,7 @@ export class EditionScreenComponent implements OnInit {
   flagUrls: any = {};
 
   constructor(private database: AngularFirestore, private storage: AngularFireStorage,
-    private router: Router, private route: ActivatedRoute) {
+    private router: Router, private route: ActivatedRoute, private authService: AuthService) {
     this.route.params.subscribe(params => {
       this.id = params.id;
       this.num = params.num;
@@ -277,6 +280,7 @@ export class EditionScreenComponent implements OnInit {
 
             for (let i = 0; i < this.edition.phases.length; ++i) {
               this.songsbyphase.push(new Array(this.edition.phases[i].num));
+              this.aqsbyphase.push(new Array(this.edition.phases[i].num));
               this.votersbyphase.push(new Array(this.edition.phases[i].num));
               this.crossvotersbyphase.push(new Array(this.edition.phases[i].num));
               this.songtablesbyphase.push(new Array(this.edition.phases[i].num));
@@ -287,6 +291,10 @@ export class EditionScreenComponent implements OnInit {
                   (x.draws[i].num === j + 1 || (!('num' in x.draws[i]) && j === 0)) &&
                   (!('qualifier' in x.draws[i]) || x.draws[i].qualifier !== 'AQ')
                 ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1);
+                this.aqsbyphase[i][j] = songs.filter(x =>
+                  x.draws.length > i && x.draws[i].num === j + 1 &&
+                  'qualifier' in x.draws[i] && x.draws[i].qualifier === 'AQ')
+                  .sort((a, b) => a.country > b.country ? 1 : -1);
                 this.songtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
                 this.pointtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
                   .filter(x => 'place' in x.draws[i])
@@ -313,6 +321,7 @@ export class EditionScreenComponent implements OnInit {
 
             console.log(this.songsbyphase);
             console.log(this.votersbyphase);
+            console.log(this.aqsbyphase);
           });
       });
   }
