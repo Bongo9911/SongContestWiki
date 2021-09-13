@@ -22,6 +22,7 @@ export class EditionScreenComponent implements OnInit {
     edition: '0',
     edval: 0,
     entries: 0,
+    hostcities: [],
     hostcountries: [],
     hostusers: [],
     phases: [],
