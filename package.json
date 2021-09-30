@@ -23,14 +23,14 @@
     "@angular/platform-browser-dynamic": "12.2.7",
     "@angular/router": "12.2.7",
     "firebase": "7.24.0",
-    "mathjs": "9.4.4",
+    "mathjs": "9.5.0",
     "rxjs": "7.3.0",
     "tslib": "2.3.1",
     "zone.js": "0.11.4"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "12.2.5",
-    "@angular/cli": "12.2.5",
+    "@angular-devkit/build-angular": "12.2.7",
+    "@angular/cli": "12.2.7",
     "@angular/compiler-cli": "12.2.7",
     "@types/jasmine": "3.9.1",
     "@types/jasminewd2": "2.0.10",
