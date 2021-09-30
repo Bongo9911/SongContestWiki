@@ -23,7 +23,7 @@
     "@angular/platform-browser-dynamic": "12.2.5",
     "@angular/router": "12.2.5",
     "firebase": "7.24.0",
-    "mathjs": "9.4.4",
+    "mathjs": "9.5.0",
     "rxjs": "7.3.0",
     "tslib": "2.3.1",
     "zone.js": "0.11.4"
