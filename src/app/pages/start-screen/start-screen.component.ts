@@ -17,7 +17,7 @@ export class StartScreenComponent implements OnInit {
   constructor(private router: Router, private route: ActivatedRoute) { 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
-    getDocs(query(collection(db, 'Contests'))).then(docs => {
+    getDocs(query(collection(db, 'contests'))).then(docs => {
       docs.forEach(doc => {
         this.contests.push(doc.data() as Contest);
       })
