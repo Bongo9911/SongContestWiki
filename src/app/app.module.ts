@@ -1,10 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-// import { AngularFireModule } from '@angular/fire';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { firebaseConfig } from './credentials';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -40,7 +38,6 @@ import { ImportScreenComponent } from './pages/import-screen/import-screen.compo
   imports: [
     BrowserModule,
     AppRoutingModule,
-    // AngularFireModule.initializeApp(firebaseConfig),
     FormsModule,
     CommonModule,
     BrowserAnimationsModule,
