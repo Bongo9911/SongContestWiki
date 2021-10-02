@@ -21,6 +21,7 @@ import { CountryScreenComponent } from './pages/country-screen/country-screen.co
 import { PotGeneratorComponent } from './pages/pot-generator/pot-generator.component';
 import { LoginComponent } from './account-pages/login/login.component';
 import { RegisterComponent } from './account-pages/register/register.component';
+import { ImportScreenComponent } from './pages/import-screen/import-screen.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { RegisterComponent } from './account-pages/register/register.component';
     PotGeneratorComponent,
     LoginComponent,
     RegisterComponent,
+    ImportScreenComponent,
   ],
   imports: [
     BrowserModule,

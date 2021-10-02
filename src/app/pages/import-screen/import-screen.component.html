@@ -1,0 +1,5 @@
+<div class="container">
+    <h1>Import your XLSX Master Sheet here!</h1>
+    <button type="button" mat-raised-button (click)="fileInput.click()" color="accent">Choose File</button>
+    <input hidden (change)="onFileSelected()" #fileInput type="file" id="file">
+</div>
