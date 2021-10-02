@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import { getFirestore, collection, query, getDocs } from "firebase/firestore";
 import { initializeApp } from "firebase/app"
 import { firebaseConfig } from '../../credentials';
 import { Contest } from 'src/app/shared/datatypes';

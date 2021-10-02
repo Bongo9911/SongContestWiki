@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as math from 'mathjs';
 import { Song } from '../../shared/datatypes';
-import { Firestore, getFirestore, collection, query, where, getDocs, getDoc, doc } from "firebase/firestore";
+import { Firestore, getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 import { initializeApp, FirebaseApp } from "firebase/app"
 import { firebaseConfig } from '../../credentials';
 
