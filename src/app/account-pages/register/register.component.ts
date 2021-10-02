@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
 import { FormControl, FormGroup, FormGroupDirective, NgForm, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
+import { Firestore, getFirestore, getDoc, doc } from "firebase/firestore";
+import { initializeApp, FirebaseApp } from "firebase/app"
+import { firebaseConfig } from '../../credentials';
 
 /** Error when invalid control is dirty, touched, or submitted. */
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -54,12 +56,15 @@ export class RegisterComponent implements OnInit {
   name: string = '';
   error_message: string = '';
   num: any = null;
+  firebaseApp: FirebaseApp;
+  db: Firestore;
 
-  constructor(private authService: AuthService, private router: Router,
-    private database: AngularFirestore) {
+  constructor(private authService: AuthService, private router: Router) {
     //if (authService.isLoggedIn()) this.router.navigate(['']);
     console.log(authService.isLoggedIn());
     console.log("Dugly_Uckling".match(/^[a-zA-Z0-9_-]+$/) ? true : false)
+    this.firebaseApp = initializeApp(firebaseConfig);
+    this.db = getFirestore(this.firebaseApp);
   }
 
   ngOnInit(): void {
@@ -80,17 +85,16 @@ export class RegisterComponent implements OnInit {
   }
 
   async registerUser(): Promise<void> {
-    this.database.firestore.collection('users').doc(this.registerForm.controls['username'].value)
-      .get().then(doc => {
-        if (!doc.exists) {
-          //Username available
-          this.authService.register(this.registerForm.controls['email'].value,
+    getDoc(doc(this.db, 'users', this.registerForm.controls['username'].value)).then(doc => {
+      if (!doc.exists) {
+        //Username available
+        this.authService.register(this.registerForm.controls['email'].value,
           this.registerForm.controls['password'].value, this.registerForm.controls['username'].value);
-        }
-        else {
-          //Username unavailable
-          this.registerForm.controls['username'].setErrors([{ 'usernameTaken': true }]);
-        }
-      })
+      }
+      else {
+        //Username unavailable
+        this.registerForm.controls['username'].setErrors([{ 'usernameTaken': true }]);
+      }
+    })
   }
 }

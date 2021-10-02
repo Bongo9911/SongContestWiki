@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
+import { Firestore, getFirestore, getDoc, doc } from "firebase/firestore";
+import { initializeApp, FirebaseApp } from "firebase/app"
+import { firebaseConfig } from '../../credentials';
 
 @Component({
   selector: 'app-login',
@@ -15,11 +17,16 @@ export class LoginComponent implements OnInit {
   error_message: string = '';
   num: any = null;
 
-  constructor(private authService: AuthService, private router: Router,
-    private database: AngularFirestore) { 
+  firebaseApp: FirebaseApp;
+  db: Firestore;
+
+  constructor(private authService: AuthService, private router: Router) { 
     //if (authService.isLoggedIn()) this.router.navigate(['']);
     console.log(authService.isLoggedIn());
     //authService.logout();
+
+    this.firebaseApp = initializeApp(firebaseConfig);
+    this.db = getFirestore(this.firebaseApp);
   }
 
   ngOnInit(): void {
@@ -30,9 +37,9 @@ export class LoginComponent implements OnInit {
       this.error_message = "";
       let email = this.username;
       if(this.username.indexOf('@') === -1) {
-        let doc = await this.database.firestore.collection('users').doc(this.username).get();
-        if(doc.exists) {
-          let data = doc.data() as {email: string}
+        let userdoc = await getDoc(doc(this.db, 'users', this.username))
+        if(userdoc.exists) {
+          let data = userdoc.data() as {email: string}
           email = data.email;
         }
         else {

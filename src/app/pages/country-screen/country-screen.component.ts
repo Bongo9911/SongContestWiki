@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
-import { firestore } from 'firebase';
 import { Contest, Song, } from 'src/app/shared/datatypes';
-import { AngularFireStorage } from '@angular/fire/storage';
+import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import { initializeApp } from "firebase/app"
+import { firebaseConfig } from '../../credentials';
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 @Component({
   selector: 'app-country-screen',
@@ -38,28 +39,30 @@ export class CountryScreenComponent implements OnInit {
 
   phases: number = 2;
 
-  constructor(private database: AngularFirestore, private storage: AngularFireStorage,
-    private router: Router, private route: ActivatedRoute) {
+  constructor(private router: Router, private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
       this.id = params.id;
       this.country = params.country;
     });
 
-    this.database.firestore.collection('contests').where('id', '==', this.id).get()
+    const firebaseApp = initializeApp(firebaseConfig);
+    const db = getFirestore(firebaseApp);
+    const storage = getStorage(firebaseApp)
+
+    getDocs(query(collection(db, 'contests'), where('id', '==', this.id)))
       .then(docs => {
         docs.forEach((doc) => {
           this.con = doc.data() as Contest;
         });
       });
 
-    storage.storage.ref('contests/' + this.id + '/flags/' + this.country + ' Flag.png')
-      .getDownloadURL().then(url => {
+      getDownloadURL(ref(storage, 'contests/' + this.id + '/flags/' + this.country + ' Flag.png')).then(url => {
         this.flagUrl = url;
       })
 
     //get all the songs sent for that country
-    this.database.firestore.collection('contests').doc(this.id)
-      .collection('newsongs').where('country', '==', this.country).get().then(docs => {
+    getDocs(query(collection(db, 'contests',this.id,'newsongs'),
+      where('country', '==', this.country))).then(docs => {
         docs.forEach((doc) => {
           this.songs.push(doc.data() as Song);
         });
@@ -236,10 +239,10 @@ export class CountryScreenComponent implements OnInit {
   }
 
   deleteSongs() {
-    this.songlist.filter(song => { return song.edition === '20.5' }).forEach(toDelete => {
-      this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
-        .doc(this.id).collection<Song>('songs').doc(toDelete.id).delete();
-    })
+    // this.songlist.filter(song => { return song.edition === '20.5' }).forEach(toDelete => {
+    //   this.database.collection<Contest>('contests', ref => ref.where('id', '==', this.id))
+    //     .doc(this.id).collection<Song>('songs').doc(toDelete.id).delete();
+    // })
   }
 }
 
