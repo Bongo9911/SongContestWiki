@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
 import { Contest, Song } from 'src/app/shared/datatypes';
-import firebase from 'firebase';
-import { AngularFireStorage } from '@angular/fire/storage';
+// import firebase from 'firebase';
 import { AuthService } from 'src/app/auth/auth.service';
+import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import { initializeApp } from "firebase/app"
+import { firebaseConfig } from '../../credentials';
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 @Component({
   selector: 'app-user-screen',
@@ -37,23 +39,31 @@ export class UserScreenComponent implements OnInit {
 
   phases: number = 2;
 
-  constructor(private database: AngularFirestore, private storage: AngularFireStorage,
-    private router: Router, private route: ActivatedRoute, private authService: AuthService) {
+  constructor(private router: Router, private route: ActivatedRoute, private authService: AuthService) {
     this.route.params.subscribe(params => {
       this.id = params.id;
       this.user = params.user;
     });
 
-    this.database.firestore.collection('contests').where('id', '==', this.id).get()
-      .then(docs => {
-        docs.forEach((doc) => {
-          this.con = doc.data() as Contest;
-        });
+    const firebaseApp = initializeApp(firebaseConfig);
+    const db = getFirestore(firebaseApp);
+    const storage = getStorage(firebaseApp)
+
+    getDocs(query(collection(db, 'contests'), where('id', '==', this.id))).then(docs => {
+      docs.forEach((doc) => {
+        this.con = doc.data() as Contest;
       });
+    })
+
+    // this.database.firestore.collection('contests').where('id', '==', this.id).get()
+    //   .then(docs => {
+    //     docs.forEach((doc) => {
+    //       this.con = doc.data() as Contest;
+    //     });
+    //   });
 
     //get all the songs sent for that user
-    this.database.firestore.collection('contests').doc(this.id)
-      .collection('newsongs').where('user', '==', this.user).get().then(docs => {
+    getDocs(query(collection(db, 'contests', this.id, 'newsongs'), where('user', '==', this.user))).then(docs => {
         docs.forEach((doc) => {
           this.songs.push(doc.data() as Song);
         });
@@ -69,8 +79,7 @@ export class UserScreenComponent implements OnInit {
         this.songs.forEach(song => {
           if (!(song.country in this.flagUrls)) {
             this.flagUrls[song.country] = "";
-            storage.storage.ref('contests/' + this.id + '/flagicons/' + song.country + '.png')
-              .getDownloadURL().then(url => {
+              getDownloadURL(ref(storage, 'contests/' + this.id + '/flagicons/' + song.country + '.png')).then(url => {
                 this.flagUrls[song.country] = url;
               })
           }
@@ -268,12 +277,12 @@ export class UserScreenComponent implements OnInit {
 
         console.log(parsedString[i][3])
 
-        this.database.firestore.collection('contests').doc(this.id)
-          .collection('songs').doc(this.songlist.filter(function (song) {
-            return song.edition === parsedString[i][0];
-          }).filter(function (song) {
-            return song.country === parsedString[i][3];
-          })[0].id).update(data)
+        // this.database.firestore.collection('contests').doc(this.id)
+        //   .collection('songs').doc(this.songlist.filter(function (song) {
+        //     return song.edition === parsedString[i][0];
+        //   }).filter(function (song) {
+        //     return song.country === parsedString[i][3];
+        //   })[0].id).update(data)
 
         data = {}
         pointsarray = new Array<string>(10); //destroy the old array and make a new empty one
@@ -300,12 +309,12 @@ export class UserScreenComponent implements OnInit {
           data['sf2pointset']['points'] = [...pointsarray];
           data['sf2pointset']['cv'] = true;
 
-          this.database.firestore.collection('contests').doc(this.id)
-            .collection('songs').doc(this.songlist.filter(function (song) {
-              return song.edition === '21';
-            }).filter(function (song) {
-              return song.country === parsedString[i][0];
-            })[0].id).update(data)
+          // this.database.firestore.collection('contests').doc(this.id)
+          //   .collection('songs').doc(this.songlist.filter(function (song) {
+          //     return song.edition === '21';
+          //   }).filter(function (song) {
+          //     return song.country === parsedString[i][0];
+          //   })[0].id).update(data)
 
           data = {}
           pointsarray = new Array<string>(10); //destroy the old array and make a new empty one
@@ -319,17 +328,17 @@ export class UserScreenComponent implements OnInit {
     const parsedString = points.split('\n').map((line) => line.split('\t'))
 
     parsedString.forEach(x => {
-      this.database.firestore.collection('contests').doc(this.id)
-        .collection('newsongs').where('country', '==', x[0]).where('edition', '==', '41').get().then(docs => {
-          if (docs.docs.length) {
-            let song = docs.docs[0].data() as Song;
-            song.draws[0].intpoints = parseInt(x[1]),
-              song.draws[0].rawextpoints = parseInt(x[2]),
-              song.draws[0].extpoints = parseInt(x[3]),
-              this.database.firestore.collection('contests').doc(this.id)
-                .collection('newsongs').doc(docs.docs[0].id).update(song);
-          }
-        })
+      // this.database.firestore.collection('contests').doc(this.id)
+      //   .collection('newsongs').where('country', '==', x[0]).where('edition', '==', '41').get().then(docs => {
+      //     if (docs.docs.length) {
+      //       let song = docs.docs[0].data() as Song;
+      //       song.draws[0].intpoints = parseInt(x[1]),
+      //         song.draws[0].rawextpoints = parseInt(x[2]),
+      //         song.draws[0].extpoints = parseInt(x[3]),
+      //         this.database.firestore.collection('contests').doc(this.id)
+      //           .collection('newsongs').doc(docs.docs[0].id).update(song);
+      //     }
+      //   })
     })
   }
 
@@ -345,34 +354,34 @@ export class UserScreenComponent implements OnInit {
       }
       console.log(pointsarray);
 
-      this.database.firestore.collection('contests').doc(this.id)
-        .collection('newsongs').where('country', '==', parsedString[0][j])
-        .where('edition', '==', '45').get().then(docs => {
-          if (docs.docs.length) {
-            let data = docs.docs[0].data() as Song;
-            if (data.pointsets.length !== 2) {
-              data.pointsets.push({});
-            }
-            data.pointsets[1][1] = {
-              cv: false,
-              points: pointsarray
-            }
+      // this.database.firestore.collection('contests').doc(this.id)
+      //   .collection('newsongs').where('country', '==', parsedString[0][j])
+      //   .where('edition', '==', '45').get().then(docs => {
+      //     if (docs.docs.length) {
+      //       let data = docs.docs[0].data() as Song;
+      //       if (data.pointsets.length !== 2) {
+      //         data.pointsets.push({});
+      //       }
+      //       data.pointsets[1][1] = {
+      //         cv: false,
+      //         points: pointsarray
+      //       }
 
-            this.database.firestore.collection('contests').doc(this.id)
-              .collection('newsongs').doc(docs.docs[0].id).set(data)
-          }
-          else {
-            console.log(parsedString[0][j] + " Not Found!")
-          }
-        })
+      //       this.database.firestore.collection('contests').doc(this.id)
+      //         .collection('newsongs').doc(docs.docs[0].id).set(data)
+      //     }
+      //     else {
+      //       console.log(parsedString[0][j] + " Not Found!")
+      //     }
+      //   })
     }
   }
 
   deleteSongs() {
-    this.songlist.filter(song => { return song.edition === '20.5' }).forEach(toDelete => {
-      this.database.firestore.collection('contests').doc(this.id)
-        .collection('songs').doc(toDelete.id).delete();
-    })
+    // this.songlist.filter(song => { return song.edition === '20.5' }).forEach(toDelete => {
+    //   this.database.firestore.collection('contests').doc(this.id)
+    //     .collection('songs').doc(toDelete.id).delete();
+    // })
   }
 }
 

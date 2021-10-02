@@ -1,28 +1,36 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from "@angular/router";
-import firebase from 'firebase/app';
-import { AngularFireAuth } from "@angular/fire/auth";
-import { AngularFirestore } from '@angular/fire/firestore';
 import { Subscription } from 'rxjs';
+import "firebase/compat/auth";
+import {
+	getAuth, onAuthStateChanged, Auth, User, setPersistence, browserLocalPersistence,
+	browserSessionPersistence, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile,
+	sendEmailVerification, sendPasswordResetEmail, updatePassword, updateEmail, signOut, Unsubscribe
+} from "firebase/auth";
+import { initializeApp, FirebaseApp } from "firebase/app"
+import { firebaseConfig } from '../credentials';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class AuthService implements OnDestroy {
-	user?: firebase.User;
+	user?: User;
 	credential: any;
 	redirect: string = '';
 
 	durationInSeconds = 2;
 
-	authSubscription: Subscription;
+	authSubscription: Unsubscribe;
+	firebaseApp: FirebaseApp;
+	auth: Auth;
 
 	//https://www.techiediaries.com/angular-firebase/angular-9-firebase-authentication-email-google-and-password/
 
-	constructor(public afAuth: AngularFireAuth, public router: Router,
-		private database: AngularFirestore) {
+	constructor(public router: Router) {
+		this.firebaseApp = initializeApp(firebaseConfig);
 		//Checks the local storage to see if the user is logged in, if they are, it grabs their information.
-		this.authSubscription = this.afAuth.authState.subscribe(user => {
+		this.auth = getAuth(this.firebaseApp);
+		this.authSubscription = onAuthStateChanged(this.auth, user => {
 			if (user) {
 				this.user = user;
 				localStorage.setItem('user', JSON.stringify(this.user));
@@ -33,15 +41,15 @@ export class AuthService implements OnDestroy {
 	}
 
 	ngOnDestroy(): void {
-		this.authSubscription.unsubscribe();
+		this.authSubscription(); //unsubscribe from subscription
 	}
 
 	//Logs a user into their account
 	async login(email: string, password: string): Promise<any> {
 		//Sets the authentication state to persist forever
 		return new Promise((resolve, reject) => {
-			firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(async () => {
-				let result = await this.afAuth.signInWithEmailAndPassword(email, password).then(async (res) => {
+			setPersistence(this.auth, browserLocalPersistence).then(async () => {
+				let result = signInWithEmailAndPassword(this.auth, email, password).then(async (res) => {
 					await res.user;
 					if (res.user) {
 						this.user = res.user
@@ -58,84 +66,82 @@ export class AuthService implements OnDestroy {
 	}
 
 	//Logs a user into a guest account
-	async loginAsGuest() {
-		//Sets the authentication state to persist until the window is closed
-		firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION).then(async () => {
-			let result = await this.afAuth.signInAnonymously()
-			await this.afAuth.currentUser.then(async (u) => {
-				if (u) {
-					this.user = u;
-					localStorage.setItem('user', JSON.stringify(this.user));
-				}
-			})
-		})
-	}
+	// async loginAsGuest() {
+	// 	//Sets the authentication state to persist until the window is closed
+	// 	setPersistence(this.auth, browserSessionPersistence).then(async () => {
+	// 		let result = await signInAnonymously(this.auth)
+	// 		await this.afAuth.currentUser.then(async (u) => {
+	// 			if (u) {
+	// 				this.user = u;
+	// 				localStorage.setItem('user', JSON.stringify(this.user));
+	// 			}
+	// 		})
+	// 	})
+	// }
 
 	//Can be used if we want to set up logging in with a Google account
-	async loginWithGoogle() {
-		await this.afAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(async (res) => {
-			if (res.additionalUserInfo?.isNewUser) {
-				await this.afAuth.currentUser.then(async (u) => {
-					if (u) {
-						this.user = u;
-						localStorage.setItem('user', JSON.stringify(this.user));
-					}
-				});
-			}
-			else {
-				await this.afAuth.currentUser.then(async (u) => {
-					if (u) {
-						this.user = u;
-						localStorage.setItem('user', JSON.stringify(this.user));
-						this.router.navigate([this.redirect]);
-						this.redirect = ''
-					}
-				})
-			}
-		})
-	}
+	// async loginWithGoogle() {
+	// 	await this.afAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(async (res) => {
+	// 		if (res.additionalUserInfo?.isNewUser) {
+	// 			await this.afAuth.currentUser.then(async (u) => {
+	// 				if (u) {
+	// 					this.user = u;
+	// 					localStorage.setItem('user', JSON.stringify(this.user));
+	// 				}
+	// 			});
+	// 		}
+	// 		else {
+	// 			await this.afAuth.currentUser.then(async (u) => {
+	// 				if (u) {
+	// 					this.user = u;
+	// 					localStorage.setItem('user', JSON.stringify(this.user));
+	// 					this.router.navigate([this.redirect]);
+	// 					this.redirect = ''
+	// 				}
+	// 			})
+	// 		}
+	// 	})
+	// }
 
 	//Creates a new user with an email and password
 	async register(email: string, password: string, displayName: string) {
-		let result = await this.afAuth.createUserWithEmailAndPassword(email, password);
-		await this.afAuth.currentUser.then(u => {
-			if (u) {
-				u.updateProfile({
-					displayName: displayName,
-					//photoUrl: "url"
-				});
-				this.sendEmailVerification();
-			}
-		});
+		let result = await createUserWithEmailAndPassword(this.auth, email, password);
+
+		let user = await this.auth.currentUser;
+
+		if (user) {
+			updateProfile(user, {
+				displayName: displayName,
+				//photoUrl: "url"
+			});
+			this.sendEmailVerification();
+		}
 	}
 
 	//Sends an email to user when they sign up to verify their account
 	async sendEmailVerification() {
-		await this.afAuth.currentUser.then(u => {
-			if (u) {
-				u.sendEmailVerification();
-			}
-		});
+		let user = await this.auth.currentUser;
+		if (user) {
+			sendEmailVerification(user);
+		}
 		this.router.navigate(['verify-email']);
 	}
 
 	//Sends a reset email to the provided email so they can change their password.
 	async sendPasswordResetEmail(passwordResetEmail: string) {
-		return await this.afAuth.sendPasswordResetEmail(passwordResetEmail);
+		return await sendPasswordResetEmail(this.auth, passwordResetEmail);
 	}
 
 	//Updates the user's password given their old password and a new password
 	async changePassword(oldPassword: string, newPassword: string) {
 		let changed: boolean = false;
-
-		firebase.auth()
-			//Signs the user in again to make sure their credentials are valid.
-			.signInWithEmailAndPassword(this.email(), oldPassword)
+		//Signs the user in again to make sure their credentials are valid.
+		signInWithEmailAndPassword(this.auth, this.email(), oldPassword)
 			.then(function (user) {
-				let currentUser = firebase.auth().currentUser;
+				let currentUser = this.auth.currentUser;
 				if (currentUser) {
 					//Updates the user's password
-					currentUser.updatePassword(newPassword).then(function () {
+					updatePassword(currentUser, newPassword).then(function () {
 						//Password change successful
 						changed = true;
 					}).catch(function (err) {
@@ -152,14 +158,13 @@ export class AuthService implements OnDestroy {
 	//Changes the user's email to the provided email
 	async changeEmail(newEmail: string, oldEmail: string, password: string): Promise<boolean> {
 		let success = false;
-		await firebase.auth()
-			//Signs the user in again to make sure their credentials are valid.
-			.signInWithEmailAndPassword(oldEmail, password)
+		//Signs the user in again to make sure their credentials are valid.
+		signInWithEmailAndPassword(this.auth, oldEmail, password)
 			.then(async (user) => {
-				let currentUser = await firebase.auth().currentUser;
+				let currentUser = await this.auth.currentUser;
 				if (currentUser) {
 					//Updates the user's email
-					currentUser.updateEmail(newEmail).then(() => {
+					updateEmail(currentUser, newEmail).then(() => {
 						//Email change successful
 						return true;
 					}).catch((err) => {
@@ -179,18 +184,17 @@ export class AuthService implements OnDestroy {
 	async logout() {
 		localStorage.removeItem('user');
 		this.router.navigate(['login']);
-		this.afAuth.signOut();
+		signOut(this.auth);
 	}
 
 	//Updates the user's display name to the new name provided
 	async updateDisplayName(displayName: string) {
-		await this.afAuth.currentUser.then(u => {
-			if (u) {
-				u.updateProfile({
-					displayName: displayName
-				});
-			}
-		});
+		let user = await this.auth.currentUser
+		if (user) {
+			updateProfile(user, {
+				displayName: displayName
+			});
+		}
 	}
 
 	//Checks if a user is logged in.

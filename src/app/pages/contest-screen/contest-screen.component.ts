@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Contest, Song } from 'src/app/shared/datatypes';
-import { AngularFireStorage } from '@angular/fire/storage'
 import { AuthService } from 'src/app/auth/auth.service';
+import { getFirestore, collection, query, where, getDocs, getDoc, doc } from "firebase/firestore";
+import { initializeApp } from "firebase/app"
+import { firebaseConfig } from '../../credentials';
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 @Component({
   selector: 'app-contest-screen',
@@ -28,79 +30,78 @@ export class ContestScreenComponent implements OnInit {
 
   flagUrls: any = {};
 
-  constructor(private database: AngularFirestore, private storage: AngularFireStorage,
-    private router: Router, private route: ActivatedRoute, private authService: AuthService) {
+  constructor(private router: Router, private route: ActivatedRoute, private authService: AuthService) {
     this.route.params.subscribe(params => this.id = params.id);
 
-    storage.storage.ref('contests/' + this.id + '/logo.png')
-      .getDownloadURL().then(url => {
-        this.mainLogo = url;
-      })
+    const firebaseApp = initializeApp(firebaseConfig);
+    const db = getFirestore(firebaseApp);
+    const storage = getStorage(firebaseApp)
 
-    this.database.firestore.collection('contests').doc(this.id)
-      .get().then((doc) => {
-        this.con = doc.data() as Contest;
+    getDownloadURL(ref(storage, 'contests/' + this.id + '/logo.png')).then(url => {
+      this.mainLogo = url;
+    })
+
+    getDoc(doc(db, 'contests', this.id)).then((doc) => {
+      this.con = doc.data() as Contest;
+      console.log(doc.data());
+    });
+
+    getDocs(query(collection(db, 'contests', this.id, 'editions'))).then(docs => {
+      docs.forEach((doc) => {
+        this.eds.push(doc.data() as SmallEdition);
         console.log(doc.data());
       });
-
-    this.database.firestore.collection('contests').doc(this.id).collection('editions').get()
-      .then(docs => {
-        docs.forEach((doc) => {
-          this.eds.push(doc.data() as SmallEdition);
-          console.log(doc.data());
-        });
-        this.eds.sort((a, b) => a.edval > b.edval ? 1 : -1);
-        this.logos = new Array(this.eds.length);
-        this.edflags = new Array(this.eds.length)
-        for (let i = 0; i < this.eds.length; ++i) {
-          storage.storage.ref('contests/' + this.id + '/logos/' + this.eds[i].edition + '.png')
-            .getDownloadURL().then(url => {
-              this.logos[i] = url;
-            })
-        }
-
-        this.database.firestore.collection('contests').doc(this.id).collection('newsongs')
-          .where('winner', '==', true).get().then(docs => {
-
-            let winners: SmallSong[] = []
-            for (let i = 0; i < docs.docs.length; ++i) {
-              winners.push(docs.docs[i].data() as Song);
-            }
-
-            for (let i = 0; i < this.eds.length; ++i) {
-              let filtered = winners.filter(w => w.edition === this.eds[i].edition)
-              if (filtered.length) {
-                this.winners.push(filtered[0])
-              }
-              else {
-                this.winners.push({
-                  edition: this.eds[i].edition,
-                  edval: this.eds[i].edval,
-                })
-              }
-            }
-
-            for (let i = 0; i < this.eds.length; ++i) {
-              for (let j = 0; j < this.eds[i].hostcountries.length; ++j) {
-                if (!(this.eds[i].hostcountries[j] in this.flagUrls)) {
-                  this.flagUrls[this.eds[i].hostcountries[j]] = "";
-                  storage.storage.ref('contests/' + this.id + '/flagicons/' + this.eds[i].hostcountries[j] + '.png')
-                    .getDownloadURL().then(url => {
-                      this.flagUrls[this.eds[i].hostcountries[j]] = url;
-                    })
-                }
-              }
-            }
-
-            for (let i = 0; i < winners.length; ++i) {
-              this.flagUrls[winners[i].country] = "";
-              storage.storage.ref('contests/' + this.id + '/flagicons/' + winners[i].country + '.png')
-                .getDownloadURL().then(url => {
-                  this.flagUrls[winners[i].country] = url;
-                })
-            }
+      this.eds.sort((a, b) => a.edval > b.edval ? 1 : -1);
+      this.logos = new Array(this.eds.length);
+      this.edflags = new Array(this.eds.length)
+      for (let i = 0; i < this.eds.length; ++i) {
+        getDownloadURL(ref(storage, 'contests/' + this.id + '/logos/' + this.eds[i].edition + '.png'))
+          .then(url => {
+            this.logos[i] = url;
           })
-      });
+      }
+
+      getDocs(query(collection(db, 'contests', this.id, 'newsongs'), where('winner', '==', true))).then(docs => {
+          let winners: SmallSong[] = []
+          for (let i = 0; i < docs.docs.length; ++i) {
+            winners.push(docs.docs[i].data() as Song);
+          }
+
+          for (let i = 0; i < this.eds.length; ++i) {
+            let filtered = winners.filter(w => w.edition === this.eds[i].edition)
+            if (filtered.length) {
+              this.winners.push(filtered[0])
+            }
+            else {
+              this.winners.push({
+                edition: this.eds[i].edition,
+                edval: this.eds[i].edval,
+              })
+            }
+          }
+
+          for (let i = 0; i < this.eds.length; ++i) {
+            for (let j = 0; j < this.eds[i].hostcountries.length; ++j) {
+              if (!(this.eds[i].hostcountries[j] in this.flagUrls)) {
+                this.flagUrls[this.eds[i].hostcountries[j]] = "";
+                getDownloadURL(
+                  ref(storage, 'contests/' + this.id + '/flagicons/' + this.eds[i].hostcountries[j] + '.png'))
+                  .then(url => {
+                    this.flagUrls[this.eds[i].hostcountries[j]] = url;
+                  })
+              }
+            }
+          }
+
+          for (let i = 0; i < winners.length; ++i) {
+            this.flagUrls[winners[i].country] = "";
+            getDownloadURL(ref(storage, 'contests/' + this.id + '/flagicons/' + winners[i].country + '.png'))
+              .then(url => {
+                this.flagUrls[winners[i].country] = url;
+              })
+          }
+        })
+    });
   }
 
   ngOnInit(): void {

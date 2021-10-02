@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
 import { Router, ActivatedRoute } from '@angular/router';
+import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import { initializeApp } from "firebase/app"
+import { firebaseConfig } from '../../credentials';
 import { Contest } from 'src/app/shared/datatypes';
 
 @Component({
@@ -12,8 +14,10 @@ export class StartScreenComponent implements OnInit {
 
   contests: Contest[] = [];
 
-  constructor(private database: AngularFirestore, private router: Router, private route: ActivatedRoute) { 
-    this.database.firestore.collection('contests').get().then(docs => {
+  constructor(private router: Router, private route: ActivatedRoute) { 
+    const firebaseApp = initializeApp(firebaseConfig);
+    const db = getFirestore(firebaseApp);
+    getDocs(query(collection(db, 'contests'))).then(docs => {
       docs.forEach(doc => {
         this.contests.push(doc.data() as Contest);
       })

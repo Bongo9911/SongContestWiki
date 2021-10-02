@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from "@angular/fire/firestore";
 import { Router, ActivatedRoute } from '@angular/router';
 import { Sort } from '@angular/material/sort';
 import { Contest, Edition, Song } from 'src/app/shared/datatypes';
-import { AngularFireStorage } from '@angular/fire/storage';
 import { AuthService } from 'src/app/auth/auth.service';
+import { Firestore, getFirestore, collection, query, where, getDocs, getDoc, doc } from "firebase/firestore";
+import { initializeApp, FirebaseApp } from "firebase/app"
+import { firebaseConfig } from '../../credentials';
+import { FirebaseStorage, getStorage, ref, getDownloadURL } from "firebase/storage";
 
 @Component({
   selector: 'app-edition-screen',
@@ -46,18 +48,24 @@ export class EditionScreenComponent implements OnInit {
 
   flagUrls: any = {};
 
-  constructor(private database: AngularFirestore, private storage: AngularFireStorage,
-    private router: Router, private route: ActivatedRoute, private authService: AuthService) {
+  firebaseApp: FirebaseApp;
+  db: Firestore;
+  storage: FirebaseStorage
+
+  constructor(private router: Router, private route: ActivatedRoute, private authService: AuthService) {
     this.route.params.subscribe(params => {
       this.id = params.id;
       this.num = params.num;
     });
     console.log(this.id)
 
-    this.database.firestore.collection('contests').doc(this.id).get()
-      .then(doc => {
-        this.con = doc.data() as Contest;
-      });
+    this.firebaseApp = initializeApp(firebaseConfig);
+    this.db = getFirestore(this.firebaseApp);
+    this.storage = getStorage(this.firebaseApp)
+
+    getDoc(doc(this.db, 'contests', this.id)).then(doc => {
+      this.con = doc.data() as Contest;
+    });
 
     // this.database.firestore
     //   .collection('contests').doc(this.id)
@@ -231,99 +239,97 @@ export class EditionScreenComponent implements OnInit {
     this.pointtablesbyphase = [];
 
     //gets the info on the edition
-    this.database.firestore.collection('contests').doc(this.id)
-      .collection('editions').doc(this.num).get().then(doc => {
-        this.edition = doc.data() as Edition;
+    getDoc(doc(this.db, 'contests', this.id, 'editions', this.num)).then(doc => {
+      this.edition = doc.data() as Edition;
 
-        this.storage.storage.ref('contests/' + this.id + '/logos/' + this.edition.edition + '.png')
-          .getDownloadURL().then(url => {
-            this.logourl = url;
-          })
+      getDownloadURL(ref(this.storage, 'contests/' + this.id + '/logos/' + this.edition.edition + '.png'))
+        .then(url => {
+          this.logourl = url;
+        })
 
-        this.database.firestore.collection('contests').doc(this.id)
-          .collection('editions').where('edval', '==', this.edition.edval + 1).get().then(docs => {
-            if (docs.docs.length) {
-              let data = docs.docs[0].data() as Edition;
-              console.log(data)
-              this.nexted = data.edition
+      getDocs(query(collection(this.db, 'contests', this.id, 'editions'),
+        where('edval', '==', this.edition.edval + 1))).then(docs => {
+          if (docs.docs.length) {
+            let data = docs.docs[0].data() as Edition;
+            console.log(data)
+            this.nexted = data.edition
+          }
+        })
+      getDocs(query(collection(this.db, 'contests', this.id, 'editions'),
+        where('edval', '==', this.edition.edval - 1))).then(docs => {
+          if (docs.docs.length) {
+            let data = docs.docs[0].data() as Edition;
+            this.preved = data.edition
+          }
+        })
+
+      //get all the songs sent to that edition
+      getDocs(query(collection(this.db, 'contests', this.id, 'newsongs'), where('edition', '==', this.num)))
+        .then(docs => {
+          let songs: Song[] = []
+          docs.forEach((doc) => {
+            songs.push(doc.data() as Song);
+          });
+          this.entries = songs.length;
+
+          songs.forEach(song => {
+            if (!(song.country in this.flagUrls)) {
+              getDownloadURL(ref(this.storage, 'contests/' + this.id + '/flagicons/' + song.country + '.png'))
+                .then(url => {
+                  this.flagUrls[song.country] = url;
+                }).catch(() => {
+                  //Set it to a string so that it shows the image not found image
+                  this.flagUrls[song.country] = "/"
+                })
             }
           })
-        this.database.firestore.collection('contests').doc(this.id)
-          .collection('editions').where('edval', '==', this.edition.edval - 1).get().then(docs => {
-            if (docs.docs.length) {
-              let data = docs.docs[0].data() as Edition;
-              this.preved = data.edition
-            }
-          })
 
-        //get all the songs sent to that edition
-        this.database.firestore
-          .collection('contests').doc(this.id)
-          .collection('newsongs').where('edition', '==', this.num).get().then(docs => {
-            let songs: Song[] = []
-            docs.forEach((doc) => {
-              songs.push(doc.data() as Song);
-            });
-            this.entries = songs.length;
-
-            songs.forEach(song => {
-              if (!(song.country in this.flagUrls)) {
-                this.storage.storage.ref('contests/' + this.id + '/flagicons/' + song.country + '.png')
-                  .getDownloadURL().then(url => {
-                    this.flagUrls[song.country] = url;
-                  }).catch(() => {
-                    //Set it to a string so that it shows the image not found image
-                    this.flagUrls[song.country] = "/" 
-                  })
-              }
-            })
-
-            for (let i = 0; i < this.edition.phases.length; ++i) {
-              this.songsbyphase.push(new Array(this.edition.phases[i].num));
-              this.aqsbyphase.push(new Array(this.edition.phases[i].num));
-              this.votersbyphase.push(new Array(this.edition.phases[i].num));
-              this.crossvotersbyphase.push(new Array(this.edition.phases[i].num));
-              this.songtablesbyphase.push(new Array(this.edition.phases[i].num));
-              this.pointtablesbyphase.push(new Array(this.edition.phases[i].num));
-              for (let j = 0; j < this.edition.phases[i].num; ++j) {
-                this.songsbyphase[i][j] = songs.filter(x =>
-                  x.draws.length > i &&
-                  (x.draws[i].num === j + 1 || (!('num' in x.draws[i]) && j === 0)) &&
-                  (!('qualifier' in x.draws[i]) || x.draws[i].qualifier !== 'AQ')
-                ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1);
-                this.aqsbyphase[i][j] = songs.filter(x =>
-                  x.draws.length > i && x.draws[i].num === j + 1 &&
-                  'qualifier' in x.draws[i] && x.draws[i].qualifier === 'AQ')
-                  .sort((a, b) => a.country > b.country ? 1 : -1);
-                this.songtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
-                this.pointtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
-                  .filter(x => 'place' in x.draws[i])
-                  .sort((a, b) => a.draws[i].place > b.draws[i].place ? 1 : -1)
-                this.votersbyphase[i][j] = songs.filter(x =>
-                  x.draws.length > i && 'ro' in x.draws[i] &&
+          for (let i = 0; i < this.edition.phases.length; ++i) {
+            this.songsbyphase.push(new Array(this.edition.phases[i].num));
+            this.aqsbyphase.push(new Array(this.edition.phases[i].num));
+            this.votersbyphase.push(new Array(this.edition.phases[i].num));
+            this.crossvotersbyphase.push(new Array(this.edition.phases[i].num));
+            this.songtablesbyphase.push(new Array(this.edition.phases[i].num));
+            this.pointtablesbyphase.push(new Array(this.edition.phases[i].num));
+            for (let j = 0; j < this.edition.phases[i].num; ++j) {
+              this.songsbyphase[i][j] = songs.filter(x =>
+                x.draws.length > i &&
+                (x.draws[i].num === j + 1 || (!('num' in x.draws[i]) && j === 0)) &&
+                (!('qualifier' in x.draws[i]) || x.draws[i].qualifier !== 'AQ')
+              ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1);
+              this.aqsbyphase[i][j] = songs.filter(x =>
+                x.draws.length > i && x.draws[i].num === j + 1 &&
+                'qualifier' in x.draws[i] && x.draws[i].qualifier === 'AQ')
+                .sort((a, b) => a.country > b.country ? 1 : -1);
+              this.songtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
+              this.pointtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
+                .filter(x => 'place' in x.draws[i])
+                .sort((a, b) => a.draws[i].place > b.draws[i].place ? 1 : -1)
+              this.votersbyphase[i][j] = songs.filter(x =>
+                x.draws.length > i && 'ro' in x.draws[i] &&
+                x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
+                && !x.pointsets[i][(j + 1).toString()].cv
+              ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1).concat(
+                songs.filter(x =>
+                  (x.draws.length <= i || !('ro' in x.draws[i])) &&
                   x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
                   && !x.pointsets[i][(j + 1).toString()].cv
-                ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1).concat(
-                  songs.filter(x =>
-                    (x.draws.length <= i || !('ro' in x.draws[i])) &&
-                    x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
-                    && !x.pointsets[i][(j + 1).toString()].cv
-                  ).sort((a, b) => a.country > b.country ? 1 : -1)
-                );
-                if (this.edition.phases[i].cv) {
-                  this.crossvotersbyphase[i][j] = songs.filter(x =>
-                    x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
-                    && x.pointsets[i][(j + 1).toString()].cv
-                  )
-                }
+                ).sort((a, b) => a.country > b.country ? 1 : -1)
+              );
+              if (this.edition.phases[i].cv) {
+                this.crossvotersbyphase[i][j] = songs.filter(x =>
+                  x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
+                  && x.pointsets[i][(j + 1).toString()].cv
+                )
               }
             }
+          }
 
-            console.log(this.songsbyphase);
-            console.log(this.votersbyphase);
-            console.log(this.aqsbyphase);
-          });
-      });
+          console.log(this.songsbyphase);
+          console.log(this.votersbyphase);
+          console.log(this.aqsbyphase);
+        });
+    });
   }
 
   //Returns the styling for rows in the song tables
@@ -373,30 +379,30 @@ export class EditionScreenComponent implements OnInit {
 
   //Temporary function to upload a list of songs to the database
   uploadSong(song: string): void {
-    console.log(song);
-    const parsedString = song.split('\n').map((line) => line.split('\t'))
-    console.log(parsedString);
-    parsedString.forEach(song => {
-      this.database.firestore
-        .collection('contests').doc(this.id).collection('songs').add({
-          edition: song[0],
-          edval: parseInt(song[0]) + Math.floor((parseInt(song[0]) - 1) / 10),
-          qualifier: song[1],
-          disqualified: song[2],
-          sfnum: song[3],
-          user: song[4],
-          country: song[5],
-          language: song[6],
-          artist: song[7],
-          song: song[8],
-          fro: parseInt(song[9]),
-          fplace: parseInt(song[10]),
-          fpoints: parseInt(song[11]),
-          sfro: parseInt(song[12]),
-          sfplace: parseInt(song[13]),
-          sfpoints: parseInt(song[14])
-        })
-    })
+    // console.log(song);
+    // const parsedString = song.split('\n').map((line) => line.split('\t'))
+    // console.log(parsedString);
+    // parsedString.forEach(song => {
+    //   this.database.firestore
+    //     .collection('contests').doc(this.id).collection('songs').add({
+    //       edition: song[0],
+    //       edval: parseInt(song[0]) + Math.floor((parseInt(song[0]) - 1) / 10),
+    //       qualifier: song[1],
+    //       disqualified: song[2],
+    //       sfnum: song[3],
+    //       user: song[4],
+    //       country: song[5],
+    //       language: song[6],
+    //       artist: song[7],
+    //       song: song[8],
+    //       fro: parseInt(song[9]),
+    //       fplace: parseInt(song[10]),
+    //       fpoints: parseInt(song[11]),
+    //       sfro: parseInt(song[12]),
+    //       sfplace: parseInt(song[13]),
+    //       sfpoints: parseInt(song[14])
+    //     })
+    // })
   }
 
   // uploadSongNew(song: string): void {
@@ -430,72 +436,72 @@ export class EditionScreenComponent implements OnInit {
   // }
 
   uploadSongNew(song: string): void {
-    console.log(song);
-    const parsedString = song.split('\n').map((line) => line.split('\t'))
-    console.log(parsedString);
-    parsedString.forEach(song => {
-      let songObj: Song = {
-        edition: song[0],
-        edval: parseInt(song[0]) + Math.floor((parseInt(song[0]) - 1) / 10),
-        dqphase: parseInt(song[3]),
-        user: song[6],
-        country: song[7],
-        language: song[8],
-        artist: song[9],
-        song: song[10],
-        draws: [],
-        pointsets: [],
-        phases: 2
-      }
+    // console.log(song);
+    // const parsedString = song.split('\n').map((line) => line.split('\t'))
+    // console.log(parsedString);
+    // parsedString.forEach(song => {
+    //   let songObj: Song = {
+    //     edition: song[0],
+    //     edval: parseInt(song[0]) + Math.floor((parseInt(song[0]) - 1) / 10),
+    //     dqphase: parseInt(song[3]),
+    //     user: song[6],
+    //     country: song[7],
+    //     language: song[8],
+    //     artist: song[9],
+    //     song: song[10],
+    //     draws: [],
+    //     pointsets: [],
+    //     phases: 2
+    //   }
 
-      if (songObj.dqphase !== -1) {
-        songObj.dqreason = song[4]
-      }
-      songObj.draws.push({
-        num: parseInt(song[5]),
-        qualifier: song[1]
-      })
-      if (song[14] !== "-1") {
-        songObj.draws[0].ro = parseInt(song[14])
-        if (song[15] !== "-1") {
-          songObj.draws[0].place = parseInt(song[15])
-          songObj.draws[0].points = parseInt(song[16])
-        }
-      }
+    //   if (songObj.dqphase !== -1) {
+    //     songObj.dqreason = song[4]
+    //   }
+    //   songObj.draws.push({
+    //     num: parseInt(song[5]),
+    //     qualifier: song[1]
+    //   })
+    //   if (song[14] !== "-1") {
+    //     songObj.draws[0].ro = parseInt(song[14])
+    //     if (song[15] !== "-1") {
+    //       songObj.draws[0].place = parseInt(song[15])
+    //       songObj.draws[0].points = parseInt(song[16])
+    //     }
+    //   }
 
-      if (song[11] !== "-1") {
-        songObj.draws.push({
-          num: 1,
-          ro: parseInt(song[11]),
-          qualifier: song[2]
-        })
-        if (song[12] !== "-1") {
-          songObj.draws[1].place = parseInt(song[12])
-          songObj.draws[1].points = parseInt(song[13])
-        }
-        if (songObj.draws[1].place === 1) {
-          songObj.winner = true;
-        }
-      }
+    //   if (song[11] !== "-1") {
+    //     songObj.draws.push({
+    //       num: 1,
+    //       ro: parseInt(song[11]),
+    //       qualifier: song[2]
+    //     })
+    //     if (song[12] !== "-1") {
+    //       songObj.draws[1].place = parseInt(song[12])
+    //       songObj.draws[1].points = parseInt(song[13])
+    //     }
+    //     if (songObj.draws[1].place === 1) {
+    //       songObj.winner = true;
+    //     }
+    //   }
 
 
-      this.database.firestore
-        .collection('contests').doc(this.id).collection('newsongs').add(songObj)
-    })
+    //   this.database.firestore
+    //     .collection('contests').doc(this.id).collection('newsongs').add(songObj)
+    // })
   }
 
   deleteSongs(song: string) {
-    const parsedString = song.split('\n');
-    parsedString.forEach(s => {
-      this.database.firestore.collection('contests').doc('RSC').collection('songs')
-        .where('song', '==', s).get().then(docs => {
-          docs.forEach(doc => {
-            console.log(doc.id);
-            this.database.firestore.collection('contests').doc('RSC').collection('songs')
-              .doc(doc.id).delete();
-          })
-        })
-    })
+    // const parsedString = song.split('\n');
+    // parsedString.forEach(s => {
+    //   this.database.firestore.collection('contests').doc('RSC').collection('songs')
+    //     .where('song', '==', s).get().then(docs => {
+    //       docs.forEach(doc => {
+    //         console.log(doc.id);
+    //         this.database.firestore.collection('contests').doc('RSC').collection('songs')
+    //           .doc(doc.id).delete();
+    //       })
+    //     })
+    // })
   }
 
   //Returns the semi-final points given from voter to receiver, returns nothing if no points given.

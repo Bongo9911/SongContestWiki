@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import * as math from 'mathjs';
 import { Song } from '../../shared/datatypes';
+import { Firestore, getFirestore, collection, query, where, getDocs, getDoc, doc } from "firebase/firestore";
+import { initializeApp, FirebaseApp } from "firebase/app"
+import { firebaseConfig } from '../../credentials';
 
 @Component({
   selector: 'app-pot-generator',
@@ -17,10 +19,16 @@ export class PotGeneratorComponent implements OnInit {
 
   potList: string[][] = [];
 
-  constructor(private database: AngularFirestore, private route: ActivatedRoute) {
+  firebaseApp: FirebaseApp;
+  db: Firestore;
+
+  constructor(private route: ActivatedRoute) {
     this.route.params.subscribe(params => {
       this.id = params.id;
     });
+
+    this.firebaseApp = initializeApp(firebaseConfig);
+    this.db = getFirestore(this.firebaseApp);
 
     // this.database.firestore.collection("contests").doc('RSC').collection('newsongs').get().then(docs => {
     //   docs.forEach(doc => {
@@ -57,8 +65,8 @@ export class PotGeneratorComponent implements OnInit {
     }
 
     for (let i = 0; i < usersArray.length; ++i) {
-      let docs = await this.database.firestore.collection('contests').doc(this.id).collection('users')
-        .where('lower', '==', usersArray[i].toLowerCase()).get()
+      let docs = await getDocs(query(collection(this.db, 'contests', this.id, 'users'), 
+        where('lower', '==', usersArray[i].toLowerCase())))
       if (!docs.docs.length) {
         //this.invalid.push(usersArray[i]);
       }
@@ -84,9 +92,8 @@ export class PotGeneratorComponent implements OnInit {
       for (let i = 0; i < sansInvalidUsers.length; ++i) {
         pointsets.push([]);
         for (let j = 0; j < edArray.length; ++j) {
-          let docs = await this.database.firestore.collection('contests').doc(this.id)
-            .collection('newsongs').where('edition', '==', edArray[j])
-            .where('user', '==', sansInvalidUsers[i]).get();
+          let docs = await getDocs(query(collection(this.db, 'contests', this.id, 'newsongs'),
+            where('edition', '==', edArray[j])));
 
           if (docs.docs.length) {
             let data = docs.docs[0].data() as Song;

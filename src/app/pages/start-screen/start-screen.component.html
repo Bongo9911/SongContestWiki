@@ -14,7 +14,8 @@
       </div>
 
       <div style="margin: 6px 10px;">
-        <div style="display: flex; justify-content: space-evenly; align-items: center; flex-wrap: wrap;">
+        <div *ngIf="contests.length" 
+          style="display: flex; justify-content: space-evenly; align-items: center; flex-wrap: wrap;">
           <ng-container *ngFor="let con of contests">
             <div class="logoBox" routerLink="/contest/{{con.id}}">
               <div style="height: 100%; display: flex; align-items: center;">
