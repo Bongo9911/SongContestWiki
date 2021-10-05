@@ -30,11 +30,11 @@ export class ImportScreenComponent implements OnInit {
     this.firebaseApp = initializeApp(firebaseConfig);
     this.db = getFirestore(this.firebaseApp);
     //const storage = getStorage(firebaseApp)
-    getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "46"))).then(docs => {
-      docs.forEach(song => {
-        deleteDoc(doc(this.db, "contests", this.id, "newsongs", song.id))
-      })
-    })
+    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "SE4"))).then(docs => {
+    //   docs.forEach(song => {
+    //     deleteDoc(doc(this.db, "contests", this.id, "newsongs", song.id))
+    //   })
+    // })
   }
 
   ngOnInit(): void {
@@ -125,7 +125,7 @@ export class ImportScreenComponent implements OnInit {
                       language: "",
                       phases: 2,
                       pointsets: [],
-                      song: workBook.Sheets["Song submission"]["F" + j].v.replace('"', ''),
+                      song: workBook.Sheets["Song submission"]["F" + j].v.replaceAll('"', ''),
                       user: workBook.Sheets["Song submission"]["D" + j].v.replace('u/', ''),
                     })
                     break;
