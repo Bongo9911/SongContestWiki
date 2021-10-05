@@ -2,4 +2,30 @@
     <h1>Import your XLSX Master Sheet here!</h1>
     <button type="button" mat-raised-button (click)="fileInput.click()" color="accent">Choose File</button>
     <input hidden (change)="onFileSelected()" #fileInput type="file" id="file">
+    <button type="button" mat-raised-button (click)="uploadSongs()" color="accent">Upload Songs</button>
+
+    <div *ngFor="let semi of semiSongs; index as s">
+        <h1>Semi {{s + 1}}</h1>
+
+        <table>
+            <thead>
+                <th>R/O</th>
+                <th>Country</th>
+                <th>User</th>
+                <th>Artist</th>
+                <th>Song</th>
+                <th>Place</th>
+                <th>Points</th>
+            </thead>
+            <tr *ngFor="let song of semi">
+                <td>{{song.draws[0].ro}}</td>
+                <td><a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
+                <td><a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a></td>
+                <td>{{song.artist}}</td>
+                <td>"{{song.song}}"</td>
+                <td>{{song.draws[0].place}}</td>
+                <td>{{song.draws[0].points}}</td>
+            </tr>
+        </table>
+    </div>
 </div>

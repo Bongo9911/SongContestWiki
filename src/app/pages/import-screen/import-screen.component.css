@@ -4,3 +4,23 @@
     align-items: center;
     padding: 1vw;
 }
+
+th, td {
+	padding: 3px 7px 3px 7px;
+}
+
+th {
+	background-color: #dadada;
+	text-align: center;
+}
+
+table, th, td {
+	border: 1px solid gray;
+	border-collapse: collapse;
+	/* font-family: "Verdana", "Trebuchet MS"; */
+	font-size: 14px;
+}
+
+table {
+	margin-top: 10px;
+}
