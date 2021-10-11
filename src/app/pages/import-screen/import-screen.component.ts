@@ -1,3 +1,5 @@
+declare var require: any
+
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Song } from 'src/app/shared/datatypes';
@@ -6,9 +8,31 @@ import { getFirestore, collection, query, where, getDocs, Firestore, addDoc, del
 import { initializeApp, FirebaseApp } from "firebase/app"
 import { firebaseConfig } from '../../credentials';
 import { AuthService } from 'src/app/auth/auth.service';
+import * as countries from "i18n-iso-countries";
+
+countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 
 const alphabet: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
-  'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+  'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI',
+  'AJ', 'AK', 'AL']
+
+const countryCodes = {
+  BHS: "The Bahamas",
+  CIV: "Côte d'Ivoire",
+  ENG: "England",
+  FSM: "Micronesia",
+  IRE: "Ireland",
+  MDA: "Moldova",
+  NIR: "Northern Ireland",
+  RUS: "Russia",
+  SCO: "Scotland",
+  SCT: "Scotland",
+  STP: "São Tomé and Príncipe",
+  TWN: "Taiwan",
+  USA: "United States",
+  WAL: "Wales",
+  WLS: "Wales",
+}
 
 @Component({
   selector: 'app-import-screen',
@@ -32,12 +56,15 @@ export class ImportScreenComponent implements OnInit {
     });
     this.firebaseApp = initializeApp(firebaseConfig);
     this.db = getFirestore(this.firebaseApp);
-    //const storage = getStorage(firebaseApp)
-    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "SE4"))).then(docs => {
-    //   docs.forEach(song => {
-    //     deleteDoc(doc(this.db, "contests", this.id, "newsongs", song.id))
-    //   })
-    // })
+    //const storage = getStorage(firebaseApp);
+
+    getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "SE4"))).then(docs => {
+      docs.forEach(song => {
+        deleteDoc(doc(this.db, "contests", this.id, "newsongs", song.id))
+      })
+    })
+
+    console.log("US (Alpha-3) => " + countries.getName("USA", "en", { select: "official" })); // United States of America
   }
 
   ngOnInit(): void {
@@ -83,13 +110,20 @@ export class ImportScreenComponent implements OnInit {
     for (let s = 0; s < 3; ++s) {
       this.semiSongs.push([]);
       let i = 2;
-      while (true) {
+      for (let i = 2; true; ++i) {
         if ("I" + i in workBook.Sheets["Semi " + (s + 1)]) {
           console.log(workBook.Sheets["Semi " + (s + 1)]["I" + i].v);
           let country = workBook.Sheets["Semi " + (s + 1)]["I" + i].v.trim();
-          let j = 2;
+          let code = workBook.Sheets["Semi " + (s + 1)][alphabet[8 + i] + "1"].v;
+          if(code in countryCodes) {
+            console.log(code + ": " + countryCodes[code])
+          }
+          else {
+            console.log(code + ": " + countries.getName(code, "en", { select: "official" }))
+          }
+         
           let rawextpoints = 0;
-          while (j < 30) {
+          for (let j = 2; j < 30; ++j) {
             if ("I" + j in workBook.Sheets["Semi " + (s + 1) + " EXT"]) {
               if (workBook.Sheets["Semi " + (s + 1) + " EXT"]["I" + j].v.trim() == country) {
                 rawextpoints = workBook.Sheets["Semi " + (s + 1) + " EXT"]["J" + j].v
@@ -99,13 +133,11 @@ export class ImportScreenComponent implements OnInit {
             else {
               //break;
             }
-            ++j;
           }
-          j = 3;
           let extpoints = 0;
           let points = 0;
           let place = 0;
-          while (j < 30) {
+          for (let j = 3; j < 30; ++j) {
             if (alphabet[3 + s * 7] + j in workBook.Sheets["INT+EXT"]) {
               // console.log("Error?" + j);
               if (workBook.Sheets["INT+EXT"][alphabet[3 + s * 7] + j].v.trim() == country) {
@@ -118,10 +150,8 @@ export class ImportScreenComponent implements OnInit {
             else {
               //break;
             }
-            ++j;
           }
-          j = 3;
-          while (j < 80) {
+          for (let j = 3; j < 80; ++j) {
             if ("C" + j in workBook.Sheets["Song submission"]) {
               if (workBook.Sheets["Song submission"]["C" + j].v.trim() == country) {
                 let song: Song = {
@@ -143,8 +173,8 @@ export class ImportScreenComponent implements OnInit {
                   language: "",
                   phases: 2,
                   pointsets: [],
-                  song: workBook.Sheets["Song submission"]["F" + j].v.replaceAll('"', '').trim(),
-                  user: workBook.Sheets["Song submission"]["D" + j].v.replace('u/', '').trim(),
+                  song: workBook.Sheets["Song submission"]["F" + j].v.toString().replaceAll('"', '').trim(),
+                  user: workBook.Sheets["Song submission"]["D" + j].v.toString().replace('u/', '').trim(),
                 }
                 this.semiSongs[s].push(song);
                 this.semiCountries.push(country);
@@ -155,9 +185,7 @@ export class ImportScreenComponent implements OnInit {
             else {
               //break;
             }
-            ++j;
           }
-          ++i;
         }
         else {
           break;
@@ -247,10 +275,8 @@ export class ImportScreenComponent implements OnInit {
   }
 
   uploadSongs() {
-    this.semiSongs.forEach(semi => {
-      semi.forEach(song => {
-        addDoc(collection(this.db, "contests", this.id, "newsongs"), song);
-      })
+    this.allSongs.forEach(song => {
+      addDoc(collection(this.db, "contests", this.id, "newsongs"), song);
     })
   }
 
