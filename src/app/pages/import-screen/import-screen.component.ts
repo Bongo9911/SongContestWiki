@@ -37,45 +37,64 @@ export class ImportScreenComponent implements OnInit {
 
   countryCodes = {
     BHS: "The Bahamas",
-    BUL: "Bulgaria",
-    CAM: "Cambodia",
+    // BUL: "Bulgaria",
+    // CAM: "Cambodia",
     CIV: "Côte d'Ivoire",
-    CYM: "Wales",
-    DEN: "Denmark",
+    // CYM: "Wales",
+    // DEN: "Denmark",
     ENG: "England",
     FSM: "Micronesia",
-    GUA: "Guatemala",
-    IRE: "Ireland",
+    // GUA: "Guatemala",
+    // IRE: "Ireland",
+    IRN: "Iran",
     LAO: "Laos",
-    LCU: "Saint Lucia",
+    // LCU: "Saint Lucia",
     MDA: "Moldova",
-    MLY: "Malaysia",
-    NIR: "Northern Ireland",
+    MKD: "North Macedonia",
+    // MLY: "Malaysia",
+    // NIR: "Northern Ireland",
     NLD: "The Netherlands",
-    PLY: "French Polynesia",
-    RUS: "Russia",
-    SCT: "Scotland",
+    // PLY: "French Polynesia",
+    // RUS: "Russia",
     SCO: "Scotland",
-    SLV: "Slovenia",
+    SCT: "Scotland",
+    // SLV: "Slovenia",
     STP: "São Tomé and Príncipe",
-    SVG: "Saint Vincent and the Grenadines",
+    // SVG: "Saint Vincent and the Grenadines",
     SXM: "Sint Maarten",
-    TWN: "Taiwan",
     USA: "United States",
     WAL: "Wales",
     WLS: "Wales",
-    ZAM: "Zambia",
+    // ZAM: "Zambia",
   }
 
-  countryNames = {};
+  countryNames = {
+    "Côte d'Ivoire": "CIV",
+    "England": "ENG",
+    "Iran": "IRN",
+    "Laos": "LAO",
+    "Micronesia": "FSM",
+    "Moldova": "MDA",
+    "North Macedonia": "MKD",
+    "São Tomé and Príncipe": "STP",
+    "Scotland": "SCO",
+    "Sint Maarten": "SXM",
+    "The Bahamas": "BHS",
+    "The Netherlands": "NLD",
+    "United States": "USA",
+    "Wales": "WLS",
+  };
 
   fixedCountryNames = {
     "Bosnia & Herzegovina": "Bosnia and Herzegovina",
     "Cote d'Ivoire": "Côte d'Ivoire",
     "Cote D'Ivoire": "Côte d'Ivoire",
+    "Côte D'Ivoire": "Côte d'Ivoire",
+    "Curacao": "Curaçao",
     "St Kitts & Nevis": "Saint Kitts and Nevis",
     "St Vincent & The Grenadines": "Saint Vincent and the Grenadines",
     "St Vincent & the Grenadines": "Saint Vincent and the Grenadines",
+    "Trinidad & Tobago": "Trinidad and Tobago",
     "USA": "United States",
     "United States of America": "United States",
   }
@@ -87,10 +106,10 @@ export class ImportScreenComponent implements OnInit {
     this.firebaseApp = initializeApp(firebaseConfig);
     this.db = getFirestore(this.firebaseApp);
     this.countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
-    this.countryNames = this.objectFlip(this.countryCodes)
+    //this.countryNames = this.objectFlip(this.countryCodes)
     //const storage = getStorage(firebaseApp);
 
-    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "SE4"))).then(docs => {
+    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "46"))).then(docs => {
     //   docs.forEach(song => {
     //     deleteDoc(doc(this.db, "contests", this.id, "newsongs", song.id))
     //   })
@@ -220,7 +239,7 @@ export class ImportScreenComponent implements OnInit {
                 };
 
                 let song: Song = {
-                  artist: workBook.Sheets["Song submission"]["E" + j].v.trim(),
+                  artist: workBook.Sheets["Song submission"]["E" + j].v.toString().trim(),
                   country: fixedCountry,
                   draws: [{
                     ro: workBook.Sheets["Semi " + (s + 1)]["H" + i].v,
@@ -233,8 +252,8 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: place <= 8 ? "Q" : "NQ"
                   }],
                   dqphase: -1,
-                  edition: "SE4",
-                  edval: 44,
+                  edition: "46",
+                  edval: 50,
                   language: "",
                   phases: 2,
                   pointsets: [pointsets],
@@ -316,7 +335,7 @@ export class ImportScreenComponent implements OnInit {
             if ("C" + s in workBook.Sheets["Song submission"]) {
               if (workBook.Sheets["Song submission"]["C" + s].v.trim() == country) {
                 let song: Song = {
-                  artist: workBook.Sheets["Song submission"]["E" + s].v.trim(),
+                  artist: workBook.Sheets["Song submission"]["E" + s].w.trim(),
                   country: country,
                   draws: [{
                     ro: -1,
@@ -331,13 +350,13 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: workBook.Sheets["GF Scoreboard"]["F" + n].v <= 6 ? "FAQ" : "NAQ"
                   }],
                   dqphase: -1,
-                  edition: "SE4",
-                  edval: 44,
+                  edition: "46",
+                  edval: 50,
                   language: "",
                   phases: 2,
                   pointsets: [],
-                  song: workBook.Sheets["Song submission"]["F" + s].v.replaceAll('"', '').trim(),
-                  user: workBook.Sheets["Song submission"]["D" + s].v.replace('u/', '').trim(),
+                  song: workBook.Sheets["Song submission"]["F" + s].v.toString().replaceAll('"', '').trim(),
+                  user: workBook.Sheets["Song submission"]["D" + s].v.toString().replace('u/', '').trim(),
                 }
                 this.allSongs.push(song);
                 this.finalSongs.push(song);
@@ -357,6 +376,21 @@ export class ImportScreenComponent implements OnInit {
   }
 
   uploadSongs() {
+
+    this.allSongs.forEach(song => {
+      song.draws[0].place = -1;
+      song.draws[0].points = -1;
+      song.draws[0].intpoints = 0;
+      song.draws[0].extpoints = 0;
+      song.draws[0].rawextpoints = 0;
+      song.pointsets = [];
+      if(song.draws.length == 2) {
+        song.draws[1].place = -1;
+        song.draws[1].points = -1;
+        song.draws[1].qualifier = "TBD";
+      }
+    })
+
     this.allSongs.forEach(song => {
       addDoc(collection(this.db, "contests", this.id, "newsongs"), song);
     })

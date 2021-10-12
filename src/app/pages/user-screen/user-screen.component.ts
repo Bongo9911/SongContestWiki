@@ -87,7 +87,7 @@ export class UserScreenComponent implements OnInit {
 
         for (let i = 0; i <= this.phases; ++i) {
           let songsort = [...this.songs].filter(song => song.draws.length === song.phases - i &&
-            'place' in song.draws[song.phases - i - 1])
+            'place' in song.draws[song.phases - i - 1] && song.draws[song.phases - i - 1].place > 0)
           if (songsort.length) {
             songsort.sort((a, b) => a.draws[a.phases - i - 1].place > b.draws[b.phases - i - 1].place
               ? 1 : -1)
@@ -110,7 +110,7 @@ export class UserScreenComponent implements OnInit {
 
         for (let i = this.phases; i >= 0; --i) {
           let songsort = [...this.songs].filter(song => song.draws.length === song.phases - i &&
-            'place' in song.draws[song.phases - i - 1])
+            'place' in song.draws[song.phases - i - 1] && song.draws[song.phases - i - 1].place > 0)
           if (songsort.length) {
             songsort.sort((a, b) => a.draws[2 - i - 1].place < b.draws[2 - i - 1].place ? 1 : -1)
             this.worstPlace = this.numToRankString(songsort[0].draws[2 - i - 1].place);

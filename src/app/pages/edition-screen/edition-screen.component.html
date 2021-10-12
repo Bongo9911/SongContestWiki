@@ -131,7 +131,7 @@
     </div>
   </div>
 
-  <div *ngIf="votersbyphase.length && votersbyphase[0].length">
+  <div *ngIf="votersbyphase.length && votersbyphase[0].length && votersbyphase[0][0].length">
     <div class="sectionheader">
       <h2>Scoreboard<ng-container *ngIf="edition.phases.length > 1">s</ng-container>
       </h2>
