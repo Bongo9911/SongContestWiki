@@ -313,6 +313,7 @@ export class ImportScreenComponent implements OnInit {
             points: workBook.Sheets["GF Scoreboard"]["I" + n].v,
             qualifier: workBook.Sheets["GF Scoreboard"]["F" + n].v <= 6 ? "FAQ" : "NAQ"
           })
+          if(workBook.Sheets["GF Scoreboard"]["F" + n].v === 1) this.allSongs[index].winner = true;
           this.finalSongs.push(this.allSongs[index]);
         }
         //Country was not in the semi-finals (AQ)
@@ -358,6 +359,7 @@ export class ImportScreenComponent implements OnInit {
                   song: workBook.Sheets["Song submission"]["F" + s].v.toString().replaceAll('"', '').trim(),
                   user: workBook.Sheets["Song submission"]["D" + s].v.toString().replace('u/', '').trim(),
                 }
+                if(workBook.Sheets["GF Scoreboard"]["F" + n].v === 1) song.winner = true;
                 this.allSongs.push(song);
                 this.finalSongs.push(song);
                 break;
