@@ -19,6 +19,7 @@ const alphabet: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K
 const countryCodes = {
   BHS: "The Bahamas",
   CIV: "Côte d'Ivoire",
+  CYM: "Wales",
   ENG: "England",
   FSM: "Micronesia",
   IRE: "Ireland",
@@ -106,22 +107,49 @@ export class ImportScreenComponent implements OnInit {
     }
   }
 
+  cleanSpreadsheet(workBook: xlsx.WorkBook) {
+    //TODO: Create a function to fix any country names like St. Lucia or Curacao and turn them into their
+    //proper format with no symbols and with proper accenting
+  }
+
   readSemiSongs(workBook: xlsx.WorkBook) {
     for (let s = 0; s < 3; ++s) {
       this.semiSongs.push([]);
-      let i = 2;
       for (let i = 2; true; ++i) {
         if ("I" + i in workBook.Sheets["Semi " + (s + 1)]) {
           console.log(workBook.Sheets["Semi " + (s + 1)]["I" + i].v);
           let country = workBook.Sheets["Semi " + (s + 1)]["I" + i].v.trim();
-          let code = workBook.Sheets["Semi " + (s + 1)][alphabet[8 + i] + "1"].v;
-          if(code in countryCodes) {
-            console.log(code + ": " + countryCodes[code])
+          for (let j = 0; j < 30; ++j) {
+            if (alphabet[10 + j] + "1" in workBook.Sheets["Semi " + (s + 1)]) {
+              let code = workBook.Sheets["Semi " + (s + 1)][alphabet[10 + j] + "1"].v;
+              if (code in countryCodes && countryCodes[code] === country) {
+                console.log(code + ": " + countryCodes[code]);
+                for (let p = 2; p < 30; ++p) {
+                  if (alphabet[10 + j] + p in workBook.Sheets["Semi " + (s + 1)] &&
+                    "I" + p in workBook.Sheets["Semi " + (s + 1)]) {
+                    console.log(workBook.Sheets["Semi " + (s + 1)][alphabet[10 + j] + p].v + ": " +
+                      workBook.Sheets["Semi " + (s + 1)]["I" + p].v)
+                  }
+                }
+                break;
+              }
+              else {
+                let codeCountry = countries.getName(code, "en", { select: "official" });
+                if (codeCountry = country) {
+                  console.log(codeCountry);
+                  for (let p = 2; p < 30; ++p) {
+                    if (alphabet[10 + j] + p in workBook.Sheets["Semi " + (s + 1)] &&
+                      "I" + p in workBook.Sheets["Semi " + (s + 1)]) {
+                      console.log(workBook.Sheets["Semi " + (s + 1)][alphabet[10 + j] + p].v + ": " +
+                        workBook.Sheets["Semi " + (s + 1)]["I" + p].v)
+                    }
+                  }
+                  break;
+                }
+              }
+            }
           }
-          else {
-            console.log(code + ": " + countries.getName(code, "en", { select: "official" }))
-          }
-         
+
           let rawextpoints = 0;
           for (let j = 2; j < 30; ++j) {
             if ("I" + j in workBook.Sheets["Semi " + (s + 1) + " EXT"]) {
@@ -196,8 +224,7 @@ export class ImportScreenComponent implements OnInit {
   }
 
   readFinalSongs(workBook: xlsx.WorkBook) {
-    let n = 2;
-    while (true) {
+    for (let n = 2; true; ++n) {
       if ("H" + n in workBook.Sheets["GF Scoreboard"]) {
         let index = this.semiCountries.indexOf(workBook.Sheets["GF Scoreboard"]["H" + n].v.trim())
         //Country was in the semi-finals
@@ -227,8 +254,7 @@ export class ImportScreenComponent implements OnInit {
             if (sfnum !== -1) break;
           }
 
-          let s = 3;
-          while (s < 80) {
+          for (let s = 3; s < 80; ++s) {
             if ("C" + s in workBook.Sheets["Song submission"]) {
               if (workBook.Sheets["Song submission"]["C" + s].v.trim() == country) {
                 let song: Song = {
@@ -263,10 +289,8 @@ export class ImportScreenComponent implements OnInit {
             else {
               //break;
             }
-            ++s;
           }
         }
-        ++n;
       }
       else {
         break;
