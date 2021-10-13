@@ -55,7 +55,8 @@ export class ImportScreenComponent implements OnInit {
     // NIR: "Northern Ireland",
     NLD: "The Netherlands",
     // PLY: "French Polynesia",
-    // RUS: "Russia",
+    RUS: "Russia",
+    SAM: "Samoa",
     SCO: "Scotland",
     SCT: "Scotland",
     // SLV: "Slovenia",
@@ -63,6 +64,7 @@ export class ImportScreenComponent implements OnInit {
     // SVG: "Saint Vincent and the Grenadines",
     SXM: "Sint Maarten",
     USA: "United States",
+    VAT: "Vatican City",
     WAL: "Wales",
     WLS: "Wales",
     // ZAM: "Zambia",
@@ -76,12 +78,14 @@ export class ImportScreenComponent implements OnInit {
     "Micronesia": "FSM",
     "Moldova": "MDA",
     "North Macedonia": "MKD",
+    "Russia": "RUS",
     "São Tomé and Príncipe": "STP",
     "Scotland": "SCO",
     "Sint Maarten": "SXM",
     "The Bahamas": "BHS",
     "The Netherlands": "NLD",
     "United States": "USA",
+    "Vatican City": "VAT",
     "Wales": "WLS",
   };
 
@@ -92,6 +96,7 @@ export class ImportScreenComponent implements OnInit {
     "Côte D'Ivoire": "Côte d'Ivoire",
     "Curacao": "Curaçao",
     "St Kitts & Nevis": "Saint Kitts and Nevis",
+    "St Lucia": "Saint Lucia",
     "St Vincent & The Grenadines": "Saint Vincent and the Grenadines",
     "St Vincent & the Grenadines": "Saint Vincent and the Grenadines",
     "Trinidad & Tobago": "Trinidad and Tobago",
@@ -109,11 +114,13 @@ export class ImportScreenComponent implements OnInit {
     //this.countryNames = this.objectFlip(this.countryCodes)
     //const storage = getStorage(firebaseApp);
 
-    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "46"))).then(docs => {
+    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "31"))).then(docs => {
     //   docs.forEach(song => {
     //     deleteDoc(doc(this.db, "contests", this.id, "newsongs", song.id))
     //   })
     // })
+
+    console.log(this.getColumnName(50));
   }
 
   ngOnInit(): void {
@@ -176,7 +183,7 @@ export class ImportScreenComponent implements OnInit {
           console.log(workBook.Sheets["Semi " + (s + 1)]["I" + i].v);
           let country = workBook.Sheets["Semi " + (s + 1)]["I" + i].v.trim();
           let fixedCountry = country;
-          if(country in this.fixedCountryNames) {
+          if (country in this.fixedCountryNames) {
             fixedCountry = this.fixedCountryNames[country];
           }
           let pointsArray: string[] = [];
@@ -252,14 +259,17 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: place <= 8 ? "Q" : "NQ"
                   }],
                   dqphase: -1,
-                  edition: "46",
-                  edval: 50,
+                  edition: "31",
+                  edval: 34,
                   language: "",
                   phases: 2,
-                  pointsets: [pointsets],
+                  pointsets: [],
                   song: workBook.Sheets["Song submission"]["F" + j].v.toString().replaceAll('"', '').trim(),
                   user: workBook.Sheets["Song submission"]["D" + j].v.toString().replace('u/', '').trim(),
                   //TODO: Fix capitilization of usernames by querying database to see if they exist already
+                }
+                if (pointsArray.some(s => s.length)) {
+                  song.pointsets.push(pointsets);
                 }
                 this.semiSongs[s].push(song);
                 this.semiCountries.push(country);
@@ -287,7 +297,7 @@ export class ImportScreenComponent implements OnInit {
         "I" + p in workBook.Sheets["Semi " + (s + 1)]) {
         if (pointset.indexOf(workBook.Sheets["Semi " + (s + 1)][alphabet[10 + j] + p].v) !== -1) {
           let fixedCountry = workBook.Sheets["Semi " + (s + 1)]["I" + p].v.trim();
-          if(fixedCountry in this.fixedCountryNames) {
+          if (fixedCountry in this.fixedCountryNames) {
             fixedCountry = this.fixedCountryNames[fixedCountry];
           }
           points[pointset.indexOf(workBook.Sheets["Semi " + (s + 1)][alphabet[10 + j] + p].v)] = fixedCountry;
@@ -302,8 +312,15 @@ export class ImportScreenComponent implements OnInit {
 
   readFinalSongs(workBook: xlsx.WorkBook) {
     for (let n = 2; true; ++n) {
-      if ("H" + n in workBook.Sheets["GF Scoreboard"]) {
+      if ("H" + n in workBook.Sheets["GF Scoreboard"]
+        && workBook.Sheets["GF Scoreboard"]["H" + n].v.trim() !== "Total") {
         let index = this.semiCountries.indexOf(workBook.Sheets["GF Scoreboard"]["H" + n].v.trim())
+        let country = workBook.Sheets["GF Scoreboard"]["H" + n].v;
+        let fixedCountry = country;
+        if (country in this.fixedCountryNames) {
+          fixedCountry = this.fixedCountryNames[country];
+        }
+
         //Country was in the semi-finals
         if (index !== -1) {
           this.allSongs[index].draws.push({
@@ -313,17 +330,16 @@ export class ImportScreenComponent implements OnInit {
             points: workBook.Sheets["GF Scoreboard"]["I" + n].v,
             qualifier: workBook.Sheets["GF Scoreboard"]["F" + n].v <= 6 ? "FAQ" : "NAQ"
           })
-          if(workBook.Sheets["GF Scoreboard"]["F" + n].v === 1) this.allSongs[index].winner = true;
+          if (workBook.Sheets["GF Scoreboard"]["F" + n].v === 1) this.allSongs[index].winner = true;
           this.finalSongs.push(this.allSongs[index]);
         }
         //Country was not in the semi-finals (AQ)
         else {
           let sfnum = -1;
-          let country = workBook.Sheets["GF Scoreboard"]["H" + n].v;
           for (let i = 0; i < 3; ++i) {
             for (let j = 24; j <= 25; ++j) {
-              if (alphabet[2 + (5 * i)] + j in workBook.Sheets["CountryUser list"]) {
-                if (workBook.Sheets["CountryUser list"][alphabet[2 + (5 * i)] + j].v.trim() === country) {
+              if (alphabet[2 + (5 * i)] + j in workBook.Sheets["SF RO + Vote Checker"]) {
+                if (workBook.Sheets["SF RO + Vote Checker"][alphabet[2 + (5 * i)] + j].v.trim() === country) {
                   sfnum = i + 1;
                   break;
                 }
@@ -332,12 +348,33 @@ export class ImportScreenComponent implements OnInit {
             if (sfnum !== -1) break;
           }
 
+          let pointsArray: string[] = [];
+          console.log(sfnum)
+          for (let j = 0; j < 30; ++j) {
+            if (this.getColumnName(10 + j) + "1" in workBook.Sheets["Semi " + sfnum]) {
+              let code = workBook.Sheets["Semi " + sfnum][this.getColumnName(10 + j) + "1"].v;
+              if (code in this.countryCodes && this.countryCodes[code] === fixedCountry) {
+                console.log(code + ": " + this.countryCodes[code]);
+                pointsArray = this.readSemiPointset(workBook, sfnum - 1, j);
+                break;
+              }
+              else {
+                let codeCountry = this.countries.getName(code, "en", { select: "official" });
+                if (codeCountry === fixedCountry) {
+                  console.log(code + ": " + codeCountry);
+                  pointsArray = this.readSemiPointset(workBook, sfnum - 1, j);
+                  break;
+                }
+              }
+            }
+          }
+
           for (let s = 3; s < 80; ++s) {
             if ("C" + s in workBook.Sheets["Song submission"]) {
               if (workBook.Sheets["Song submission"]["C" + s].v.trim() == country) {
                 let song: Song = {
                   artist: workBook.Sheets["Song submission"]["E" + s].w.trim(),
-                  country: country,
+                  country: fixedCountry,
                   draws: [{
                     ro: -1,
                     num: sfnum,
@@ -351,15 +388,23 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: workBook.Sheets["GF Scoreboard"]["F" + n].v <= 6 ? "FAQ" : "NAQ"
                   }],
                   dqphase: -1,
-                  edition: "46",
-                  edval: 50,
+                  edition: "31",
+                  edval: 34,
                   language: "",
                   phases: 2,
                   pointsets: [],
                   song: workBook.Sheets["Song submission"]["F" + s].v.toString().replaceAll('"', '').trim(),
                   user: workBook.Sheets["Song submission"]["D" + s].v.toString().replace('u/', '').trim(),
                 }
-                if(workBook.Sheets["GF Scoreboard"]["F" + n].v === 1) song.winner = true;
+
+                //TODO: Add semi pointsets
+                song.pointsets.push({});
+                song.pointsets[0][sfnum] = {
+                  cv: false,
+                  points: pointsArray,
+                }
+
+                if (workBook.Sheets["GF Scoreboard"]["F" + n].v === 1) song.winner = true;
                 this.allSongs.push(song);
                 this.finalSongs.push(song);
                 break;
@@ -375,27 +420,104 @@ export class ImportScreenComponent implements OnInit {
         break;
       }
     }
+
+    this.allSongs.forEach(song => {
+
+      let fixedCountry = song.country;
+      if (song.country in this.fixedCountryNames) {
+        fixedCountry = this.fixedCountryNames[song.country];
+      }
+
+      let pointsArray: string[] = [];
+      for (let j = 0; j < 80; ++j) {
+        if (this.getColumnName(9 + j) + "1" in workBook.Sheets["GF Scoreboard"]) {
+          let code = workBook.Sheets["GF Scoreboard"][this.getColumnName(9 + j) + "1"].v;
+          if (code in this.countryCodes && this.countryCodes[code] === fixedCountry) {
+            console.log(code + ": " + this.countryCodes[code]);
+            pointsArray = this.readFinalPointset(workBook, j);
+            if (pointsArray.some(s => s.length)) {
+              song.pointsets.push({
+                1: {
+                  cv: false,
+                  points: pointsArray
+                }
+              });
+            }
+            break;
+          }
+          else {
+            let codeCountry = this.countries.getName(code, "en", { select: "official" });
+            if (codeCountry === fixedCountry) {
+              console.log(code + ": " + codeCountry);
+              pointsArray = this.readFinalPointset(workBook, j);
+              if (pointsArray.some(s => s.length)) {
+                song.pointsets.push({
+                  1: {
+                    cv: false,
+                    points: pointsArray
+                  }
+                });
+              }
+              break;
+            }
+          }
+        }
+      }
+
+      console.log(song.pointsets);
+    });
+
+    console.log(this.allSongs)
+  }
+
+  readFinalPointset(workBook: xlsx.WorkBook, j: number): string[] {
+    let points: string[] = new Array(10);
+    for (let p = 2; p < 40; ++p) {
+      if (this.getColumnName(9 + j) + p in workBook.Sheets["GF Scoreboard"] &&
+        "H" + p in workBook.Sheets["GF Scoreboard"]) {
+        if (pointset.indexOf(workBook.Sheets["GF Scoreboard"][this.getColumnName(9 + j) + p].v) !== -1) {
+          let fixedCountry = workBook.Sheets["GF Scoreboard"]["H" + p].v.trim();
+          if (fixedCountry in this.fixedCountryNames) {
+            fixedCountry = this.fixedCountryNames[fixedCountry];
+          }
+          points[pointset.indexOf(workBook.Sheets["GF Scoreboard"][this.getColumnName(9 + j) + p].v)] = fixedCountry;
+        }
+        // console.log(workBook.Sheets["Semi " + (s + 1)][alphabet[10 + j] + p].v + ": " +
+        //   workBook.Sheets["Semi " + (s + 1)]["I" + p].v)
+      }
+    }
+    console.log(points);
+    return points;
   }
 
   uploadSongs() {
 
-    this.allSongs.forEach(song => {
-      song.draws[0].place = -1;
-      song.draws[0].points = -1;
-      song.draws[0].intpoints = 0;
-      song.draws[0].extpoints = 0;
-      song.draws[0].rawextpoints = 0;
-      song.pointsets = [];
-      if(song.draws.length == 2) {
-        song.draws[1].place = -1;
-        song.draws[1].points = -1;
-        song.draws[1].qualifier = "TBD";
-      }
-    })
+    // this.allSongs.forEach(song => {
+    //   song.draws[0].place = -1;
+    //   song.draws[0].points = -1;
+    //   song.draws[0].intpoints = 0;
+    //   song.draws[0].extpoints = 0;
+    //   song.draws[0].rawextpoints = 0;
+    //   song.pointsets = [];
+    //   if (song.draws.length == 2) {
+    //     song.draws[1].place = -1;
+    //     song.draws[1].points = -1;
+    //     song.draws[1].qualifier = "TBD";
+    //   }
+    // })
 
     this.allSongs.forEach(song => {
       addDoc(collection(this.db, "contests", this.id, "newsongs"), song);
     })
+  }
+
+  getColumnName(n: number): string {
+    if (n < 26) {
+      return alphabet[n];
+    }
+    else {
+      return alphabet[Math.floor(n / 26) - 1] + alphabet[n % 26]
+    }
   }
 
   //Returns the styling for rows in the song tables
@@ -455,7 +577,7 @@ export class ImportScreenComponent implements OnInit {
 
   getPoints(voter: Song, receiver: string, phase: number, num: number) {
     let fixedCountry = receiver;
-    if(receiver in this.fixedCountryNames) {
+    if (receiver in this.fixedCountryNames) {
       fixedCountry = this.fixedCountryNames[receiver];
     }
     let index = voter.pointsets[phase][(num + 1).toString()].points.indexOf(fixedCountry);

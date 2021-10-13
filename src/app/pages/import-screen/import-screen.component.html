@@ -63,22 +63,60 @@
 			<thead>
 				<th>R/O</th>
 				<th>Country</th>
-				<th *ngFor="let voter of semi">
-					<ng-container *ngIf="countryNames[voter.country]; else otherCode">
-						{{countryNames[voter.country]}}
-					</ng-container>
-					<ng-template #otherCode>
-						{{countries.getAlpha3Code(voter.country, "en")}}
-					</ng-template>
-				</th>
+				<ng-container *ngFor="let voter of semi">
+					<th *ngIf="voter.pointsets.length >= 1">
+						<ng-container *ngIf="countryNames[voter.country]; else otherCode">
+							{{countryNames[voter.country]}}
+						</ng-container>
+						<ng-template #otherCode>
+							{{countries.getAlpha3Code(voter.country, "en")}}
+						</ng-template>
+					</th>
+				</ng-container>
 			</thead>
 			<ng-container *ngFor="let song of semi">
-				<tr [ngStyle]="getPointStyle(song, 0)">
+				<tr *ngIf="song.pointsets.length >= 1" [ngStyle]="getPointStyle(song, 0)">
 					<td>{{song.draws[0].ro}}</td>
 					<td><a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
-					<td *ngFor="let voter of semi" [ngStyle]="(voter.country == song.country) ? { 'background-color': '#aaa' } : { }"
-					[innerHTML]="getPoints(voter, song.country, 0, s)">
-					</td>
+					<ng-container *ngFor="let voter of semi">
+						<td *ngIf="voter.pointsets.length >= 1"
+							[ngStyle]="(voter.country == song.country) ? { 'background-color': '#aaa' } : { }"
+							[innerHTML]="getPoints(voter, song.country, 0, s)">
+						</td>
+					</ng-container>
+				</tr>
+			</ng-container>
+		</table>
+	</div>
+
+	<h1>Grand Final</h1>
+
+	<div style="overflow-x: auto; max-width: 100%;">
+		<table>
+			<thead>
+				<th>R/O</th>
+				<th>Country</th>
+				<ng-container *ngFor="let voter of allSongs">
+					<th *ngIf="voter.pointsets.length == 2">
+						<ng-container *ngIf="countryNames[voter.country]; else otherCode">
+							{{countryNames[voter.country]}}
+						</ng-container>
+						<ng-template #otherCode>
+							{{countries.getAlpha3Code(voter.country, "en")}}
+						</ng-template>
+					</th>
+				</ng-container>
+			</thead>
+			<ng-container *ngFor="let song of finalSongs">
+				<tr [ngStyle]="getPointStyle(song, 1)">
+					<td>{{song.draws[1].ro}}</td>
+					<td><a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a></td>
+					<ng-container *ngFor="let voter of allSongs">
+						<td *ngIf="voter.pointsets.length == 2"
+							[ngStyle]="(voter.country == song.country) ? { 'background-color': '#aaa' } : { }"
+							[innerHTML]="getPoints(voter, song.country, 1, 0)">
+						</td>
+					</ng-container>
 				</tr>
 			</ng-container>
 		</table>
