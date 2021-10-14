@@ -50,7 +50,7 @@ export class CountryUserScreenComponent implements OnInit {
 
     console.log(this.router.url.split('/'));
 
-    this.type = this.router.url.split('/')[3].toLowerCase().replace('new', ''); //Remove replace after finalizing
+    this.type = this.router.url.split('/')[3].toLowerCase();
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
