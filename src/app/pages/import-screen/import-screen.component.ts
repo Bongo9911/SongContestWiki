@@ -40,11 +40,13 @@ export class ImportScreenComponent implements OnInit {
     // BUL: "Bulgaria",
     // CAM: "Cambodia",
     CIV: "Côte d'Ivoire",
+    CUR: "Curaçao",
     // CYM: "Wales",
     // DEN: "Denmark",
     ENG: "England",
     FSM: "Micronesia",
     // GUA: "Guatemala",
+    ICE: "Iceland",
     // IRE: "Ireland",
     IRN: "Iran",
     LAO: "Laos",
@@ -61,7 +63,7 @@ export class ImportScreenComponent implements OnInit {
     SCT: "Scotland",
     // SLV: "Slovenia",
     STP: "São Tomé and Príncipe",
-    // SVG: "Saint Vincent and the Grenadines",
+    SVG: "Saint Vincent and the Grenadines",
     SXM: "Sint Maarten",
     USA: "United States",
     VAT: "Vatican City",
@@ -90,16 +92,22 @@ export class ImportScreenComponent implements OnInit {
   };
 
   fixedCountryNames = {
+    "Bahamas": "The Bahamas",
     "Bosnia & Herzegovina": "Bosnia and Herzegovina",
+    "CAR": "Central African Republic",
     "Cote d'Ivoire": "Côte d'Ivoire",
     "Cote D'Ivoire": "Côte d'Ivoire",
     "Côte D'Ivoire": "Côte d'Ivoire",
     "Curacao": "Curaçao",
+    "PNG": "Papua New Guinea",
     "St Kitts & Nevis": "Saint Kitts and Nevis",
     "St Lucia": "Saint Lucia",
+    "Saint Vincent": "Saint Vincent and the Grenadines",
+    "St Vincent": "Saint Vincent and the Grenadines",
     "St Vincent & The Grenadines": "Saint Vincent and the Grenadines",
     "St Vincent & the Grenadines": "Saint Vincent and the Grenadines",
     "Trinidad & Tobago": "Trinidad and Tobago",
+    "Trinida": "Trinidad and Tobago",
     "USA": "United States",
     "United States of America": "United States",
   }
@@ -121,6 +129,9 @@ export class ImportScreenComponent implements OnInit {
     // })
 
     console.log(this.getColumnName(50));
+
+    // console.log(this.countries.getName("DZA", "en", { select: "official" }))
+    // console.log(this.countries.getAlpha3Code("Algeria", "en"))
   }
 
   ngOnInit(): void {
@@ -288,6 +299,7 @@ export class ImportScreenComponent implements OnInit {
       }
     }
     console.log(this.semiSongs);
+    console.log(this.semiCountries);
   }
 
   readSemiPointset(workBook: xlsx.WorkBook, s: number, j: number): string[] {
@@ -336,6 +348,7 @@ export class ImportScreenComponent implements OnInit {
         //Country was not in the semi-finals (AQ)
         else {
           let sfnum = -1;
+          console.log(country)
           for (let i = 0; i < 3; ++i) {
             for (let j = 24; j <= 25; ++j) {
               if (alphabet[2 + (5 * i)] + j in workBook.Sheets["SF RO + Vote Checker"]) {
@@ -376,7 +389,6 @@ export class ImportScreenComponent implements OnInit {
                   artist: workBook.Sheets["Song submission"]["E" + s].w.trim(),
                   country: fixedCountry,
                   draws: [{
-                    ro: -1,
                     num: sfnum,
                     qualifier: "AQ"
                   },
@@ -418,6 +430,53 @@ export class ImportScreenComponent implements OnInit {
       }
       else {
         break;
+      }
+    }
+
+    //Read in cross-votes
+    for (let s = 0; s < 3; ++s) {
+      for (let j = 0; j < 30; ++j) {
+        let points: string[] = new Array(10);
+        if (alphabet[10 + j] + 1 in workBook.Sheets["Semi " + (s + 1) + " EXT"]) {
+          let voter = "";
+          let code = workBook.Sheets["Semi " + (s + 1) + " EXT"][alphabet[10 + j] + 1].v.trim()
+          if (code in this.countryCodes) {
+            voter = this.countryCodes[code];
+          }
+          else {
+            voter = this.countries.getName(code, "en", { select: "official" })
+          }
+
+          let votersongarray = this.allSongs.filter(song => song.country === voter);
+          if (votersongarray.length) {
+            let votersong = votersongarray[0];
+            for (let p = 2; p < 30; ++p) {
+              if (alphabet[10 + j] + p in workBook.Sheets["Semi " + (s + 1) + " EXT"] &&
+                "I" + p in workBook.Sheets["Semi " + (s + 1) + " EXT"]) {
+                if (pointset.indexOf(workBook.Sheets["Semi " + (s + 1) + " EXT"][alphabet[10 + j] + p].v) !== -1) {
+                  let fixedCountry = workBook.Sheets["Semi " + (s + 1) + " EXT"]["I" + p].v.trim();
+                  if (fixedCountry in this.fixedCountryNames) {
+                    fixedCountry = this.fixedCountryNames[fixedCountry];
+                  }
+                  points[pointset.indexOf(workBook.Sheets["Semi " + (s + 1) + " EXT"][alphabet[10 + j] + p].v)] = fixedCountry;
+                }
+                // console.log(workBook.Sheets["Semi " + (s + 1)][alphabet[10 + j] + p].v + ": " +
+                //   workBook.Sheets["Semi " + (s + 1)]["I" + p].v)
+              }
+            }
+            votersong.pointsets[0][s + 1] = {
+              cv: true,
+              points: points
+            }
+          }
+          else {
+            console.error("ERROR: " + voter + " WITH CODE " + code + " NOT FOUND");
+          }
+        }
+        else {
+          break;
+        }
+        console.log(points);
       }
     }
 
