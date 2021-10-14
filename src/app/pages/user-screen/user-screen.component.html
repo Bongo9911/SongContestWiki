@@ -17,11 +17,16 @@
 			</div>
 			<div class="infoboxsection">
 				<div><b>Appearances</b></div>
-				<div>{{numEntries}} ({{numQualifiers}} final<ng-container *ngIf="numQualifiers !== 1">s</ng-container>)</div>
+				<div>{{numEntries}} ({{numQualifiers}} final<ng-container *ngIf="numQualifiers !== 1">s</ng-container>)
+				</div>
 			</div>
 			<div class="infoboxsection" *ngIf="bestPlace">
 				<div><b>Best Result</b></div>
-				<div>{{bestPlace}}: <a routerLink="/contest/{{id}}/ed/{{bestEd}}">{{bestEd}}</a></div>
+				<div>{{bestPlace}}:
+					<ng-container *ngFor="let ed of bestEds; index as e">
+						<ng-container *ngIf="e > 0">, </ng-container><a routerLink="/contest/{{id}}/ed/{{ed}}">{{ed}}</a>
+					</ng-container>
+				</div>
 			</div>
 			<div class="infoboxsection" *ngIf="worstPlace">
 				<div><b>Worst Result</b></div>
@@ -82,10 +87,12 @@
 									<td></td>
 								</ng-container>
 							</ng-container>
-							<ng-container *ngIf="song.draws.length < (song.phases - p) && p == 0 && song.draws[p].qualifier === 'NQ'">
+							<ng-container
+								*ngIf="song.draws.length < (song.phases - p) && p == 0 && song.draws[p].qualifier === 'NQ'">
 								<td class="dqrow" colspan="2 * (p + 1)">Did not qualify</td>
 							</ng-container>
-							<ng-container *ngIf="song.draws.length < (song.phases - p) && p == 0 && song.draws[p].qualifier !== 'NQ'">
+							<ng-container
+								*ngIf="song.draws.length < (song.phases - p) && p == 0 && song.draws[p].qualifier !== 'NQ'">
 								<td></td>
 								<td></td>
 							</ng-container>
