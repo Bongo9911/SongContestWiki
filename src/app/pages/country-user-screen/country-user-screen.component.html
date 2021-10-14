@@ -1,16 +1,17 @@
-<!-- Start Screen html file -->
-
 <div class="container">
 
 	<a routerLink="/contest/{{id}}">&#60; {{con.name}}</a>
 
-	<h1>{{user}}</h1>
+	<h1>{{name}}</h1>
 	<hr />
 
 	<div class="infoboxcon">
 		<div class="infobox">
 			<div class="infoboxheader">
-				{{user}}
+				{{name}}
+			</div>
+            <div *ngIf="type === 'country'" style="width: 100%;">
+				<img src="{{flagUrl}}" style="width: 100%;">
 			</div>
 			<div class="infoboxheader">
 				Appearances
@@ -50,7 +51,8 @@
 		<table matSort (matSortChange)="sortData($event)">
 			<tr>
 				<th mat-sort-header="edition">Edition</th>
-				<th mat-sort-header="country">Country</th>
+				<th mat-sort-header="country" *ngIf="type == 'user'">Country</th>
+                <th mat-sort-header="user" *ngIf="type == 'country'">User</th>
 				<th mat-sort-header="language">Language</th>
 				<th mat-sort-header="artist">Artist</th>
 				<th mat-sort-header="song">Song</th>
@@ -66,7 +68,10 @@
 			<ng-container *ngFor="let song of songs">
 				<tr [ngStyle]="getStyle(song)">
 					<td><a routerLink="/contest/{{id}}/ed/{{song.edition}}">{{song.edition}}</a></td>
-					<td>
+                    <td *ngIf="type == 'country'">
+                        <a routerLink="/contest/{{id}}/user/{{song.user}}">{{song.user}}</a>
+                    </td>
+					<td *ngIf="type == 'user'">
 						<img class="flag" src="{{flagUrls[song.country]}}">
 						<a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a>
 					</td>
@@ -131,12 +136,12 @@
 		</table>
 	</div>
 
-	<textarea #points></textarea>
+	<!-- <textarea #points></textarea> -->
 
-	<button (click)="uploadPoints(points.value)">Upload</button>
+	<!-- <button (click)="uploadPoints(points.value)">Upload</button>
 	<button (click)="uploadTablePoints(points.value)">Upload From Table</button>
 	<button (click)="uploadPointTotals(points.value)">Upload Totals</button>
-	<button (click)="uploadPointsFromSpreadsheet(points.value)">Upload From Spreadsheet</button>
+	<button (click)="uploadPointsFromSpreadsheet(points.value)">Upload From Spreadsheet</button> -->
 
 	<!-- <button (click)="deleteSongs()">Delete</button> -->
 </div>

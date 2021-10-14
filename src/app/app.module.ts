@@ -13,13 +13,12 @@ import { MatInputModule } from '@angular/material/input';
 import { ContestScreenComponent } from './pages/contest-screen/contest-screen.component';
 import { StartScreenComponent } from './pages/start-screen/start-screen.component';
 import { EditionScreenComponent } from './pages/edition-screen/edition-screen.component';
-import { UserScreenComponent } from './pages/user-screen/user-screen.component';
 import { ReallocatorScreenComponent } from './pages/reallocator-screen/reallocator-screen.component';
-import { CountryScreenComponent } from './pages/country-screen/country-screen.component';
 import { PotGeneratorComponent } from './pages/pot-generator/pot-generator.component';
 import { LoginComponent } from './account-pages/login/login.component';
 import { RegisterComponent } from './account-pages/register/register.component';
 import { ImportScreenComponent } from './pages/import-screen/import-screen.component';
+import { CountryUserScreenComponent } from './pages/country-user-screen/country-user-screen.component';
 
 @NgModule({
   declarations: [
@@ -27,13 +26,12 @@ import { ImportScreenComponent } from './pages/import-screen/import-screen.compo
     ContestScreenComponent,
     StartScreenComponent,
     EditionScreenComponent,
-    UserScreenComponent,
     ReallocatorScreenComponent,
-    CountryScreenComponent,
     PotGeneratorComponent,
     LoginComponent,
     RegisterComponent,
     ImportScreenComponent,
+    CountryUserScreenComponent,
   ],
   imports: [
     BrowserModule,
