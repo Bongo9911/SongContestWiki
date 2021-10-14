@@ -260,6 +260,7 @@ export class CountryUserScreenComponent implements OnInit {
       switch (sort.active) {
         case 'edition': return compare(a.edval, b.edval, isAsc);
         case 'country': return compare(a.country, b.country, isAsc);
+        case 'user': return compare(a.user, b.user, isAsc);
         case 'language': return compare(a.language, b.language, isAsc);
         case 'artist': return compare(a.artist.toLowerCase(), b.artist.toLowerCase(), isAsc);
         case 'song': return compare(a.song.toLowerCase(), b.song.toLowerCase(), isAsc);
