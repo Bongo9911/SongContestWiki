@@ -33,7 +33,7 @@ export class UserScreenComponent implements OnInit {
   bestPlace: string = "";
   bestEds: string[] = [];
   worstPlace: string = "";
-  worstEd: string = "";
+  worstEds: string[] = [];
 
   songlist: any[] = [];
 
@@ -139,7 +139,17 @@ export class UserScreenComponent implements OnInit {
                 this.worstPlace += ' (OF)'
                 break;
             }
-            this.worstEd = songsort[0].edition;
+            this.worstEds.push(songsort[0].edition);
+
+            for(let j = 1; j < songsort.length; ++j) {
+              if(songsort[0].draws[songsort[0].phases - i - 1].place 
+                === songsort[j].draws[songsort[j].phases - i - 1].place) {
+                  this.worstEds.push(songsort[j].edition)
+              }
+              else {
+                break;
+              }
+            }
             break;
           }
         }

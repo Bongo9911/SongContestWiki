@@ -24,13 +24,19 @@
 				<div><b>Best Result</b></div>
 				<div>{{bestPlace}}:
 					<ng-container *ngFor="let ed of bestEds; index as e">
-						<ng-container *ngIf="e > 0">, </ng-container><a routerLink="/contest/{{id}}/ed/{{ed}}">{{ed}}</a>
+						<ng-container *ngIf="e > 0">, </ng-container>
+						<a routerLink="/contest/{{id}}/ed/{{ed}}">{{ed}}</a>
 					</ng-container>
 				</div>
 			</div>
 			<div class="infoboxsection" *ngIf="worstPlace">
 				<div><b>Worst Result</b></div>
-				<div>{{worstPlace}}: <a routerLink="/contest/{{id}}/ed/{{worstEd}}">{{worstEd}}</a></div>
+				<div>{{worstPlace}}:
+					<ng-container *ngFor="let ed of worstEds; index as e">
+						<ng-container *ngIf="e > 0">, </ng-container>
+						<a routerLink="/contest/{{id}}/ed/{{ed}}">{{ed}}</a>
+					</ng-container>
+				</div>
 			</div>
 		</div>
 	</div>
