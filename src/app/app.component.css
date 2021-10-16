@@ -1,0 +1,12 @@
+.logo {
+    height: 70px;
+    width: auto;
+}
+
+.toolbar {
+    position: fixed;
+    top: 0; /* Sets the sticky toolbar to be on top */
+    z-index: 1000; /* Ensure that your app's content doesn't overlap the toolbar */
+    min-height:64px;
+    max-height:64px
+}

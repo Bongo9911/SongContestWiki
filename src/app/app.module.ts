@@ -9,6 +9,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSortModule } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
 
 import { ContestScreenComponent } from './pages/contest-screen/contest-screen.component';
 import { StartScreenComponent } from './pages/start-screen/start-screen.component';
@@ -43,6 +45,8 @@ import { CountryUserScreenComponent } from './pages/country-user-screen/country-
     MatButtonModule,
     MatInputModule,
     ReactiveFormsModule,
+    MatToolbarModule,
+    MatIconModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
