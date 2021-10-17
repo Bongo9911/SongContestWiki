@@ -35,6 +35,7 @@ export class AppComponent implements OnDestroy {
         }
         else {
           this.link = "";
+          this.logo = "";
         }
       }
     });

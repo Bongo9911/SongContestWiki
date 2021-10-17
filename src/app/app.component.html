@@ -2,6 +2,9 @@
     <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
         <mat-icon>menu</mat-icon>
     </button>
+    <button mat-icon-button aria-label="Home" *ngIf="link !== '/'" routerLink="/">
+            <mat-icon>home</mat-icon>
+    </button>
     <!-- <span>My App</span> -->
     <div style="max-height: 100%;">
         <a [routerLink]="link"><img class="logo" src="{{logo}}"></a>
@@ -9,10 +12,17 @@
     <!-- <span class="example-spacer"></span>
     <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
         <mat-icon>favorite</mat-icon>
-    </button>
-    <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon">
-        <mat-icon>share</mat-icon>
     </button> -->
+    <button mat-icon-button class="search-icon" aria-label="Search">
+        <mat-icon>search</mat-icon>
+    </button>
+
+    <div class="searchbox">
+        <mat-icon [ngStyle]="{'color':'#888'}">search</mat-icon>
+        <mat-form-field style="margin-bottom: -7px;" appearance="none">
+            <input type="text" matInput placeholder="Search">
+        </mat-form-field>
+    </div>
 </mat-toolbar>
 
 <div style="height: 75px;"></div>

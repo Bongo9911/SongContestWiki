@@ -1,12 +1,45 @@
 .logo {
-    height: 70px;
+    height: 64px;
     width: auto;
+    padding: 3px;
 }
 
 .toolbar {
     position: fixed;
-    top: 0; /* Sets the sticky toolbar to be on top */
-    z-index: 1000; /* Ensure that your app's content doesn't overlap the toolbar */
-    min-height:64px;
-    max-height:64px
+    top: 0;
+    /* Sets the sticky toolbar to be on top */
+    z-index: 1000;
+    /* Ensure that your app's content doesn't overlap the toolbar */
+    min-height: 64px;
+    max-height: 64px;
+    width: 100%;
+}
+
+.search-icon {
+    position: absolute;
+    right: 1vw;
+}
+
+.searchbox {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    border: 2px solid #aaa;
+    border-radius: 50px;
+    height: 40px;
+    position: absolute;
+    right: 1vw;
+    padding: 0 3px;
+}
+
+@media only screen and (max-width: 600px) {
+    .searchbox {
+        display: none;
+    }
+}
+
+@media only screen and (min-width: 601px) {
+    .search-icon {
+        display: none;
+    }
 }
