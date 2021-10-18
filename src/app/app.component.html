@@ -13,11 +13,11 @@
     <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
         <mat-icon>favorite</mat-icon>
     </button> -->
-    <button mat-icon-button class="search-icon" aria-label="Search">
+    <button mat-icon-button class="search-icon" aria-label="Search" *ngIf="link !== '' && link !== '/'">
         <mat-icon>search</mat-icon>
     </button>
 
-    <div class="searchbox">
+    <div class="searchbox" *ngIf="link !== '' && link !== '/'">
         <mat-icon [ngStyle]="{'color':'#888'}">search</mat-icon>
         <mat-form-field style="margin-bottom: -7px;" appearance="none">
             <input type="text" matInput placeholder="Search">

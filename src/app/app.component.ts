@@ -14,7 +14,7 @@ import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 export class AppComponent implements OnDestroy {
   title = 'Song Contest Wiki';
   logo = "";
-  link = "/";
+  link = "";
   sub: SubscriptionLike = null;
 
   constructor(private location: Location, private router: Router) {
@@ -32,6 +32,9 @@ export class AppComponent implements OnDestroy {
             })
             this.link = "/contest/" + split[2];
           }
+        }
+        else if(split.length > 1) {
+          this.link = "/";
         }
         else {
           this.link = "";
