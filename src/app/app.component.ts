@@ -2,9 +2,11 @@ import { Component, OnDestroy } from '@angular/core';
 import { Location } from '@angular/common';
 import { initializeApp } from "firebase/app"
 import { firebaseConfig } from './credentials';
+import { getFirestore, collection, query, where, getDocs, setDoc, doc, getDoc } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { SubscriptionLike } from 'rxjs';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
+import * as fuzzysort from 'fuzzysort';
 
 @Component({
   selector: 'app-root',
@@ -16,10 +18,16 @@ export class AppComponent implements OnDestroy {
   logo = "";
   link = "";
   sub: SubscriptionLike = null;
+  countrieslower: any = {};
+  countries: any = {};
+  userslower: any = {};
+  users: any = {};
+  searchval: string = "";
 
   constructor(private location: Location, private router: Router) {
     console.log(this.location.path().split('/'));
     const firebaseApp = initializeApp(firebaseConfig);
+    const db = getFirestore(firebaseApp);
     const storage = getStorage(firebaseApp)
 
     this.sub = router.events.subscribe((val) => {
@@ -31,6 +39,10 @@ export class AppComponent implements OnDestroy {
               this.logo = url;
             })
             this.link = "/contest/" + split[2];
+            getDoc(doc(db, 'contests', split[2], 'lists', 'users')).then(doc => {
+              this.users = doc.data();
+              console.log(fuzzysort.go('Bon', this.users["list"]))
+            })
           }
         }
         else if(split.length > 1) {
@@ -46,5 +58,9 @@ export class AppComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.sub.unsubscribe();
+  }
+
+  search() {
+    console.log(fuzzysort.go(this.searchval, this.users["list"]));
   }
 }

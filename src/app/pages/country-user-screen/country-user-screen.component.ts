@@ -4,7 +4,7 @@ import { Sort } from '@angular/material/sort';
 import { Contest, Song } from 'src/app/shared/datatypes';
 // import firebase from 'firebase';
 import { AuthService } from 'src/app/auth/auth.service';
-import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, setDoc, doc } from "firebase/firestore";
 import { initializeApp } from "firebase/app"
 import { firebaseConfig } from '../../credentials';
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
@@ -68,12 +68,48 @@ export class CountryUserScreenComponent implements OnInit {
       })
     }
 
-    // this.database.firestore.collection('contests').where('id', '==', this.id).get()
-    //   .then(docs => {
-    //     docs.forEach((doc) => {
-    //       this.con = doc.data() as Contest;
-    //     });
-    //   });
+    // getDocs(query(collection(db, 'contests', this.id, 'newsongs'))).then(docs => {
+    //   // let users: {aliases: string[], lower: string, username: string}[] = [];
+    //   let users: any = {};
+    //   let countries: any = {};
+    //   //let countries: {lower: string, country: string}[] = [];
+    //   docs.forEach(doc => {
+    //     let data = doc.data() as Song;
+    //     users[data.user] = {
+    //       aliases: [data.user],
+    //       lower: data.user.toLowerCase(),
+    //       username: data.user
+    //     }
+    //     countries[data.country] = {
+    //       lower: data.country.toLowerCase(),
+    //       country: data.country
+    //     }
+    //   })
+
+    //   let userslower: string[] = []
+    //   let countrieslower: string[] = []
+    //   let usernames: string[] = []
+    //   let countrynames:string[] = [];
+    //   for(let user in users) {
+    //     console.log(users[user]);
+    //     //setDoc(doc(db, 'contests', this.id, 'users', user), users[user])
+    //     userslower.push(users[user].lower)
+    //     usernames.push(users[user].username)
+    //   }
+    //   for(let country in countries) {
+    //     //setDoc(doc(db, 'contests', this.id, 'countries', country), countries[country])
+    //     countrieslower.push(countries[country].lower)
+    //     countrynames.push(countries[country].country)
+    //   }
+
+    //   console.log(usernames);
+
+    //   setDoc(doc(db, 'contests', this.id, 'lists', "countries"), {list: countrynames})
+    //   setDoc(doc(db, 'contests', this.id, 'lists', "users"), {list: usernames})
+    //   setDoc(doc(db, 'contests', this.id, 'lists', "countrieslower"), {list: countrieslower})
+    //   setDoc(doc(db, 'contests', this.id, 'lists', "userslower"), {list: userslower})
+    //   console.log(countries)
+    // })
 
     //get all the songs sent for that user
     getDocs(query(collection(db, 'contests', this.id, 'newsongs'), where(this.type, '==', this.name))).then(docs => {

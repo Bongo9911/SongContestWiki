@@ -20,7 +20,7 @@
     <div class="searchbox" *ngIf="link !== '' && link !== '/'">
         <mat-icon [ngStyle]="{'color':'#888'}">search</mat-icon>
         <mat-form-field style="margin-bottom: -7px;" appearance="none">
-            <input type="text" matInput placeholder="Search">
+            <input type="text" matInput placeholder="Search" [(ngModel)]="searchval" (ngModelChange)="search()">
         </mat-form-field>
     </div>
 </mat-toolbar>
