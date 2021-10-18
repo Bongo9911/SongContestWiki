@@ -61,6 +61,9 @@ export class AppComponent implements OnDestroy {
   }
 
   search() {
-    console.log(fuzzysort.go(this.searchval, this.users["list"]));
+    console.log(fuzzysort.go(this.searchval, this.users["list"], {allowTypo: true}));
+
+    //Also search countries and then sort both lists by score. Tag them as a user or country and then
+    //combine the lists together. Only keep the top 4-5 results so the search bar doesn't drop down a billion results
   }
 }
