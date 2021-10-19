@@ -47,7 +47,7 @@ export class ImportScreenComponent implements OnInit {
     FSM: "Micronesia",
     // GUA: "Guatemala",
     ICE: "Iceland",
-    // IRE: "Ireland",
+    IRE: "Ireland",
     IRN: "Iran",
     LAO: "Laos",
     // LCU: "Saint Lucia",
@@ -65,6 +65,7 @@ export class ImportScreenComponent implements OnInit {
     STP: "São Tomé and Príncipe",
     SVG: "Saint Vincent and the Grenadines",
     SXM: "Sint Maarten",
+    TWN: "Taiwan",
     USA: "United States",
     VAT: "Vatican City",
     WAL: "Wales",
@@ -76,6 +77,7 @@ export class ImportScreenComponent implements OnInit {
     "Côte d'Ivoire": "CIV",
     "England": "ENG",
     "Iran": "IRN",
+    "Ireland": "IRE",
     "Laos": "LAO",
     "Micronesia": "FSM",
     "Moldova": "MDA",
@@ -85,6 +87,7 @@ export class ImportScreenComponent implements OnInit {
     "São Tomé and Príncipe": "STP",
     "Scotland": "SCO",
     "Sint Maarten": "SXM",
+    "Taiwan": "TWN",
     "The Bahamas": "BHS",
     "The Netherlands": "NLD",
     "United States": "USA",
@@ -123,7 +126,7 @@ export class ImportScreenComponent implements OnInit {
     //this.countryNames = this.objectFlip(this.countryCodes)
     //const storage = getStorage(firebaseApp);
 
-    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "31"))).then(docs => {
+    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "46"))).then(docs => {
     //   docs.forEach(song => {
     //     deleteDoc(doc(this.db, "contests", this.id, "newsongs", song.id))
     //   })
@@ -271,8 +274,8 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: place <= 8 ? "Q" : "NQ"
                   }],
                   dqphase: -1,
-                  edition: "31",
-                  edval: 34,
+                  edition: "46",
+                  edval: 50,
                   language: "",
                   phases: 2,
                   pointsets: [],
@@ -401,8 +404,8 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: workBook.Sheets["GF Scoreboard"]["F" + n].v <= 6 ? "FAQ" : "NAQ"
                   }],
                   dqphase: -1,
-                  edition: "31",
-                  edval: 34,
+                  edition: "46",
+                  edval: 50,
                   language: "",
                   phases: 2,
                   pointsets: [],
@@ -487,12 +490,13 @@ export class ImportScreenComponent implements OnInit {
       if (song.country in this.fixedCountryNames) {
         fixedCountry = this.fixedCountryNames[song.country];
       }
-
+      let found: boolean = false;
       let pointsArray: string[] = [];
       for (let j = 0; j < 80; ++j) {
         if (this.getColumnName(9 + j) + "1" in workBook.Sheets["GF Scoreboard"]) {
           let code = workBook.Sheets["GF Scoreboard"][this.getColumnName(9 + j) + "1"].v;
           if (code in this.countryCodes && this.countryCodes[code] === fixedCountry) {
+            found = true;
             console.log(code + ": " + this.countryCodes[code]);
             pointsArray = this.readFinalPointset(workBook, j);
             if (pointsArray.some(s => s.length)) {
@@ -508,6 +512,7 @@ export class ImportScreenComponent implements OnInit {
           else {
             let codeCountry = this.countries.getName(code, "en", { select: "official" });
             if (codeCountry === fixedCountry) {
+              found = true;
               console.log(code + ": " + codeCountry);
               pointsArray = this.readFinalPointset(workBook, j);
               if (pointsArray.some(s => s.length)) {
@@ -522,6 +527,10 @@ export class ImportScreenComponent implements OnInit {
             }
           }
         }
+      }
+
+      if(!found) {
+        console.error("ERROR: " + fixedCountry + " FINAL POINTSET NOT FOUND")
       }
 
       console.log(song.pointsets);

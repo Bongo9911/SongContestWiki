@@ -125,14 +125,16 @@
 
       <div style="margin: 6px 10px;">
         <div style="display: flex; justify-content: space-evenly; align-items: center; flex-wrap: wrap;">
-          <div *ngFor="let ed of eds; index as i" class="logoBox" routerLink="/contest/{{con.id}}/ed/{{ed.edition}}">
-            <div style="height: 100%; display: flex; align-items: center;">
-              <img class="edlogo" src="{{logos[i]}}">
+          <ng-container *ngFor="let ed of eds; index as i">
+            <div class="logoBox" routerLink="/contest/{{con.id}}/ed/{{ed.edition}}" *ngIf="logos[i].length">
+              <div style="height: 100%; display: flex; align-items: center;">
+                <img class="edlogo" src="{{logos[i]}}">
+              </div>
+              <div style="padding-top: 4px">
+                {{con.name}} {{ed.edition}}
+              </div>
             </div>
-            <div style="padding-top: 4px">
-              {{con.name}} {{ed.edition}}
-            </div>
-          </div>
+          </ng-container>
         </div>
       </div>
     </div>
