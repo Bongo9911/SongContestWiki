@@ -23,6 +23,9 @@ export class AppComponent implements OnDestroy {
   userslower: any = {};
   users: any = {};
   searchval: string = "";
+  searchresults: any[] = [];
+  searching: boolean = false;
+  contest: string = "";
 
   constructor(private location: Location, private router: Router) {
     console.log(this.location.path().split('/'));
@@ -35,6 +38,7 @@ export class AppComponent implements OnDestroy {
         let split = this.location.path().split('/');
         if (split.length >= 3 && split[1] === 'contest') {
           if ("/contest/" + split[2] !== this.link) {
+            this.contest = split[2];
             getDownloadURL(ref(storage, 'contests/' + split[2] + '/logo.png')).then(url => {
               this.logo = url;
             })
@@ -43,9 +47,12 @@ export class AppComponent implements OnDestroy {
               this.users = doc.data();
               console.log(fuzzysort.go('Bon', this.users["list"]))
             })
+            getDoc(doc(db, 'contests', split[2], 'lists', 'countries')).then(doc => {
+              this.countries = doc.data();
+            })
           }
         }
-        else if(split.length > 1) {
+        else if (split.length > 1) {
           this.link = "/";
         }
         else {
@@ -61,9 +68,25 @@ export class AppComponent implements OnDestroy {
   }
 
   search() {
-    console.log(fuzzysort.go(this.searchval, this.users["list"], {allowTypo: true}));
+    let userresult = fuzzysort.go(this.searchval, this.users["list"], { allowTypo: true });
+    userresult.forEach(user => {
+      user["type"] = "user";
+    });
 
-    //Also search countries and then sort both lists by score. Tag them as a user or country and then
-    //combine the lists together. Only keep the top 4-5 results so the search bar doesn't drop down a billion results
+    let countryresult = fuzzysort.go(this.searchval, this.countries["list"], { allowTypo: true });
+    countryresult.forEach(country => {
+      country["type"] = "country";
+    });
+
+    this.searchresults = userresult.concat(countryresult).sort((a, b) => a["score"] < b["score"] ? 1 : -1);
+    this.searchresults = this.searchresults.slice(0, this.searchresults.length >= 5 ? 5 : this.searchresults.length);
+
+    console.log(this.searchresults);
+  }
+
+  hideSearch() {
+    setTimeout(() => {
+      this.searching = false;
+    }, 100);
   }
 }

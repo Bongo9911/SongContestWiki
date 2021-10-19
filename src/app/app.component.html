@@ -3,7 +3,7 @@
         <mat-icon>menu</mat-icon>
     </button>
     <button mat-icon-button aria-label="Home" *ngIf="link !== ''" routerLink="">
-            <mat-icon>home</mat-icon>
+        <mat-icon>home</mat-icon>
     </button>
     <!-- <span>My App</span> -->
     <div style="max-height: 100%;">
@@ -20,8 +20,17 @@
     <div class="searchbox" *ngIf="link !== '' && link !== '/'">
         <mat-icon [ngStyle]="{'color':'#888'}">search</mat-icon>
         <mat-form-field style="margin-bottom: -7px;" appearance="none">
-            <input type="text" matInput placeholder="Search" [(ngModel)]="searchval" (ngModelChange)="search()">
+            <input type="text" matInput placeholder="Search" [(ngModel)]="searchval" (ngModelChange)="search()"
+                (focus)="searching = true;" (blur)="hideSearch()">
         </mat-form-field>
+    </div>
+
+    <div style="position: absolute; right: 1vw; top: 60px;" *ngIf="searching">
+        <ng-container *ngFor="let result of searchresults">
+            <div class="searchresult" routerLink="/contest/{{contest}}/{{result.type}}/{{result.target}}">
+                {{result.target}}
+            </div>
+        </ng-container>
     </div>
 </mat-toolbar>
 
