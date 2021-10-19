@@ -1,20 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { Sort } from '@angular/material/sort';
 import { Contest, Song } from 'src/app/shared/datatypes';
 // import firebase from 'firebase';
 import { AuthService } from 'src/app/auth/auth.service';
-import { getFirestore, collection, query, where, getDocs, setDoc, doc } from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, setDoc, doc, Firestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app"
 import { firebaseConfig } from '../../credentials';
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, getDownloadURL, FirebaseStorage } from "firebase/storage";
+import { SubscriptionLike } from 'rxjs';
 
 @Component({
   selector: 'app-country-user-screen',
   templateUrl: './country-user-screen.component.html',
   styleUrls: ['./country-user-screen.component.css']
 })
-export class CountryUserScreenComponent implements OnInit {
+export class CountryUserScreenComponent implements OnInit, OnDestroy {
 
   readonly pointset: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
 
@@ -42,6 +43,11 @@ export class CountryUserScreenComponent implements OnInit {
 
   phases: number = 2;
 
+  sub: SubscriptionLike = null;
+
+  db: Firestore;
+  storage: FirebaseStorage;
+
   constructor(private router: Router, private route: ActivatedRoute, private authService: AuthService) {
     this.route.params.subscribe(params => {
       this.id = params.id;
@@ -50,178 +56,196 @@ export class CountryUserScreenComponent implements OnInit {
 
     console.log(this.router.url.split('/'));
 
-    this.type = this.router.url.split('/')[3].toLowerCase();
 
     const firebaseApp = initializeApp(firebaseConfig);
-    const db = getFirestore(firebaseApp);
-    const storage = getStorage(firebaseApp)
+    this.db = getFirestore(firebaseApp);
+    this.storage = getStorage(firebaseApp)
 
-    getDocs(query(collection(db, 'contests'), where('id', '==', this.id))).then(docs => {
-      docs.forEach((doc) => {
-        this.con = doc.data() as Contest;
-      });
-    })
+    this.sub = router.events.subscribe((val) => {
+      if (val instanceof NavigationEnd) {
 
-    if (this.type === 'country') {
-      getDownloadURL(ref(storage, 'contests/' + this.id + '/flags/' + this.name + ' Flag.png')).then(url => {
-        this.flagUrl = url;
-      })
-    }
+        this.bestPlace = "";
+        this.bestEds = [];
+        this.worstPlace = "";
+        this.worstEds = [];
+        this.songs = [];
 
-    // getDocs(query(collection(db, 'contests', this.id, 'newsongs'))).then(docs => {
-    //   // let users: {aliases: string[], lower: string, username: string}[] = [];
-    //   let users: any = {};
-    //   let countries: any = {};
-    //   //let countries: {lower: string, country: string}[] = [];
-    //   docs.forEach(doc => {
-    //     let data = doc.data() as Song;
-    //     users[data.user] = {
-    //       aliases: [data.user],
-    //       lower: data.user.toLowerCase(),
-    //       username: data.user
-    //     }
-    //     countries[data.country] = {
-    //       lower: data.country.toLowerCase(),
-    //       country: data.country
-    //     }
-    //   })
+        this.type = this.router.url.split('/')[3].toLowerCase();
+        getDocs(query(collection(this.db, 'contests'), where('id', '==', this.id))).then(docs => {
+          docs.forEach((doc) => {
+            this.con = doc.data() as Contest;
+          });
+        })
 
-    //   let userslower: string[] = []
-    //   let countrieslower: string[] = []
-    //   let usernames: string[] = []
-    //   let countrynames:string[] = [];
-    //   for(let user in users) {
-    //     console.log(users[user]);
-    //     //setDoc(doc(db, 'contests', this.id, 'users', user), users[user])
-    //     userslower.push(users[user].lower)
-    //     usernames.push(users[user].username)
-    //   }
-    //   for(let country in countries) {
-    //     //setDoc(doc(db, 'contests', this.id, 'countries', country), countries[country])
-    //     countrieslower.push(countries[country].lower)
-    //     countrynames.push(countries[country].country)
-    //   }
+        if (this.type === 'country') {
+          getDownloadURL(ref(this.storage, 'contests/' + this.id + '/flags/' + this.name + ' Flag.png')).then(url => {
+            this.flagUrl = url;
+          })
+        }
 
-    //   console.log(usernames);
+        // getDocs(query(collection(db, 'contests', this.id, 'newsongs'))).then(docs => {
+        //   // let users: {aliases: string[], lower: string, username: string}[] = [];
+        //   let users: any = {};
+        //   let countries: any = {};
+        //   //let countries: {lower: string, country: string}[] = [];
+        //   docs.forEach(doc => {
+        //     let data = doc.data() as Song;
+        //     users[data.user] = {
+        //       aliases: [data.user],
+        //       lower: data.user.toLowerCase(),
+        //       username: data.user
+        //     }
+        //     countries[data.country] = {
+        //       lower: data.country.toLowerCase(),
+        //       country: data.country
+        //     }
+        //   })
 
-    //   setDoc(doc(db, 'contests', this.id, 'lists', "countries"), {list: countrynames})
-    //   setDoc(doc(db, 'contests', this.id, 'lists', "users"), {list: usernames})
-    //   setDoc(doc(db, 'contests', this.id, 'lists', "countrieslower"), {list: countrieslower})
-    //   setDoc(doc(db, 'contests', this.id, 'lists', "userslower"), {list: userslower})
-    //   console.log(countries)
-    // })
+        //   let userslower: string[] = []
+        //   let countrieslower: string[] = []
+        //   let usernames: string[] = []
+        //   let countrynames:string[] = [];
+        //   for(let user in users) {
+        //     console.log(users[user]);
+        //     //setDoc(doc(db, 'contests', this.id, 'users', user), users[user])
+        //     userslower.push(users[user].lower)
+        //     usernames.push(users[user].username)
+        //   }
+        //   for(let country in countries) {
+        //     //setDoc(doc(db, 'contests', this.id, 'countries', country), countries[country])
+        //     countrieslower.push(countries[country].lower)
+        //     countrynames.push(countries[country].country)
+        //   }
 
-    //get all the songs sent for that user
-    getDocs(query(collection(db, 'contests', this.id, 'newsongs'), where(this.type, '==', this.name))).then(docs => {
-      docs.forEach((doc) => {
-        this.songs.push(doc.data() as Song);
-      });
+        //   console.log(usernames);
 
-      console.log(this.songs)
+        //   setDoc(doc(db, 'contests', this.id, 'lists', "countries"), {list: countrynames})
+        //   setDoc(doc(db, 'contests', this.id, 'lists', "users"), {list: usernames})
+        //   setDoc(doc(db, 'contests', this.id, 'lists', "countrieslower"), {list: countrieslower})
+        //   setDoc(doc(db, 'contests', this.id, 'lists', "userslower"), {list: userslower})
+        //   console.log(countries)
+        // })
 
-      this.songs = this.songs.sort((a, b) => (a.edval > b.edval) ? 1 : -1);
-      this.numEntries = this.songs.length;
-      this.numQualifiers = this.songs.filter(function (song) {
-        return song.draws.length === song.phases;
-      }).length;
+        //get all the songs sent for that user
+        getDocs(query(collection(this.db, 'contests', this.id, 'newsongs'), where(this.type, '==', this.name))).then(docs => {
+          docs.forEach((doc) => {
+            this.songs.push(doc.data() as Song);
+          });
 
-      this.phases = [...this.songs].sort((a, b) => a.phases < b.phases ? 1 : -1)[0].phases
+          console.log(this.songs)
 
-      if (this.type === "user") {
-        this.songs.forEach(song => {
-          if (!(song.country in this.flagUrls)) {
-            this.flagUrls[song.country] = "";
-            getDownloadURL(ref(storage, 'contests/' + this.id + '/flagicons/' + song.country + '.png')).then(url => {
-              this.flagUrls[song.country] = url;
+          this.songs = this.songs.sort((a, b) => (a.edval > b.edval) ? 1 : -1);
+          this.numEntries = this.songs.length;
+          this.numQualifiers = this.songs.filter(function (song) {
+            return song.draws.length === song.phases;
+          }).length;
+
+          this.phases = [...this.songs].sort((a, b) => a.phases < b.phases ? 1 : -1)[0].phases
+
+          if (this.type === "user") {
+            this.songs.forEach(song => {
+              if (!(song.country in this.flagUrls)) {
+                this.flagUrls[song.country] = "";
+                getDownloadURL(ref(this.storage, 'contests/' + this.id + '/flagicons/' + song.country + '.png')).then(url => {
+                  this.flagUrls[song.country] = url;
+                })
+              }
             })
           }
-        })
-      }
 
-      for (let i = 0; i <= this.phases; ++i) {
-        let songsort = [...this.songs].filter(song => song.draws.length === song.phases - i &&
-          'place' in song.draws[song.phases - i - 1] && song.draws[song.phases - i - 1].place > 0)
-        if (songsort.length) {
-          songsort.sort((a, b) => a.edval < b.edval ? 1 : -1)
-            .sort((a, b) => a.draws[a.phases - i - 1].place > b.draws[b.phases - i - 1].place ? 1 : -1)
-          this.bestPlace = this.numToRankString(songsort[0].draws[songsort[0].phases - i - 1].place);
-          switch (i) {
-            case 1:
-              this.bestPlace += ' (SF)'
-              break;
-            case 2:
-              this.bestPlace += ' (QF)'
-              break;
-            case 3:
-              this.bestPlace += ' (OF)'
-              break;
-          }
-          this.bestEds.push(songsort[0].edition);
+          for (let i = 0; i <= this.phases; ++i) {
+            let songsort = [...this.songs].filter(song => song.draws.length === song.phases - i &&
+              'place' in song.draws[song.phases - i - 1] && song.draws[song.phases - i - 1].place > 0)
+            if (songsort.length) {
+              songsort.sort((a, b) => a.edval < b.edval ? 1 : -1)
+                .sort((a, b) => a.draws[a.phases - i - 1].place > b.draws[b.phases - i - 1].place ? 1 : -1)
+              this.bestPlace = this.numToRankString(songsort[0].draws[songsort[0].phases - i - 1].place);
+              switch (i) {
+                case 1:
+                  this.bestPlace += ' (SF)'
+                  break;
+                case 2:
+                  this.bestPlace += ' (QF)'
+                  break;
+                case 3:
+                  this.bestPlace += ' (OF)'
+                  break;
+              }
+              this.bestEds.push(songsort[0].edition);
 
-          for (let j = 1; j < songsort.length; ++j) {
-            if (songsort[0].draws[songsort[0].phases - i - 1].place
-              === songsort[j].draws[songsort[j].phases - i - 1].place) {
-              this.bestEds.push(songsort[j].edition)
-            }
-            else {
-              break;
-            }
-          }
-          break;
-        }
-      }
-
-      for (let i = this.phases - 1; i >= 0; --i) {
-        let songsort = [...this.songs].filter(song => song.draws.length === song.phases - i &&
-          'place' in song.draws[song.phases - i - 1] && song.draws[song.phases - i - 1].place > 0)
-        console.log(songsort);
-        if (songsort.length) {
-          songsort.sort((a, b) => a.edval < b.edval ? 1 : -1)
-            .sort((a, b) => a.draws[a.phases - i - 1].place < b.draws[b.phases - i - 1].place ? 1 : -1)
-          this.worstPlace = this.numToRankString(songsort[0].draws[songsort[0].phases - i - 1].place);
-          switch (i) {
-            case 1:
-              this.worstPlace += ' (SF)'
-              break;
-            case 2:
-              this.worstPlace += ' (QF)'
-              break;
-            case 3:
-              this.worstPlace += ' (OF)'
-              break;
-          }
-          this.worstEds.push(songsort[0].edition);
-
-          for (let j = 1; j < songsort.length; ++j) {
-            if (songsort[0].draws[songsort[0].phases - i - 1].place
-              === songsort[j].draws[songsort[j].phases - i - 1].place) {
-              this.worstEds.push(songsort[j].edition)
-            }
-            else {
+              for (let j = 1; j < songsort.length; ++j) {
+                if (songsort[0].draws[songsort[0].phases - i - 1].place
+                  === songsort[j].draws[songsort[j].phases - i - 1].place) {
+                  this.bestEds.push(songsort[j].edition)
+                }
+                else {
+                  break;
+                }
+              }
               break;
             }
           }
-          break;
-        }
+
+          for (let i = this.phases - 1; i >= 0; --i) {
+            let songsort = [...this.songs].filter(song => song.draws.length === song.phases - i &&
+              'place' in song.draws[song.phases - i - 1] && song.draws[song.phases - i - 1].place > 0)
+            console.log(songsort);
+            if (songsort.length) {
+              songsort.sort((a, b) => a.edval < b.edval ? 1 : -1)
+                .sort((a, b) => a.draws[a.phases - i - 1].place < b.draws[b.phases - i - 1].place ? 1 : -1)
+              this.worstPlace = this.numToRankString(songsort[0].draws[songsort[0].phases - i - 1].place);
+              switch (i) {
+                case 1:
+                  this.worstPlace += ' (SF)'
+                  break;
+                case 2:
+                  this.worstPlace += ' (QF)'
+                  break;
+                case 3:
+                  this.worstPlace += ' (OF)'
+                  break;
+              }
+              this.worstEds.push(songsort[0].edition);
+
+              for (let j = 1; j < songsort.length; ++j) {
+                if (songsort[0].draws[songsort[0].phases - i - 1].place
+                  === songsort[j].draws[songsort[j].phases - i - 1].place) {
+                  this.worstEds.push(songsort[j].edition)
+                }
+                else {
+                  break;
+                }
+              }
+              break;
+            }
+          }
+        });
+
+        // this.database.firestore.collection('contests').doc(this.id)
+        //   .collection('newsongs').where('edition', '==', '4').get().then(docs => {
+        //     docs.forEach((doc) => {
+        //       this.songlist.push({ id: doc.id, ...doc.data() });
+        //     });
+        //   });
+
+        // this.database.firestore.collection('contests').doc(this.id).collection('newsongs')
+        // .where('edition', '==', '41').get().then(docs => {
+        //   docs.forEach(doc => {
+        //     let data = doc.data() as Song;
+        //     data.pointsets = [];
+        //     this.database.firestore.collection('contests').doc(this.id).collection('newsongs')
+        //     .doc(doc.id).set(data)
+        //   })
+        // })
       }
     });
+  }
 
-    // this.database.firestore.collection('contests').doc(this.id)
-    //   .collection('newsongs').where('edition', '==', '4').get().then(docs => {
-    //     docs.forEach((doc) => {
-    //       this.songlist.push({ id: doc.id, ...doc.data() });
-    //     });
-    //   });
+  ngOnInit(): void {
+  }
 
-    // this.database.firestore.collection('contests').doc(this.id).collection('newsongs')
-    // .where('edition', '==', '41').get().then(docs => {
-    //   docs.forEach(doc => {
-    //     let data = doc.data() as Song;
-    //     data.pointsets = [];
-    //     this.database.firestore.collection('contests').doc(this.id).collection('newsongs')
-    //     .doc(doc.id).set(data)
-    //   })
-    // })
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   //Converts the number to a string in the form of "nth"
@@ -248,9 +272,6 @@ export class CountryUserScreenComponent implements OnInit {
     }
 
     return place;
-  }
-
-  ngOnInit(): void {
   }
 
   getStyle(song: Song): object {
