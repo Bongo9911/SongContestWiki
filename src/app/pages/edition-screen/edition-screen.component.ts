@@ -231,6 +231,7 @@ export class EditionScreenComponent implements OnInit {
     this.num = edition;
     this.preved = "";
     this.nexted = "";
+    this.logourl = "";
 
     this.songsbyphase = [];
     this.votersbyphase = [];
