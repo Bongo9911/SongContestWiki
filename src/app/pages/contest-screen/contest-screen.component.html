@@ -81,7 +81,7 @@
                 </td>
                 <td>
                   <div style="display: flex; flex-direction: column;">
-                    <div *ngFor="let country of eds[i].hostcountries; index as j;">
+                    <div *ngFor="let country of eds[i].hostcountries; index as j;" style = "display: flex;">
                       <img class="flag" src="{{flagUrls[country]}}">
                       <a routerLink="/contest/{{con.id}}/country/{{country}}">
                         <ng-container *ngIf="eds[i].hostcities; else elseBlock">
