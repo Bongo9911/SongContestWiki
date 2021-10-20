@@ -28,7 +28,6 @@ export class AppComponent implements OnDestroy {
   contest: string = "";
 
   constructor(private location: Location, private router: Router) {
-    console.log(this.location.path().split('/'));
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
     const storage = getStorage(firebaseApp)
@@ -45,7 +44,6 @@ export class AppComponent implements OnDestroy {
             this.link = "/contest/" + split[2];
             getDoc(doc(db, 'contests', split[2], 'lists', 'users')).then(doc => {
               this.users = doc.data();
-              console.log(fuzzysort.go('Bon', this.users["list"]))
             })
             getDoc(doc(db, 'contests', split[2], 'lists', 'countries')).then(doc => {
               this.countries = doc.data();
@@ -80,8 +78,6 @@ export class AppComponent implements OnDestroy {
 
     this.searchresults = userresult.concat(countryresult).sort((a, b) => a["score"] < b["score"] ? 1 : -1);
     this.searchresults = this.searchresults.slice(0, this.searchresults.length >= 5 ? 5 : this.searchresults.length);
-
-    console.log(this.searchresults);
   }
 
   hideSearch() {

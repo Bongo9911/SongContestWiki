@@ -43,13 +43,11 @@ export class ContestScreenComponent implements OnInit {
 
     getDoc(doc(db, 'contests', this.id)).then((doc) => {
       this.con = doc.data() as Contest;
-      console.log(doc.data());
     });
 
     getDocs(query(collection(db, 'contests', this.id, 'editions'))).then(docs => {
       docs.forEach((doc) => {
         this.eds.push(doc.data() as SmallEdition);
-        console.log(doc.data());
       });
       this.eds.sort((a, b) => a.edval > b.edval ? 1 : -1);
       this.logos = new Array(this.eds.length);
@@ -58,6 +56,8 @@ export class ContestScreenComponent implements OnInit {
         getDownloadURL(ref(storage, 'contests/' + this.id + '/logos/' + this.eds[i].edition + '.png'))
           .then(url => {
             this.logos[i] = url;
+          }).catch(() => {
+            console.error("Logo for edition " + this.eds[i].edition + " does not exist.");
           })
       }
 

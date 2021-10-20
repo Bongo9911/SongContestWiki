@@ -84,7 +84,7 @@ export class PotGeneratorComponent implements OnInit {
     console.log(sansInvalidUsers)
 
 
-    if (sansInvalidUsers.length > 1 && this.pots > 1) {
+    if (sansInvalidUsers.length >= this.pots && this.pots > 1) {
 
       let pointsets: string[][][] = [];
 
@@ -233,6 +233,9 @@ export class PotGeneratorComponent implements OnInit {
       else {
         console.error("Error: number of pots is greater than number of users")
       }
+    }
+    else {
+      console.error("Error: not enough users to fill pots");
     }
   }
 
