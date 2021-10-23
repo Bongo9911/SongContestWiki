@@ -47,6 +47,8 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
   songtablesbyphase: Song[][][] = [];
   pointtablesbyphase: Song[][][] = [];
 
+  winningSongs: Song[] = [];
+
   flagUrls: any = {};
 
   firebaseApp: FirebaseApp;
@@ -129,6 +131,9 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
             songs.push(doc.data() as Song);
           });
           this.entries = songs.length;
+
+          console.log(songs.filter(song => "winner" in song && song.winner));
+          this.winningSongs = songs.filter(song => "winner" in song && song.winner);
 
           songs.forEach(song => {
             if (!(song.country in this.flagUrls)) {

@@ -41,6 +41,24 @@
         <div>{{entries}}</div>
       </div>
 
+      <div class="infoboxheader">Vote</div>
+      <div class="infoboxsection">
+        <div><b>Voting system</b></div>
+        <div>Each country awards 12, 10, then 8 through 1 points to their 10 favorite songs.</div>
+      </div>
+
+      <div class="infoboxsection" *ngIf="winningSongs.length">
+        <div><b>Winning song<ng-container *ngIf="winningSongs.length > 1">s</ng-container></b></div>
+        <div>
+          <div *ngFor="let song of winningSongs">
+            "{{song.song}}"
+            <br/>
+            <img class="flag" src="{{flagUrls[song.country]}}">
+            <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a>
+          </div>
+        </div>
+      </div>
+
       <div class="infoboxheader"><a routerLink="/contest/{{id}}">{{con.name}}</a></div>
       <div style="display: flex; justify-content: center;">
         <span *ngIf="preved.length">

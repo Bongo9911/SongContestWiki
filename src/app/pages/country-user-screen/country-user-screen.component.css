@@ -72,6 +72,8 @@ table, th, td {
 .infoboxsection {
 	display: flex;
 	flex-wrap: nowrap;
+	padding-bottom: 5px;
+	font-size: 13px;
 }
 
 .infoboxsection>div {
