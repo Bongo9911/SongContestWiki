@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { Sort } from '@angular/material/sort';
 import { Contest, Edition, Song } from 'src/app/shared/datatypes';
 import { AuthService } from 'src/app/auth/auth.service';
@@ -7,13 +7,14 @@ import { Firestore, getFirestore, collection, query, where, getDocs, getDoc, doc
 import { initializeApp, FirebaseApp } from "firebase/app"
 import { firebaseConfig } from '../../credentials';
 import { FirebaseStorage, getStorage, ref, getDownloadURL } from "firebase/storage";
+import { SubscriptionLike } from 'rxjs';
 
 @Component({
   selector: 'app-edition-screen',
   templateUrl: './edition-screen.component.html',
   styleUrls: ['./edition-screen.component.scss']
 })
-export class EditionScreenComponent implements OnInit {
+export class EditionScreenComponent implements OnInit, OnDestroy {
   readonly pointset: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '10', '12'];
 
   con: Contest = {
@@ -50,7 +51,9 @@ export class EditionScreenComponent implements OnInit {
 
   firebaseApp: FirebaseApp;
   db: Firestore;
-  storage: FirebaseStorage
+  storage: FirebaseStorage;
+
+  sub: SubscriptionLike = null;
 
   constructor(private router: Router, private route: ActivatedRoute, private authService: AuthService) {
     this.route.params.subscribe(params => {
@@ -67,164 +70,18 @@ export class EditionScreenComponent implements OnInit {
       this.con = doc.data() as Contest;
     });
 
-    // this.database.firestore
-    //   .collection('contests').doc(this.id)
-    //   .collection('newsongs').where('edition', '==', this.num).get().then(docs => {
-    //     docs.forEach(doc => {
-    //       let data = doc.data() as NewSong;
-    //       for (let i = 0; i < data.draws.length; ++i) {
-    //         data.draws[i].num = parseInt(data.draws[i].num.toString())
-    //       }
-    //       this.database.firestore
-    //         .collection('contests').doc(this.id)
-    //         .collection('newsongs').doc(doc.id).set(data);
-    //     })
-    //   })
-
-    // this.database.firestore.collection('contests').doc(this.id)
-    //    .collection('newsongs').where('edition', '==', this.num).get().then(docs => {
-    //     docs.forEach(doc => {
-    //       let data = doc.data() as any;
-    //       if(data.pointsets.length === 2) {
-    //         data.pointsets[1] = {1: data.pointsets[1]}
-    //         this.database.firestore.collection('contests').doc(this.id)
-    //         .collection('newsongs').doc(doc.id).set(data);
-    //       }
-    //     })
-    //   })
-
-    // this.database.firestore.collection('contests').doc(this.id)
-    //   .collection('songs').where('edition', '==', this.num).get().then(docs => {
-    //     docs.forEach(doc => {
-    //       let data = doc.data() as Song;
-    //       let dqphase = -1;
-    //       if (data.disqualified === 'SFDQ' || data.disqualified === 'SFWD') {
-    //         dqphase = 0;
-    //       }
-    //       else if (data.disqualified === 'FDQ' || data.disqualified === 'FWD') {
-    //         dqphase = 1;
-    //       }
-
-    //       let song: NewSong = {
-    //         artist: data.artist,
-    //         country: data.country,
-    //         draws: [],
-    //         dqphase: dqphase,
-    //         edition: data.edition,
-    //         edval: data.edval,
-    //         language: data.language,
-    //         pointsets: [],
-    //         song: data.song,
-    //         user: data.user,
-    //       };
-
-
-
-    //       if (data.disqualified === 'SFDQ' || data.disqualified === 'FDQ') {
-    //         song.dqreason = 'DQ';
-    //       }
-    //       else if (data.disqualified === 'SFWD' || data.disqualified === 'FWD') {
-    //         song.dqreason = 'WD';
-    //       }
-
-    //       let sfdraw: Draw = {
-    //         num: parseInt(data.sfnum),
-    //         qualifier: data.qualifier,
-    //         ro: data.sfro,
-    //       }
-    //       if (data.sfplace !== -1) {
-    //         sfdraw.place = data.sfplace;
-    //         sfdraw.points = data.sfpoints;
-    //         if ('extpoints' in data) {
-    //           sfdraw.extpoints = data.extpoints;
-    //           sfdraw.intpoints = data.intpoints;
-    //           sfdraw.rawextpoints = data.rawextpoints
-    //         }
-    //       }
-    //       // song.draws.push(sfdraw);
-    //       // if(data.qualifier == 'AQ') {
-    //       //   song.draws.push({
-    //       //     ro: 0,
-    //       //     num: 1
-    //       //   })
-    //       // }
-    //       if (data.fro !== -1) {
-    //         let fdraw: Draw = {
-    //           num: 1,
-    //           ro: data.fro,
-    //           qualifier: (data.fplace !== -1 && data.fplace <= 6) ? 'FAQ' : 'NQ'
-    //         }
-    //         if (data.fplace !== -1) {
-    //           fdraw.points = data.fpoints;
-    //           fdraw.place = data.fplace;
-    //         }
-    //         song.draws.push(fdraw);
-    //       }
-
-    //       if (song.dqphase !== 0) {
-    //         song.pointsets.push({})
-    //         for (let i = 0; i < 3; ++i) {
-    //           if ('sf' + (i + 1).toString() + 'pointset' in data) {
-    //             song.pointsets[0][i + 1] = data['sf' + (i + 1).toString() + 'pointset']
-    //           }
-    //         }
-    //         if (song.dqphase !== 1) {
-    //           song.pointsets.push({})
-    //           song.pointsets[1][1] = data.fpointset;
-    //         }
-    //       }
-
-    //       this.database.firestore.collection('contests').doc(this.id)
-    //         .collection('newsongs').add(song);
-    //       console.log(song);
-    //     })
-    //   })
-
-    // this.database.firestore.collection('contests').doc(this.id)
-    //   .collection('newsongs').where('edition', '==', '45').get().then(docs => {
-    //     docs.forEach(doc => {
-    //       this.database.firestore.collection('contests').doc(this.id)
-    //   .collection('newsongs').doc(doc.id).delete();
-    //     })
-    //   })
-
-    //  this.database.firestore.collection('contests').doc(this.id)
-    //   .collection('newsongs').get().then(docs => {
-    //     docs.forEach(doc => {
-    //       let data = doc.data() as NewSong;
-    //       if(data.draws.length == 2 && data.draws[1].qualifier === 'NQ') {
-    //         data.draws[1].qualifier = 'NAQ'
-    //         this.database.firestore.collection('contests').doc(this.id)
-    //           .collection('newsongs').doc(doc.id).set(data);
-    //       }
-    //     })
-    //   })
-
-    //    this.database.firestore.collection('contests').doc(this.id)
-    // .collection('newsongs').get().then(docs => {
-    //   docs.forEach(doc => {
-    //     let data = doc.data() as NewSong;
-    //     data.phases = 2;
-    //       this.database.firestore.collection('contests').doc(this.id)
-    //         .collection('newsongs').doc(doc.id).set(data);
-    //   })
-    // })
-
-    //  this.database.firestore.collection('contests').doc(this.id)
-    //   .collection('newsongs').where('edition', '==', '4').get().then(docs => {
-    //     docs.forEach(doc => {
-    //       this.database.firestore.collection('contests').doc(this.id)
-    //   .collection('newsongs').doc(doc.id).delete();
-    //     })
-    //   })
-
-    this.updateData(this.num);
-
-    // let str = "English, Korean"
-    // console.log(str.split(/\s*,\s*/))
+    this.sub = router.events.subscribe((val) => {
+      if (val instanceof NavigationEnd) {
+        this.updateData(this.num);
+      }
+    });
   }
 
   ngOnInit(): void {
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   async updateData(edition: string) {
