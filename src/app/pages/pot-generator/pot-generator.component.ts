@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as math from 'mathjs';
 import { Song } from '../../shared/datatypes';
-import { Firestore, getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import { Firestore, getFirestore, collection, query, where, getDocs, setDoc, doc } from "firebase/firestore";
 import { initializeApp, FirebaseApp } from "firebase/app"
 import { firebaseConfig } from '../../credentials';
 
@@ -30,21 +30,13 @@ export class PotGeneratorComponent implements OnInit {
     this.firebaseApp = initializeApp(firebaseConfig);
     this.db = getFirestore(this.firebaseApp);
 
-    // this.database.firestore.collection("contests").doc('RSC').collection('newsongs').get().then(docs => {
-    //   docs.forEach(doc => {
-    //     let data = doc.data() as Song;
-    //     this.database.firestore.collection('contests').doc('RSC').collection('users').doc(data.user).set({
+    // getDocs(query(collection(this.db, "contests", 'RSC', 'newsongs'))).then(docs => {
+    //   docs.forEach(songDoc => {
+    //     let data = songDoc.data() as Song;
+    //     setDoc(doc(this.db, 'contests', 'RSC', 'users', data.user), {
     //       username: data.user,
     //       aliases: [data.user],
     //       lower: data.user.toLowerCase(),
-    //     })
-    //   })
-    // })
-
-    // this.database.firestore.collection("contests").doc('RSC').collection('songs').where('qualifier', '==', 'NQ').where('edition', '==', '45').get().then(docs => {
-    //   docs.forEach(doc => {
-    //     this.database.firestore.collection("contests").doc('RSC').collection('songs').doc(doc.id).update({
-    //       qualifier: 'TBD'
     //     })
     //   })
     // })

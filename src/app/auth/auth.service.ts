@@ -5,7 +5,8 @@ import "firebase/compat/auth";
 import {
 	getAuth, onAuthStateChanged, Auth, User, setPersistence, browserLocalPersistence,
 	browserSessionPersistence, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile,
-	sendEmailVerification, sendPasswordResetEmail, updatePassword, updateEmail, signOut, Unsubscribe
+	sendEmailVerification, sendPasswordResetEmail, updatePassword, updateEmail, signOut, Unsubscribe,
+	signInAnonymously
 } from "firebase/auth";
 import { initializeApp, FirebaseApp } from "firebase/app"
 import { firebaseConfig } from '../credentials';
@@ -35,7 +36,8 @@ export class AuthService implements OnDestroy {
 				this.user = user;
 				localStorage.setItem('user', JSON.stringify(this.user));
 			} else {
-				localStorage.setItem('user', '');
+				this.loginAsGuest();
+				//localStorage.setItem('user', JSON.stringify(this.user));
 			}
 		})
 	}
@@ -66,18 +68,21 @@ export class AuthService implements OnDestroy {
 	}
 
 	//Logs a user into a guest account
-	// async loginAsGuest() {
-	// 	//Sets the authentication state to persist until the window is closed
-	// 	setPersistence(this.auth, browserSessionPersistence).then(async () => {
-	// 		let result = await signInAnonymously(this.auth)
-	// 		await this.afAuth.currentUser.then(async (u) => {
-	// 			if (u) {
-	// 				this.user = u;
-	// 				localStorage.setItem('user', JSON.stringify(this.user));
-	// 			}
-	// 		})
-	// 	})
-	// }
+	async loginAsGuest() {
+		//Sets the authentication state to persist until the window is closed
+		setPersistence(this.auth, browserSessionPersistence).then(async () => {
+			let result = await signInAnonymously(this.auth).then(async (res) => {
+				await res.user;
+				if (res.user) {
+					this.user = res.user
+					await delay(1);
+					this.router.navigate([this.redirect]);
+					this.redirect = ''
+				}
+			}).catch(() => {
+			});
+		})
+	}
 
 	//Can be used if we want to set up logging in with a Google account
 	// async loginWithGoogle() {
