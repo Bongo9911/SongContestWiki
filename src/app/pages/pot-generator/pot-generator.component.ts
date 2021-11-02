@@ -5,6 +5,7 @@ import { Song } from '../../shared/datatypes';
 import { Firestore, getFirestore, collection, query, where, getDocs, setDoc, doc } from "firebase/firestore";
 import { initializeApp, FirebaseApp } from "firebase/app"
 import { firebaseConfig } from '../../credentials';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-pot-generator',
@@ -22,7 +23,7 @@ export class PotGeneratorComponent implements OnInit {
   firebaseApp: FirebaseApp;
   db: Firestore;
 
-  constructor(private route: ActivatedRoute) {
+  constructor(private route: ActivatedRoute, private authService: AuthService) {
     this.route.params.subscribe(params => {
       this.id = params.id;
     });
@@ -85,7 +86,7 @@ export class PotGeneratorComponent implements OnInit {
         pointsets.push([]);
         for (let j = 0; j < edArray.length; ++j) {
           let docs = await getDocs(query(collection(this.db, 'contests', this.id, 'newsongs'),
-            where('edition', '==', edArray[j])));
+            where('edition', '==', edArray[j]), where('user', '==', sansInvalidUsers[i])));
 
           if (docs.docs.length) {
             let data = docs.docs[0].data() as Song;

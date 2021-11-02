@@ -7,6 +7,7 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { SubscriptionLike } from 'rxjs';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import * as fuzzysort from 'fuzzysort';
+import { AuthService } from './auth/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -27,7 +28,7 @@ export class AppComponent implements OnDestroy {
   searching: boolean = false;
   contest: string = "";
 
-  constructor(private location: Location, private router: Router) {
+  constructor(private location: Location, private router: Router, private authService: AuthService) {
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
     const storage = getStorage(firebaseApp)

@@ -74,12 +74,14 @@ export class AuthService implements OnDestroy {
 			let result = await signInAnonymously(this.auth).then(async (res) => {
 				await res.user;
 				if (res.user) {
-					this.user = res.user
+					this.user = res.user;
+					localStorage.setItem('user', JSON.stringify(this.user));
 					await delay(1);
 					this.router.navigate([this.redirect]);
 					this.redirect = ''
 				}
 			}).catch(() => {
+				localStorage.setItem('user', null);
 			});
 		})
 	}

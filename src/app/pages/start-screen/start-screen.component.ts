@@ -4,6 +4,7 @@ import { getFirestore, collection, query, getDocs } from "firebase/firestore";
 import { initializeApp } from "firebase/app"
 import { firebaseConfig } from '../../credentials';
 import { Contest } from 'src/app/shared/datatypes';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-start-screen',
@@ -14,7 +15,7 @@ export class StartScreenComponent implements OnInit {
 
   contests: Contest[] = [];
 
-  constructor(private router: Router, private route: ActivatedRoute) { 
+  constructor(private router: Router, private route: ActivatedRoute, private authService: AuthService) { 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
     getDocs(query(collection(db, 'contests'))).then(docs => {
