@@ -222,6 +222,17 @@ export class PotGeneratorComponent implements OnInit {
         }
 
         console.log(pots);
+
+        let result: string = "";
+
+        for(let i = 0; i < similarities.length; ++i) {
+          console.log(filteredUsers[i]);
+          console.log(similarities[i].indexOf(Math.max(...similarities[i])));
+
+          result += filteredUsers[i] + " - " + filteredUsers[similarities[i].indexOf(Math.max(...similarities[i]))] + "\n";
+        }
+
+        console.log(result);
       }
       else {
         console.error("Error: number of pots is greater than number of users")

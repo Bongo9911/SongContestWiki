@@ -8,6 +8,7 @@ import { initializeApp, FirebaseApp } from "firebase/app"
 import { firebaseConfig } from '../../credentials';
 import { FirebaseStorage, getStorage, ref, getDownloadURL } from "firebase/storage";
 import { SubscriptionLike } from 'rxjs';
+import { getAuth, onAuthStateChanged, Unsubscribe } from "firebase/auth";
 
 @Component({
   selector: 'app-edition-screen',
@@ -55,6 +56,7 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
   db: Firestore;
   storage: FirebaseStorage;
 
+  authSubscription: Unsubscribe;
   sub: SubscriptionLike = null;
 
   constructor(private router: Router, private route: ActivatedRoute, private authService: AuthService) {
@@ -67,14 +69,18 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
     this.firebaseApp = initializeApp(firebaseConfig);
     this.db = getFirestore(this.firebaseApp);
     this.storage = getStorage(this.firebaseApp)
+    let auth = getAuth(this.firebaseApp);
+    this.authSubscription = onAuthStateChanged(auth, user => {
+      if (user) {
+        getDoc(doc(this.db, 'contests', this.id)).then(doc => {
+          this.con = doc.data() as Contest;
+        });
 
-    getDoc(doc(this.db, 'contests', this.id)).then(doc => {
-      this.con = doc.data() as Contest;
-    });
-
-    this.sub = router.events.subscribe((val) => {
-      if (val instanceof NavigationEnd) {
-        this.updateData(this.num);
+        this.sub = router.events.subscribe((val) => {
+          if (val instanceof NavigationEnd) {
+            this.updateData(this.num);
+          }
+        });
       }
     });
   }
@@ -84,6 +90,7 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
+    this.authSubscription();
   }
 
   async updateData(edition: string) {
