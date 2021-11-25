@@ -40,6 +40,7 @@ export class ImportScreenComponent implements OnInit {
     // BUL: "Bulgaria",
     // CAM: "Cambodia",
     CIV: "Côte d'Ivoire",
+    CPV: "Cabo Verde",
     CUR: "Curaçao",
     // CYM: "Wales",
     // DEN: "Denmark",
@@ -74,6 +75,7 @@ export class ImportScreenComponent implements OnInit {
   }
 
   countryNames = {
+    "Cabo Verde": "CPV",
     "Côte d'Ivoire": "CIV",
     "England": "ENG",
     "Iran": "IRN",
@@ -126,7 +128,7 @@ export class ImportScreenComponent implements OnInit {
     //this.countryNames = this.objectFlip(this.countryCodes)
     //const storage = getStorage(firebaseApp);
 
-    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "46"))).then(docs => {
+    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "47"))).then(docs => {
     //   docs.forEach(song => {
     //     deleteDoc(doc(this.db, "contests", this.id, "newsongs", song.id))
     //   })
@@ -274,8 +276,8 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: place <= 8 ? "Q" : "NQ"
                   }],
                   dqphase: -1,
-                  edition: "46",
-                  edval: 50,
+                  edition: "47",
+                  edval: 51,
                   language: "",
                   phases: 2,
                   pointsets: [],
@@ -331,7 +333,7 @@ export class ImportScreenComponent implements OnInit {
       if ("H" + n in workBook.Sheets["GF Scoreboard"]
         && workBook.Sheets["GF Scoreboard"]["H" + n].v.trim() !== "Total") {
         let index = this.semiCountries.indexOf(workBook.Sheets["GF Scoreboard"]["H" + n].v.trim())
-        let country = workBook.Sheets["GF Scoreboard"]["H" + n].v;
+        let country = workBook.Sheets["GF Scoreboard"]["H" + n].v.trim();
         let fixedCountry = country;
         if (country in this.fixedCountryNames) {
           fixedCountry = this.fixedCountryNames[country];
@@ -404,8 +406,8 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: workBook.Sheets["GF Scoreboard"]["F" + n].v <= 6 ? "FAQ" : "NAQ"
                   }],
                   dqphase: -1,
-                  edition: "46",
-                  edval: 50,
+                  edition: "47",
+                  edval: 51,
                   language: "",
                   phases: 2,
                   pointsets: [],
@@ -531,6 +533,7 @@ export class ImportScreenComponent implements OnInit {
 
       if(!found) {
         console.error("ERROR: " + fixedCountry + " FINAL POINTSET NOT FOUND")
+        song.dqphase = 1;
       }
 
       console.log(song.pointsets);
