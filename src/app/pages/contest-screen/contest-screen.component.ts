@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { Contest, Song } from 'src/app/shared/datatypes';
 import { AuthService } from 'src/app/auth/auth.service';
@@ -15,7 +15,7 @@ import { getAuth, onAuthStateChanged, Unsubscribe } from "firebase/auth";
   styleUrls: ['./contest-screen.component.css']
 })
 
-export class ContestScreenComponent implements OnInit {
+export class ContestScreenComponent implements OnInit, OnDestroy {
 
   con: Contest = {
     name: '',
@@ -43,8 +43,8 @@ export class ContestScreenComponent implements OnInit {
     const storage = getStorage(firebaseApp)
     let auth = getAuth(firebaseApp);
 
-    this.sub = this.router.events.subscribe((val) => {
-      if (val instanceof NavigationEnd) {
+    // this.sub = this.router.events.subscribe((val) => {
+    //   if (val instanceof NavigationEnd) {
         this.authSubscription = onAuthStateChanged(auth, user => {
           console.log(user)
           if (user) {
@@ -115,11 +115,16 @@ export class ContestScreenComponent implements OnInit {
             });
           }
         })
-      }
-    });
+    //   }
+    // });
   }
 
   ngOnInit(): void {
+  }
+
+  ngOnDestroy(): void {
+    // this.sub.unsubscribe();
+    this.authSubscription();
   }
 
 }
