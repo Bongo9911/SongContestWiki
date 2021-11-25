@@ -55,8 +55,8 @@ export class AuthService implements OnDestroy {
 					if (res.user) {
 						this.user = res.user
 						await delay(1);
-						this.router.navigate([this.redirect]);
-						this.redirect = ''
+						//this.router.navigate([this.redirect]);
+						//this.redirect = ''
 					}
 					resolve(1);
 				}).catch(() => {
@@ -76,8 +76,8 @@ export class AuthService implements OnDestroy {
 					this.user = res.user;
 					localStorage.setItem('user', JSON.stringify(this.user));
 					await delay(1);
-					this.router.navigate([this.redirect]);
-					this.redirect = ''
+					//this.router.navigate([this.redirect]);
+					//this.redirect = ''
 				}
 			}).catch(() => {
 				localStorage.setItem('user', null);
