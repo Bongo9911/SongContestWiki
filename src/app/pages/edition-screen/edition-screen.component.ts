@@ -70,14 +70,14 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
     this.db = getFirestore(this.firebaseApp);
     this.storage = getStorage(this.firebaseApp)
     let auth = getAuth(this.firebaseApp);
-    this.authSubscription = onAuthStateChanged(auth, user => {
-      if (user) {
-        getDoc(doc(this.db, 'contests', this.id)).then(doc => {
-          this.con = doc.data() as Contest;
-        });
-
-        this.sub = router.events.subscribe((val) => {
-          if (val instanceof NavigationEnd) {
+    this.sub = router.events.subscribe((val) => {
+      if (val instanceof NavigationEnd) {
+        this.authSubscription = onAuthStateChanged(auth, user => {
+          if (user) {
+            getDoc(doc(this.db, 'contests', this.id)).then(doc => {
+              this.con = doc.data() as Contest;
+            });
+            
             this.updateData(this.num);
           }
         });
