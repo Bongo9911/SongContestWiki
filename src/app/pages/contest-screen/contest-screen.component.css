@@ -50,6 +50,7 @@ a:hover {
 }
 
 .logoBox {
+	max-width: calc(100vw - 50px);
 	width: 275px;
 	text-align: center;
 	font-weight: bold;
