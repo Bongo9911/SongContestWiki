@@ -43,11 +43,15 @@ export class ContestScreenComponent implements OnInit, OnDestroy {
     const storage = getStorage(firebaseApp)
     let auth = getAuth(firebaseApp);
 
-    // this.sub = this.router.events.subscribe((val) => {
-    //   if (val instanceof NavigationEnd) {
+    this.sub = this.router.events.subscribe((val) => {
+      if (val instanceof NavigationEnd) {
         this.authSubscription = onAuthStateChanged(auth, user => {
           console.log(user)
           if (user) {
+            this.eds = [];
+            this.winners = [];
+            this.logos = [];
+            this.edflags = [];
             getDownloadURL(ref(storage, 'contests/' + this.id + '/logo.png')).then(url => {
               this.mainLogo = url;
             })
@@ -115,8 +119,8 @@ export class ContestScreenComponent implements OnInit, OnDestroy {
             });
           }
         })
-    //   }
-    // });
+      }
+    });
   }
 
   ngOnInit(): void {
