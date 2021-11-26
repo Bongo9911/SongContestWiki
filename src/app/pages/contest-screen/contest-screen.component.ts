@@ -34,6 +34,7 @@ export class ContestScreenComponent implements OnInit, OnDestroy {
 
   authSubscription: Unsubscribe;
   sub: SubscriptionLike = null;
+  contentLoaded: boolean = false;
 
   constructor(private router: Router, private route: ActivatedRoute, private authService: AuthService) {
     this.route.params.subscribe(params => this.id = params.id);
@@ -46,8 +47,8 @@ export class ContestScreenComponent implements OnInit, OnDestroy {
     this.sub = this.router.events.subscribe((val) => {
       if (val instanceof NavigationEnd) {
         this.authSubscription = onAuthStateChanged(auth, user => {
-          console.log(user)
           if (user) {
+            this.contentLoaded = true;
             this.eds = [];
             this.winners = [];
             this.logos = [];
