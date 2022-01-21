@@ -9,6 +9,7 @@ import { LoginComponent } from './account-pages/login/login.component';
 import { RegisterComponent } from './account-pages/register/register.component';
 import { ImportScreenComponent } from './pages/import-screen/import-screen.component';
 import { CountryUserScreenComponent } from './pages/country-user-screen/country-user-screen.component';
+import { WikiScrubberComponent } from './pages/wiki-scrubber/wiki-scrubber.component';
 
 const routes: Routes = [
   { path: "", component: StartScreenComponent },
@@ -22,6 +23,7 @@ const routes: Routes = [
   { path: "login", component: LoginComponent },
   { path: "register", component: RegisterComponent },
   { path: "contest/:id/import", component: ImportScreenComponent },
+  { path: "contest/:id/wikiscrubber", component: WikiScrubberComponent },
   { path: "**", redirectTo: ''}
 ];
 

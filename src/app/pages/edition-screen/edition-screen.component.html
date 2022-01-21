@@ -160,7 +160,7 @@
 
         <h4 *ngIf="phase.cv">Internal Votes</h4>
 
-        <div [ngClass]="{'pointtableflex': phase.cv && pointtablesbyphase[p][f].length <= 20}">
+        <div [ngClass]="{'pointtableflex': phase.cv && pointtablesbyphase[p][f].length <= 22}">
           <ng-containter *ngIf="phase.cv">
             <table class="pointtotaltable">
               <tr>
@@ -271,9 +271,9 @@
     </ng-container>
   </div>
 
-  <textarea #song></textarea>
+  <!-- <textarea #song></textarea> -->
 
-  <button (click)="uploadSongNew(song.value)">Click me</button>
+  <!-- <button (click)="uploadSongNew(song.value)">Click me</button> -->
   <!-- <button (click)="deleteSongs(song.value)">Delete</button> -->
 
 </div>

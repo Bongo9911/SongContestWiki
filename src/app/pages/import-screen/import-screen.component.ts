@@ -4,10 +4,11 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Pointsets, Song } from 'src/app/shared/datatypes';
 import * as xlsx from 'xlsx';
-import { getFirestore, collection, query, where, getDocs, Firestore, addDoc, deleteDoc, doc } from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, Firestore, addDoc, deleteDoc, doc, getDoc } from "firebase/firestore";
 import { initializeApp, FirebaseApp } from "firebase/app"
 import { firebaseConfig } from '../../credentials';
 import { AuthService } from 'src/app/auth/auth.service';
+import { fix } from 'mathjs';
 // import * as countries from "i18n-iso-countries";
 
 // countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
@@ -101,10 +102,13 @@ export class ImportScreenComponent implements OnInit {
     "Bahamas": "The Bahamas",
     "Bosnia & Herzegovina": "Bosnia and Herzegovina",
     "CAR": "Central African Republic",
+    "C.A.R.": "Central African Republic",
     "Cote d'Ivoire": "Côte d'Ivoire",
     "Cote D'Ivoire": "Côte d'Ivoire",
     "Côte D'Ivoire": "Côte d'Ivoire",
     "Curacao": "Curaçao",
+    "Dom. Rep.": "Dominican Republic",
+    "Netherlands": "The Netherlands",
     "PNG": "Papua New Guinea",
     "St Kitts & Nevis": "Saint Kitts and Nevis",
     "St Lucia": "Saint Lucia",
@@ -112,11 +116,15 @@ export class ImportScreenComponent implements OnInit {
     "St Vincent": "Saint Vincent and the Grenadines",
     "St Vincent & The Grenadines": "Saint Vincent and the Grenadines",
     "St Vincent & the Grenadines": "Saint Vincent and the Grenadines",
+    "St. Vincent and the Grenadines": "Saint Vincent and the Grenadines",
     "Trinidad & Tobago": "Trinidad and Tobago",
     "Trinida": "Trinidad and Tobago",
     "USA": "United States",
     "United States of America": "United States",
   }
+
+  users: string[];
+  userslower: string[] = [];
 
   constructor(private route: ActivatedRoute, private authService: AuthService) {
     this.route.params.subscribe(params => {
@@ -128,7 +136,7 @@ export class ImportScreenComponent implements OnInit {
     //this.countryNames = this.objectFlip(this.countryCodes)
     //const storage = getStorage(firebaseApp);
 
-    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "47"))).then(docs => {
+    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "42"))).then(docs => {
     //   docs.forEach(song => {
     //     deleteDoc(doc(this.db, "contests", this.id, "newsongs", song.id))
     //   })
@@ -138,6 +146,16 @@ export class ImportScreenComponent implements OnInit {
 
     // console.log(this.countries.getName("DZA", "en", { select: "official" }))
     // console.log(this.countries.getAlpha3Code("Algeria", "en"))
+
+    getDoc(doc(this.db, 'contests', this.id, 'lists', 'users')).then(doc => {
+      this.users = (doc.data() as {list: string[]}).list;
+      console.log(doc.data())
+      this.users.forEach(user => {
+        this.userslower.push(user.toLowerCase());
+      })
+    })
+
+
   }
 
   ngOnInit(): void {
@@ -212,13 +230,17 @@ export class ImportScreenComponent implements OnInit {
                 pointsArray = this.readSemiPointset(workBook, s, j);
                 break;
               }
-              else {
-                let codeCountry = this.countries.getName(code, "en", { select: "official" });
-                if (codeCountry === fixedCountry) {
-                  console.log(code + ": " + codeCountry);
-                  pointsArray = this.readSemiPointset(workBook, s, j);
-                  break;
-                }
+              else if (this.countries.getName(code, "en", { select: "official" }) === fixedCountry) {
+                pointsArray = this.readSemiPointset(workBook, s, j);
+                break;
+              }
+              else if (code === fixedCountry) {
+                pointsArray = this.readSemiPointset(workBook, s, j);
+                break;
+              }
+              else if(code in this.fixedCountryNames && this.fixedCountryNames[code] === fixedCountry) {
+                pointsArray = this.readSemiPointset(workBook, s, j);
+                break;
               }
             }
           }
@@ -276,8 +298,8 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: place <= 8 ? "Q" : "NQ"
                   }],
                   dqphase: -1,
-                  edition: "47",
-                  edval: 51,
+                  edition: "24",
+                  edval: 26,
                   language: "",
                   phases: 2,
                   pointsets: [],
@@ -377,13 +399,17 @@ export class ImportScreenComponent implements OnInit {
                 pointsArray = this.readSemiPointset(workBook, sfnum - 1, j);
                 break;
               }
-              else {
-                let codeCountry = this.countries.getName(code, "en", { select: "official" });
-                if (codeCountry === fixedCountry) {
-                  console.log(code + ": " + codeCountry);
-                  pointsArray = this.readSemiPointset(workBook, sfnum - 1, j);
-                  break;
-                }
+              else if(this.countries.getName(code, "en", { select: "official" }) === fixedCountry) {
+                pointsArray = this.readSemiPointset(workBook, sfnum - 1, j);
+                break;
+              }
+              else if(code === fixedCountry) {
+                pointsArray = this.readSemiPointset(workBook, sfnum - 1, j);
+                break;
+              }
+              else if(code in this.fixedCountryNames && this.fixedCountryNames[code] === fixedCountry) {
+                pointsArray = this.readSemiPointset(workBook, sfnum - 1, j);
+                break;
               }
             }
           }
@@ -406,8 +432,8 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: workBook.Sheets["GF Scoreboard"]["F" + n].v <= 6 ? "FAQ" : "NAQ"
                   }],
                   dqphase: -1,
-                  edition: "47",
-                  edval: 51,
+                  edition: "24",
+                  edval: 26,
                   language: "",
                   phases: 2,
                   pointsets: [],
@@ -449,8 +475,14 @@ export class ImportScreenComponent implements OnInit {
           if (code in this.countryCodes) {
             voter = this.countryCodes[code];
           }
-          else {
+          else if(this.countries.getName(code, "en", { select: "official" })) {
             voter = this.countries.getName(code, "en", { select: "official" })
+          }
+          else if(code in this.fixedCountryNames) {
+            voter = this.fixedCountryNames[code];
+          }
+          else {
+            voter = code;
           }
 
           let votersongarray = this.allSongs.filter(song => song.country === voter);
@@ -511,33 +543,61 @@ export class ImportScreenComponent implements OnInit {
             }
             break;
           }
-          else {
-            let codeCountry = this.countries.getName(code, "en", { select: "official" });
-            if (codeCountry === fixedCountry) {
-              found = true;
-              console.log(code + ": " + codeCountry);
-              pointsArray = this.readFinalPointset(workBook, j);
-              if (pointsArray.some(s => s.length)) {
-                song.pointsets.push({
-                  1: {
-                    cv: false,
-                    points: pointsArray
-                  }
-                });
-              }
-              break;
+          else if (this.countries.getName(code, "en", { select: "official" }) === fixedCountry) {
+            found = true;
+            pointsArray = this.readFinalPointset(workBook, j);
+            if (pointsArray.some(s => s.length)) {
+              song.pointsets.push({
+                1: {
+                  cv: false,
+                  points: pointsArray
+                }
+              });
             }
+            break;
+          }
+          else if(code === fixedCountry) {
+            found = true;
+            pointsArray = this.readFinalPointset(workBook, j);
+            if (pointsArray.some(s => s.length)) {
+              song.pointsets.push({
+                1: {
+                  cv: false,
+                  points: pointsArray
+                }
+              });
+            }
+            break;
+          }
+          else if(code in this.fixedCountryNames && this.fixedCountryNames[code] === fixedCountry) {
+            found = true;
+            pointsArray = this.readFinalPointset(workBook, j);
+            if (pointsArray.some(s => s.length)) {
+              song.pointsets.push({
+                1: {
+                  cv: false,
+                  points: pointsArray
+                }
+              });
+            }
+            break;
           }
         }
       }
 
-      if(!found) {
+      if (!found) {
         console.error("ERROR: " + fixedCountry + " FINAL POINTSET NOT FOUND")
         song.dqphase = 1;
       }
 
       console.log(song.pointsets);
     });
+
+    this.allSongs.forEach(song => {
+      if(this.userslower.indexOf(song.user) !== -1) {
+        song.user = this.users[this.userslower.indexOf(song.user)]
+      }
+    })
 
     console.log(this.allSongs)
   }
