@@ -23,7 +23,7 @@
     "@angular/router": "12.2.13",
     "firebase": "9.6.0",
     "fuzzysort": "1.1.4",
-    "i18n-iso-countries": "7.0.0",
+    "i18n-iso-countries": "7.3.0",
     "mathjs": "10.0.0",
     "rxjs": "7.4.0",
     "tslib": "2.3.1",
