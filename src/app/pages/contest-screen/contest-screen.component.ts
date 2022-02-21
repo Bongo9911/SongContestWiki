@@ -42,7 +42,7 @@ export class ContestScreenComponent implements OnInit, OnDestroy {
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
     const storage = getStorage(firebaseApp)
-    let auth = getAuth(firebaseApp);
+    const auth = getAuth(firebaseApp);
 
     this.sub = this.router.events.subscribe((val) => {
       if (val instanceof NavigationEnd) {
