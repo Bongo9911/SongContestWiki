@@ -17,6 +17,22 @@
         <mat-icon>search</mat-icon>
     </button>
 
+    <div class="dropdown">
+        <div class="userBox" *ngIf="username.length || !authChecked">
+            <mat-icon style="line-height: 18px; vertical-align: middle;">account_circle</mat-icon>
+            {{username}}
+            <mat-icon style="line-height: 18px; vertical-align: bottom; font-size: 30px; margin-left: -5px;">
+                arrow_drop_down</mat-icon>
+        </div>
+        <div class="dropdown-content">
+            <a (click)="logout()">Logout</a>
+        </div>
+    </div>
+
+    <div style="float: right; position: absolute; right: calc(1vw + 250px);" *ngIf="!username.length && authChecked">
+        <button mat-raised-button color="primary" (click)="goToLogin()">Login</button>
+    </div>
+
     <div class="searchbox" *ngIf="link !== '' && link !== '/'">
         <mat-icon [ngStyle]="{'color':'#888'}">search</mat-icon>
         <mat-form-field style="margin-bottom: -7px;" appearance="none">

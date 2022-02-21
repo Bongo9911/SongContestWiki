@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { getFirestore, collection, query, getDocs } from "firebase/firestore";
 import { initializeApp } from "firebase/app"
@@ -13,7 +13,7 @@ import { SubscriptionLike } from 'rxjs';
   templateUrl: './start-screen.component.html',
   styleUrls: ['./start-screen.component.css']
 })
-export class StartScreenComponent implements OnInit {
+export class StartScreenComponent implements OnInit, OnDestroy {
 
   contests: Contest[] = [];
 
@@ -43,6 +43,10 @@ export class StartScreenComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  ngOnDestroy(): void {
+    this.authSubscription();
   }
 
 }

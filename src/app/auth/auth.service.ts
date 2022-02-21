@@ -55,8 +55,8 @@ export class AuthService implements OnDestroy {
 					if (res.user) {
 						this.user = res.user
 						await delay(1);
-						//this.router.navigate([this.redirect]);
-						//this.redirect = ''
+						this.router.navigate([this.redirect]);
+						this.redirect = ''
 					}
 					resolve(1);
 				}).catch(() => {
@@ -189,7 +189,17 @@ export class AuthService implements OnDestroy {
 	//Logs a user out of their account
 	async logout() {
 		localStorage.removeItem('user');
-		this.router.navigate(['login']);
+
+		let authsub = onAuthStateChanged(this.auth, user => {
+			if (!user) {
+				let url = this.router.url;
+				this.router.navigateByUrl('/', { skipLocationChange: true }).then(() =>
+					this.router.navigate([url]));
+					authsub();
+			}
+		});
+
+		//this.router.navigate(['login']);
 		signOut(this.auth);
 	}
 

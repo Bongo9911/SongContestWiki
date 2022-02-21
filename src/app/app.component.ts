@@ -8,6 +8,7 @@ import { SubscriptionLike } from 'rxjs';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import * as fuzzysort from 'fuzzysort';
 import { AuthService } from './auth/auth.service';
+import { getAuth, onAuthStateChanged, Unsubscribe } from "firebase/auth";
 
 @Component({
   selector: 'app-root',
@@ -28,42 +29,61 @@ export class AppComponent implements OnDestroy {
   searching: boolean = false;
   contest: string = "";
 
+  username: string = "";
+  authChecked: boolean = false;
+
+  authSubscription: Unsubscribe;
+
   constructor(private location: Location, private router: Router, private authService: AuthService) {
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
-    const storage = getStorage(firebaseApp)
+    const storage = getStorage(firebaseApp);
+    const auth = getAuth(firebaseApp);
 
     this.sub = router.events.subscribe((val) => {
       if (val instanceof NavigationEnd) {
-        let split = this.location.path().split('/');
-        if (split.length >= 3 && split[1] === 'contest') {
-          if ("/contest/" + split[2] !== this.link) {
-            this.contest = split[2];
-            getDownloadURL(ref(storage, 'contests/' + split[2] + '/logo.png')).then(url => {
-              this.logo = url;
-            })
-            this.link = "/contest/" + split[2];
-            getDoc(doc(db, 'contests', split[2], 'lists', 'users')).then(doc => {
-              this.users = doc.data();
-            })
-            getDoc(doc(db, 'contests', split[2], 'lists', 'countries')).then(doc => {
-              this.countries = doc.data();
-            })
+        this.authSubscription = onAuthStateChanged(auth, user => {
+          if (user) {
+            this.authChecked = true;
+            if(!user.isAnonymous) {
+              this.username = user.displayName;
+            }
+            else {
+              this.username = "";
+            }
+
+            let split = this.location.path().split('/');
+            if (split.length >= 3 && split[1] === 'contest') {
+              if ("/contest/" + split[2] !== this.link) {
+                this.contest = split[2];
+                getDownloadURL(ref(storage, 'contests/' + split[2] + '/logo.png')).then(url => {
+                  this.logo = url;
+                })
+                this.link = "/contest/" + split[2];
+                getDoc(doc(db, 'contests', split[2], 'lists', 'users')).then(doc => {
+                  this.users = doc.data();
+                })
+                getDoc(doc(db, 'contests', split[2], 'lists', 'countries')).then(doc => {
+                  this.countries = doc.data();
+                })
+              }
+            }
+            else if (split.length > 1) {
+              this.link = "/";
+            }
+            else {
+              this.link = "";
+              this.logo = "";
+            }
           }
-        }
-        else if (split.length > 1) {
-          this.link = "/";
-        }
-        else {
-          this.link = "";
-          this.logo = "";
-        }
+        });
       }
     });
   }
 
   ngOnDestroy() {
     this.sub.unsubscribe();
+    this.authSubscription();
   }
 
   search() {
@@ -85,5 +105,14 @@ export class AppComponent implements OnDestroy {
     setTimeout(() => {
       this.searching = false;
     }, 100);
+  }
+
+  goToLogin(): void {
+    this.authService.setRedirect(this.router.url)
+    this.router.navigate(["login"]);
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 }
