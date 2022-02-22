@@ -59,7 +59,7 @@
 /* The container <div> - needed to position the dropdown content */
 .dropdown {
     position: absolute;
-    right: calc(1vw + 250px);
+    right: calc(1vw + 225px);
     display: inline-block;
 }
 
@@ -109,7 +109,7 @@
     right: calc(1vw + 250px);
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 800px) {
     .searchbox {
         display: none;
     }
@@ -124,7 +124,7 @@
     }
 }
 
-@media only screen and (min-width: 601px) {
+@media only screen and (min-width: 801px) {
     .search-icon {
         display: none;
     }
