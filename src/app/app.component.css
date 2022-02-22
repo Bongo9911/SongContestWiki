@@ -18,7 +18,7 @@
 
 .search-icon {
     position: absolute;
-    right: 1vw;
+    right: 10px;
 }
 
 .searchbox {
@@ -31,18 +31,6 @@
     position: absolute;
     right: 1vw;
     padding: 0 3px;
-}
-
-@media only screen and (max-width: 600px) {
-    .searchbox {
-        display: none;
-    }
-}
-
-@media only screen and (min-width: 601px) {
-    .search-icon {
-        display: none;
-    }
 }
 
 .searchresult {
@@ -108,4 +96,39 @@
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .userBox {
     background-color: #ccc;
+}
+
+.profile-icon {
+    position: absolute;
+    right: 50px;
+}
+
+.loginButton {
+    float: right;
+    position: absolute;
+    right: calc(1vw + 250px);
+}
+
+@media only screen and (max-width: 600px) {
+    .searchbox {
+        display: none;
+    }
+    .dropdown {
+        display: none;
+    }
+    .userBox {
+        display: none;
+    }
+    .loginButton {
+        display: none;
+    }
+}
+
+@media only screen and (min-width: 601px) {
+    .search-icon {
+        display: none;
+    }
+    .profile-icon {
+        display: none;
+    }
 }
