@@ -6,7 +6,7 @@
         <mat-icon>home</mat-icon>
     </button>
     <!-- <span>My App</span> -->
-    <div style="max-height: 100%;">
+    <div style="max-height: 100%;" *ngIf="logo.length">
         <a [routerLink]="link"><img class="logo" src="{{logo}}"></a>
     </div>
     <!-- <span class="example-spacer"></span>
