@@ -1,0 +1,21 @@
+<div class="container">
+    <div *ngIf="stage === 'claims'" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h1>Claim a Country</h1>
+        <form>
+            <mat-form-field appearance="fill">
+              <mat-label>Country</mat-label>
+              <input type="text"
+                     placeholder="Pick one"
+                     aria-label="Country"
+                     matInput
+                     [formControl]="countryControl"
+                     [matAutocomplete]="auto">
+              <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                <mat-option *ngFor="let country of filteredCountryOptions | async" [value]="country">
+                  {{country}}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </form>
+    </div>
+</div>

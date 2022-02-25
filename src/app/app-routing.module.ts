@@ -10,6 +10,8 @@ import { RegisterComponent } from './account-pages/register/register.component';
 import { ImportScreenComponent } from './pages/import-screen/import-screen.component';
 import { CountryUserScreenComponent } from './pages/country-user-screen/country-user-screen.component';
 import { WikiScrubberComponent } from './pages/wiki-scrubber/wiki-scrubber.component';
+import { HostScreenComponent } from './pages/host-screen/host-screen.component';
+import { SubmitScreenComponent } from './pages/submit-screen/submit-screen.component';
 
 const routes: Routes = [
   { path: "", component: StartScreenComponent },
@@ -18,6 +20,8 @@ const routes: Routes = [
   { path: "contest/:id/edition/:num", redirectTo: "/contest/:id/ed/:num"},
   { path: "contest/:id/user/:name", component: CountryUserScreenComponent },
   { path: "contest/:id/country/:name", component: CountryUserScreenComponent },
+  { path: "contest/:id/host", component: HostScreenComponent },
+  { path: "contest/:id/submit", component: SubmitScreenComponent },
   { path: "contest/:id/pot-generator", component: PotGeneratorComponent },
   { path: "tools/reallocator", component: ReallocatorScreenComponent },
   { path: "login", component: LoginComponent },

@@ -1,0 +1,13 @@
+<div *ngIf="edData" class="container">
+    <h1 style="text-align: center;">Host Portal</h1>
+    <table>
+        <tr>
+            <th>User</th>
+            <th>Country</th>
+        </tr>
+        <tr *ngFor="let user of edData.users; index as i">
+            <td>{{user}}</td>
+            <td>{{edData.countries[i]}}</td>
+        </tr>
+    </table>
+</div>

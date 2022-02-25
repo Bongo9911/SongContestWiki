@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
 
 import { ContestScreenComponent } from './pages/contest-screen/contest-screen.component';
 import { StartScreenComponent } from './pages/start-screen/start-screen.component';
@@ -22,6 +23,8 @@ import { RegisterComponent } from './account-pages/register/register.component';
 import { ImportScreenComponent } from './pages/import-screen/import-screen.component';
 import { CountryUserScreenComponent } from './pages/country-user-screen/country-user-screen.component';
 import { WikiScrubberComponent } from './pages/wiki-scrubber/wiki-scrubber.component';
+import { HostScreenComponent } from './pages/host-screen/host-screen.component';
+import { SubmitScreenComponent } from './pages/submit-screen/submit-screen.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +39,8 @@ import { WikiScrubberComponent } from './pages/wiki-scrubber/wiki-scrubber.compo
     ImportScreenComponent,
     CountryUserScreenComponent,
     WikiScrubberComponent,
+    HostScreenComponent,
+    SubmitScreenComponent,
   ],
   imports: [
     BrowserModule,
@@ -49,6 +54,7 @@ import { WikiScrubberComponent } from './pages/wiki-scrubber/wiki-scrubber.compo
     ReactiveFormsModule,
     MatToolbarModule,
     MatIconModule,
+    MatAutocompleteModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

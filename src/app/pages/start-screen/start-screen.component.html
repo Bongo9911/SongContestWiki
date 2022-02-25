@@ -19,7 +19,7 @@
           <ng-container *ngFor="let con of contests">
             <div class="logoBox" routerLink="/contest/{{con.id}}">
               <div style="height: 100%; display: flex; align-items: center;">
-                <img class="edlogo" src="./assets/contestlogos/{{con.id}}.png">
+                <img class="edlogo" src="{{logos[con.id]}}">
               </div>
               <div style="padding-top: 4px">
                 {{con.name}}

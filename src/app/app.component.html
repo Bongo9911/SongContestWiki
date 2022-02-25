@@ -6,7 +6,7 @@
         <mat-icon>home</mat-icon>
     </button>
     <!-- <span>My App</span> -->
-    <div style="max-height: 100%;" *ngIf="logo.length">
+    <div style="max-height: 90%;" *ngIf="logo.length">
         <a [routerLink]="link"><img class="logo" src="{{logo}}"></a>
     </div>
     <!-- <span class="example-spacer"></span>
@@ -55,6 +55,6 @@
     </div>
 </mat-toolbar>
 
-<div style="height: 65px;"></div>
+<div style="height: 75px;"></div>
 
 <router-outlet></router-outlet>

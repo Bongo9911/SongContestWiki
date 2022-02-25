@@ -76,3 +76,12 @@ export interface Pointsets {
 	11?: Pointset;
 	12?: Pointset;
 }
+
+export interface HostEdition {
+	ednum: number,
+	stage: string,
+	phase: string,
+	format: string,
+	users: string[],
+	countries: string[]
+}
