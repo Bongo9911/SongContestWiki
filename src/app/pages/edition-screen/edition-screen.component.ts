@@ -176,12 +176,12 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
                 .filter(x => 'place' in x.draws[i])
                 .sort((a, b) => a.draws[i].place > b.draws[i].place ? 1 : -1)
               this.votersbyphase[i][j] = songs.filter(x =>
-                x.draws.length > i && 'ro' in x.draws[i] &&
+                x.draws.length > i && 'ro' in x.draws[i] && x.draws[i].ro !== -1 &&
                 x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
                 && !x.pointsets[i][(j + 1).toString()].cv
               ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1).concat(
                 songs.filter(x =>
-                  (x.draws.length <= i || !('ro' in x.draws[i])) &&
+                  (x.draws.length <= i || (!('ro' in x.draws[i]) || x.draws[i].ro === -1)) &&
                   x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
                   && !x.pointsets[i][(j + 1).toString()].cv
                 ).sort((a, b) => a.country > b.country ? 1 : -1)
