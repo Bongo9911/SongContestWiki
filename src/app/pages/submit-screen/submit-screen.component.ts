@@ -1,14 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { getAuth, onAuthStateChanged, Unsubscribe } from "firebase/auth";
-import { getFirestore, collection, query, getDocs, onSnapshot, doc, getDoc } from "firebase/firestore";
+import { getFirestore, collection, query, getDocs, onSnapshot, doc, getDoc, Firestore, addDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app"
 import { firebaseConfig } from '../../credentials';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
 import { map, Observable, startWith, Subscription } from 'rxjs';
 import { HostEdition } from 'src/app/shared/datatypes';
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-submit-screen',
@@ -24,18 +24,21 @@ export class SubmitScreenComponent implements OnInit {
   displayName: string = "";
   stage: string = "";
 
-  countryControl = new FormControl();
+  countryControl = new FormControl('', [Validators.required]);
   countryOptions: string[] = ['Aruba', 'Barbados', 'Cambodia', 'Denmark', 'Egypt', 'England', 'Finland',
     'Greenland', 'Hungary', 'Indonesia', 'Jamaica', 'Kazakhstan', 'Laos', 'Mongolia', 'Nepal', 'Oman',
     'Portugal', 'Qatar', 'Russia', 'Saint Vincent and the Grenadines', 'Sweden', 'Turkey', 'Ukraine', 'United States', 'Vanuatu', 'Wales',
     'Yemen', 'Zambia'];
   filteredCountryOptions: Observable<string[]>;
+  errorMsg: string = "";
+
+  db: Firestore;
 
   constructor(private router: Router, private route: ActivatedRoute, private authService: AuthService) {
     this.route.params.subscribe(params => this.id = params.id);
 
     const firebaseApp = initializeApp(firebaseConfig);
-    const db = getFirestore(firebaseApp);
+    this.db = getFirestore(firebaseApp);
     const auth = getAuth(firebaseApp);
     const storage = getStorage(firebaseApp);
 
@@ -45,7 +48,7 @@ export class SubmitScreenComponent implements OnInit {
           if (user && !user.isAnonymous) {
             this.displayName = user.displayName;
 
-            getDoc(doc(db, "contests", this.id, "hosting", "currented")).then(doc => {
+            getDoc(doc(this.db, "contests", this.id, "hosting", "currented")).then(doc => {
               let data = doc.data() as HostEdition;
               this.stage = data.stage;
             });
@@ -66,6 +69,33 @@ export class SubmitScreenComponent implements OnInit {
     const filterValue = value.toLowerCase();
 
     return this.countryOptions.filter(option => option.toLowerCase().includes(filterValue));
+  }
+
+  claimCountry(): void {
+    console.log(this.countryControl.value);
+    if(this.countryOptions.indexOf(this.countryControl.value) !== -1) {
+      addDoc(collection(this.db, "countryclaims"), {
+        contestid: this.id,
+        country: this.countryControl.value,
+        user: this.authService.user.displayName
+      }).then(countrydoc => {
+        console.log(countrydoc.id);
+        let countrySub = onSnapshot(doc(this.db, "countryclaims", countrydoc.id), (statusdoc) => {
+          console.log("data: ", statusdoc.data());
+          if("status" in statusdoc.data()) {
+            countrySub();
+            if(statusdoc.data().status == "taken") {
+              this.countryControl.setErrors({claimed: true});
+              this.errorMsg = "Country already claimed";
+            } 
+          }
+        });
+      })
+    }
+    else {
+      this.countryControl.setValue("");
+      this.errorMsg = "Invalid country";
+    }
   }
 
 }

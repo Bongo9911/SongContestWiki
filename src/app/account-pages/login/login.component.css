@@ -1,5 +1,6 @@
 .container {
 	padding: 0px 2vw;
+	margin-top: -10px;
 	display: flex;
 	justify-content: center;
 	background-color: #ffd9b3;
