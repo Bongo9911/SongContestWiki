@@ -108,6 +108,7 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
     //gets the info on the edition
     getDoc(doc(this.db, 'contests', this.id, 'editions', this.num)).then(doc => {
       this.edition = doc.data() as Edition;
+      console.log(this.edition);
 
       this.edition.hostcountries.forEach(country => {
         if (!(country in this.flagUrls)) {
@@ -167,6 +168,9 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
           })
 
           for (let i = 0; i < this.edition.phases.length; ++i) {
+            if(!("cvscaling" in this.edition.phases[i])){
+              this.edition.phases[i].cvscaling = false;
+            }
             this.songsbyphase.push(new Array(this.edition.phases[i].num));
             this.aqsbyphase.push(new Array(this.edition.phases[i].num));
             this.votersbyphase.push(new Array(this.edition.phases[i].num));
@@ -413,6 +417,9 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
       }
       else if (song.draws[phase].place === 3) {
         return { 'background-color': '#cc9966' };
+      }
+      else if (song.draws[phase].qualifier === "FAQ") {
+        return { 'background-color': '#bae8ff' };
       }
     }
     else {

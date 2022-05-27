@@ -4,6 +4,8 @@
 	<input hidden (change)="onFileSelected()" #fileInput type="file" id="file">
 	<button type="button" mat-raised-button (click)="uploadSongs()" color="accent">Upload Songs</button>
 
+	<mat-checkbox [(ngModel)]="hasROTW">ROTW</mat-checkbox>
+
 	<div *ngFor="let semi of semiSongs; index as s">
 		<h1>Semi {{s + 1}}</h1>
 

@@ -20,6 +20,7 @@ export interface Phase {
 	name: string; //Name in singular form
 	plural: string; //Name in plural form
 	cv: boolean; //Whether or not there's crossvoting in that phase
+	cvscaling?: boolean; //Whether or not the crossvotes are scaled
 	num: number; //Number of that phase (ex. 3 semi-finals, 1 grand final)
 }
 
