@@ -109,6 +109,18 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
     getDoc(doc(this.db, 'contests', this.id, 'editions', this.num)).then(doc => {
       this.edition = doc.data() as Edition;
 
+      this.edition.hostcountries.forEach(country => {
+        if (!(country in this.flagUrls)) {
+          getDownloadURL(ref(this.storage, 'contests/' + this.id + '/flagicons/' + country + '.png'))
+            .then(url => {
+              this.flagUrls[country] = url;
+            }).catch(() => {
+              //Set it to a string so that it shows the image not found image
+              this.flagUrls[country] = "/"
+            })
+        }
+      })
+      
       getDownloadURL(ref(this.storage, 'contests/' + this.id + '/logos/' + this.edition.edition + '.png'))
         .then(url => {
           this.logourl = url;
