@@ -150,7 +150,7 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
           docs.forEach((doc) => {
             songs.push(doc.data() as Song);
           });
-          this.entries = songs.length;
+          this.entries = songs.filter(song => "draws" in song).length;
 
           console.log(songs.filter(song => "winner" in song && song.winner));
           this.winningSongs = songs.filter(song => "winner" in song && song.winner);
@@ -169,7 +169,7 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
 
           for (let i = 0; i < this.edition.phases.length; ++i) {
             if(!("cvscaling" in this.edition.phases[i])){
-              this.edition.phases[i].cvscaling = false;
+              this.edition.phases[i].cvscaling = true;
             }
             this.songsbyphase.push(new Array(this.edition.phases[i].num));
             this.aqsbyphase.push(new Array(this.edition.phases[i].num));
@@ -208,7 +208,7 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
                 this.crossvotersbyphase[i][j] = songs.filter(x =>
                   x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
                   && x.pointsets[i][(j + 1).toString()].cv
-                )
+                ).sort((a,b) => a.country > b.country ? 1 : -1)
               }
             }
           }

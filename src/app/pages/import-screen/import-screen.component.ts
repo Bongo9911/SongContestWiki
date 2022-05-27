@@ -140,7 +140,7 @@ export class ImportScreenComponent implements OnInit {
     //this.countryNames = this.objectFlip(this.countryCodes)
     //const storage = getStorage(firebaseApp);
 
-    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "48"))).then(docs => {
+    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "47"))).then(docs => {
     //   docs.forEach(song => {
     //     deleteDoc(doc(this.db, "contests", this.id, "newsongs", song.id))
     //   })
@@ -311,8 +311,8 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: place <= 8 ? "Q" : "NQ"
                   }],
                   dqphase: -1,
-                  edition: "48",
-                  edval: 52,
+                  edition: "47",
+                  edval: 51,
                   language: "",
                   phases: 2,
                   pointsets: [],
@@ -387,16 +387,22 @@ export class ImportScreenComponent implements OnInit {
             if (workBook.Sheets["GF Scoreboard"]["F" + n].v === 1) this.allSongs[index].winner = true;
           }
           else {
+            let row: number = 3;
+            while("D" + row in workBook.Sheets["GF INT+ROTW"]) {
+              if(workBook.Sheets["GF INT+ROTW"]["D" + row].v.trim() == fixedCountry ||
+              workBook.Sheets["GF INT+ROTW"]["D" + row].v.trim() == country) break;
+              row++;
+            }
             this.allSongs[index].draws.push({
               ro: workBook.Sheets["GF Scoreboard"]["G" + n].v,
               num: 1,
-              place: workBook.Sheets["GF INT+ROTW"]["B" + (n + 1)].v,
-              points: workBook.Sheets["GF INT+ROTW"]["G" + (n + 1)].v,
-              intpoints: workBook.Sheets["GF INT+ROTW"]["E" + (n + 1)].v,
-              extpoints: workBook.Sheets["GF INT+ROTW"]["F" + (n + 1)].v,
-              qualifier: workBook.Sheets["GF INT+ROTW"]["B" + (n + 1)].v <= 6 ? "FAQ" : "NAQ"
+              place: workBook.Sheets["GF INT+ROTW"]["B" + row].v,
+              points: workBook.Sheets["GF INT+ROTW"]["G" + row].v,
+              intpoints: workBook.Sheets["GF INT+ROTW"]["E" + row].v,
+              extpoints: workBook.Sheets["GF INT+ROTW"]["F" + row].v,
+              qualifier: workBook.Sheets["GF INT+ROTW"]["B" + row].v <= 6 ? "FAQ" : "NAQ"
             })
-            if (workBook.Sheets["GF INT+ROTW"]["B" + (n + 1)].v === 1) this.allSongs[index].winner = true;
+            if (workBook.Sheets["GF INT+ROTW"]["B" + row].v === 1) this.allSongs[index].winner = true;
           }
           this.finalSongs.push(this.allSongs[index]);
         }
@@ -453,8 +459,8 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: "AQ"
                   }],
                   dqphase: -1,
-                  edition: "48",
-                  edval: 52,
+                  edition: "47",
+                  edval: 51,
                   language: "",
                   phases: 2,
                   pointsets: [],
@@ -710,8 +716,8 @@ export class ImportScreenComponent implements OnInit {
       this.allSongs.push({
         country: country,
         user: user,
-        edition: "48",
-        edval: 52,
+        edition: "47",
+        edval: 51,
         participant: false,
         phases: 2,
         pointsets: [
