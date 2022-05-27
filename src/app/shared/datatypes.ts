@@ -30,17 +30,18 @@ export interface Pot {
 }
 
 export interface Song {
-	artist: string;
+	artist?: string;
 	country: string;
-	draws: Draw[];
-	dqphase: number;
+	draws?: Draw[];
+	dqphase?: number;
 	dqreason?: string;
 	edition: string;
 	edval: number;
-	language: string;
+	language?: string;
+	participant?: boolean; //Whether that user sent a song (true) or just voted (false)
 	phases: number;
 	pointsets: Pointsets[];
-	song: string;
+	song?: string;
 	user: string;
 	winner?: boolean;
 }

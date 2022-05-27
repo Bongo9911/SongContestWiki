@@ -140,7 +140,7 @@ export class ImportScreenComponent implements OnInit {
     //this.countryNames = this.objectFlip(this.countryCodes)
     //const storage = getStorage(firebaseApp);
 
-    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "42"))).then(docs => {
+    // getDocs(query(collection(this.db, "contests", this.id, "newsongs"), where("edition", "==", "48"))).then(docs => {
     //   docs.forEach(song => {
     //     deleteDoc(doc(this.db, "contests", this.id, "newsongs", song.id))
     //   })
@@ -198,6 +198,9 @@ export class ImportScreenComponent implements OnInit {
 
         this.readSemiSongs(workBook);
         this.readFinalSongs(workBook);
+        if (this.hasROTW) {
+          this.readROTWPointsets(workBook);
+        }
 
         this.srcResult = event.target.result;
       };
@@ -661,6 +664,70 @@ export class ImportScreenComponent implements OnInit {
     }
     console.log(points);
     return points;
+  }
+
+  readROTWPointsets(workBook: xlsx.WorkBook) {
+    let j: number = 0;
+    while (this.getColumnName(9 + j) + 1 in workBook.Sheets["ROTW Scoreboard"]) {
+      let points: string[] = new Array(10);
+      let country = workBook.Sheets["ROTW Scoreboard"][this.getColumnName(9 + j) + 1].v.trim();
+
+      if (country in this.countryCodes) {
+        country = this.countryCodes[country];
+      }
+      else if (country in this.fixedCountryNames) {
+        country = this.fixedCountryNames[country];
+      }
+      else if (this.countries.getName(country, "en", { select: "official" })) {
+        country = this.countries.getName(country, "en", { select: "official" })
+      }
+
+      let i: number = 74;
+      let user: string = "";
+      while ("D" + i in workBook.Sheets["CountryUser list"]) {
+        if (workBook.Sheets["CountryUser list"]["D" + i] == country) {
+          user = workBook.Sheets["CountryUser list"]["C" + i].replace('u/', '').trim();
+          break;
+        }
+        i++;
+      }
+
+      for (let p = 2; p < 40; ++p) {
+        if (this.getColumnName(9 + j) + p in workBook.Sheets["ROTW Scoreboard"] &&
+          "H" + p in workBook.Sheets["ROTW Scoreboard"]) {
+          if (pointset.indexOf(workBook.Sheets["ROTW Scoreboard"][this.getColumnName(9 + j) + p].v) !== -1) {
+            let fixedCountry = workBook.Sheets["ROTW Scoreboard"]["H" + p].v.trim();
+            if (fixedCountry in this.fixedCountryNames) {
+              fixedCountry = this.fixedCountryNames[fixedCountry];
+            }
+            points[pointset.indexOf(workBook.Sheets["ROTW Scoreboard"][this.getColumnName(9 + j) + p].v)] = fixedCountry;
+          }
+          // console.log(workBook.Sheets["Semi " + (s + 1)][alphabet[10 + j] + p].v + ": " +
+          //   workBook.Sheets["Semi " + (s + 1)]["I" + p].v)
+        }
+      }
+
+      this.allSongs.push({
+        country: country,
+        user: user,
+        edition: "48",
+        edval: 52,
+        participant: false,
+        phases: 2,
+        pointsets: [
+          {},
+          {
+            1: {
+              cv: true,
+              points: points
+            }
+          }
+        ]
+      })
+
+      ++j;
+      console.log(points);
+    }
   }
 
   uploadSongs() {
