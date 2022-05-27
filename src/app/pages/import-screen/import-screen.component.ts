@@ -41,6 +41,7 @@ export class ImportScreenComponent implements OnInit {
     // BUL: "Bulgaria",
     // CAM: "Cambodia",
     CIV: "Côte d'Ivoire",
+    COG: "Congo Republic",
     CPV: "Cabo Verde",
     CUR: "Curaçao",
     // CYM: "Wales",
@@ -77,6 +78,7 @@ export class ImportScreenComponent implements OnInit {
 
   countryNames = {
     "Cabo Verde": "CPV",
+    "Congo Republic": "COG",
     "Côte d'Ivoire": "CIV",
     "England": "ENG",
     "Iran": "IRN",
@@ -197,6 +199,7 @@ export class ImportScreenComponent implements OnInit {
         console.log(workBook.Sheets["INT+EXT"]);
 
         this.readSemiSongs(workBook);
+        console.log(this.allSongs);
         this.readFinalSongs(workBook);
         if (this.hasROTW) {
           this.readROTWPointsets(workBook);
@@ -311,8 +314,8 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: place <= 8 ? "Q" : "NQ"
                   }],
                   dqphase: -1,
-                  edition: "47",
-                  edval: 51,
+                  edition: "49",
+                  edval: 53,
                   language: "",
                   phases: 2,
                   pointsets: [],
@@ -388,9 +391,14 @@ export class ImportScreenComponent implements OnInit {
           }
           else {
             let row: number = 3;
-            while("D" + row in workBook.Sheets["GF INT+ROTW"]) {
-              if(workBook.Sheets["GF INT+ROTW"]["D" + row].v.trim() == fixedCountry ||
-              workBook.Sheets["GF INT+ROTW"]["D" + row].v.trim() == country) break;
+            while ("D" + row in workBook.Sheets["GF INT+ROTW"]) {
+              if (workBook.Sheets["GF INT+ROTW"]["D" + row].v.trim() == fixedCountry ||
+                workBook.Sheets["GF INT+ROTW"]["D" + row].v.trim() == country) {
+                console.log(workBook.Sheets["GF INT+ROTW"]["D" + row].v.trim());
+                console.log(country);
+                console.log(fixedCountry);
+                break;
+              }
               row++;
             }
             this.allSongs[index].draws.push({
@@ -459,8 +467,8 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: "AQ"
                   }],
                   dqphase: -1,
-                  edition: "47",
-                  edval: 51,
+                  edition: "49",
+                  edval: 53,
                   language: "",
                   phases: 2,
                   pointsets: [],
@@ -479,16 +487,25 @@ export class ImportScreenComponent implements OnInit {
                   });
                 }
                 else {
-                  console.log(n);
-                  console.log(workBook.Sheets["GF INT+ROTW"]);
+                  let row: number = 3;
+                  while ("D" + row in workBook.Sheets["GF INT+ROTW"]) {
+                    if (workBook.Sheets["GF INT+ROTW"]["D" + row].v.trim() == fixedCountry ||
+                      workBook.Sheets["GF INT+ROTW"]["D" + row].v.trim() == country) {
+                      console.log(workBook.Sheets["GF INT+ROTW"]["D" + row].v.trim());
+                      console.log(country);
+                      console.log(fixedCountry);
+                      break;
+                    }
+                    row++;
+                  }
                   song.draws.push({
                     ro: workBook.Sheets["GF Scoreboard"]["G" + n].v,
                     num: 1,
-                    place: workBook.Sheets["GF INT+ROTW"]["B" + (n + 1)].v,
-                    points: workBook.Sheets["GF INT+ROTW"]["G" + (n + 1)].v,
-                    intpoints: workBook.Sheets["GF INT+ROTW"]["E" + (n + 1)].v,
-                    extpoints: workBook.Sheets["GF INT+ROTW"]["F" + (n + 1)].v,
-                    qualifier: workBook.Sheets["GF INT+ROTW"]["B" + (n + 1)].v <= 6 ? "FAQ" : "NAQ"
+                    place: workBook.Sheets["GF INT+ROTW"]["B" + row].v,
+                    points: workBook.Sheets["GF INT+ROTW"]["G" + row].v,
+                    intpoints: workBook.Sheets["GF INT+ROTW"]["E" + row].v,
+                    extpoints: workBook.Sheets["GF INT+ROTW"]["F" + row].v,
+                    qualifier: workBook.Sheets["GF INT+ROTW"]["B" + row].v <= 6 ? "FAQ" : "NAQ"
                   });
                 }
 
@@ -716,8 +733,8 @@ export class ImportScreenComponent implements OnInit {
       this.allSongs.push({
         country: country,
         user: user,
-        edition: "47",
-        edval: 51,
+        edition: "49",
+        edval: 53,
         participant: false,
         phases: 2,
         pointsets: [
