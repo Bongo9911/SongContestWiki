@@ -107,7 +107,7 @@ export class CountryUserScreenComponent implements OnInit, OnDestroy {
       })
     }
 
-    // getDocs(query(collection(db, 'contests', this.id, 'newsongs'))).then(docs => {
+    // getDocs(query(collection(this.db, 'contests', this.id, 'newsongs'))).then(docs => {
     //   // let users: {aliases: string[], lower: string, username: string}[] = [];
     //   let users: any = {};
     //   let countries: any = {};
@@ -143,10 +143,10 @@ export class CountryUserScreenComponent implements OnInit, OnDestroy {
 
     //   console.log(usernames);
 
-    //   setDoc(doc(db, 'contests', this.id, 'lists', "countries"), {list: countrynames})
-    //   setDoc(doc(db, 'contests', this.id, 'lists', "users"), {list: usernames})
-    //   setDoc(doc(db, 'contests', this.id, 'lists', "countrieslower"), {list: countrieslower})
-    //   setDoc(doc(db, 'contests', this.id, 'lists', "userslower"), {list: userslower})
+    //   setDoc(doc(this.db, 'contests', this.id, 'lists', "countries"), {list: countrynames})
+    //   setDoc(doc(this.db, 'contests', this.id, 'lists', "users"), {list: usernames})
+    //   setDoc(doc(this.db, 'contests', this.id, 'lists', "countrieslower"), {list: countrieslower})
+    //   setDoc(doc(this.db, 'contests', this.id, 'lists', "userslower"), {list: userslower})
     //   console.log(countries)
     // })
 
@@ -159,12 +159,14 @@ export class CountryUserScreenComponent implements OnInit, OnDestroy {
       console.log(this.songs)
 
       this.songs = this.songs.sort((a, b) => (a.edval > b.edval) ? 1 : -1);
-      this.numEntries = this.songs.length;
+      this.numEntries = this.songs.filter(song => "draws" in song).length;
       this.numQualifiers = this.songs.filter(function (song) {
-        return song.draws.length === song.phases;
+        return "draws" in song && song.draws.length === song.phases;
       }).length;
 
       this.phases = [...this.songs].sort((a, b) => a.phases < b.phases ? 1 : -1)[0].phases
+
+      console.log(this.phases);
 
       if (this.type === "user") {
         this.songs.forEach(song => {
@@ -178,7 +180,8 @@ export class CountryUserScreenComponent implements OnInit, OnDestroy {
       }
 
       for (let i = 0; i <= this.phases; ++i) {
-        let songsort = [...this.songs].filter(song => song.draws.length === song.phases - i &&
+        let songsort = [...this.songs].filter(song => "draws" in song &&
+          song.draws.length === song.phases - i &&
           'place' in song.draws[song.phases - i - 1] && song.draws[song.phases - i - 1].place > 0)
         if (songsort.length) {
           songsort.sort((a, b) => a.edval < b.edval ? 1 : -1)
@@ -211,7 +214,8 @@ export class CountryUserScreenComponent implements OnInit, OnDestroy {
       }
 
       for (let i = this.phases - 1; i >= 0; --i) {
-        let songsort = [...this.songs].filter(song => song.draws.length === song.phases - i &&
+        let songsort = [...this.songs].filter(song => 
+          "draws" in song && song.draws.length === song.phases - i &&
           'place' in song.draws[song.phases - i - 1] && song.draws[song.phases - i - 1].place > 0)
         console.log(songsort);
         if (songsort.length) {

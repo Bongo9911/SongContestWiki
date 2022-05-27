@@ -202,6 +202,12 @@ export class ImportScreenComponent implements OnInit {
           this.readROTWPointsets(workBook);
         }
 
+        this.allSongs.forEach(song => {
+          if (this.userslower.indexOf(song.user) !== -1) {
+            song.user = this.users[this.userslower.indexOf(song.user)]
+          }
+        });
+
         this.srcResult = event.target.result;
       };
 
@@ -637,12 +643,6 @@ export class ImportScreenComponent implements OnInit {
       console.log(song.pointsets);
     });
 
-    this.allSongs.forEach(song => {
-      if (this.userslower.indexOf(song.user) !== -1) {
-        song.user = this.users[this.userslower.indexOf(song.user)]
-      }
-    })
-
     console.log(this.allSongs)
   }
 
@@ -685,8 +685,8 @@ export class ImportScreenComponent implements OnInit {
       let i: number = 74;
       let user: string = "";
       while ("D" + i in workBook.Sheets["CountryUser list"]) {
-        if (workBook.Sheets["CountryUser list"]["D" + i] == country) {
-          user = workBook.Sheets["CountryUser list"]["C" + i].replace('u/', '').trim();
+        if (workBook.Sheets["CountryUser list"]["D" + i].v.trim() == country) {
+          user = workBook.Sheets["CountryUser list"]["C" + i].v.replace('u/', '').trim();
           break;
         }
         i++;
