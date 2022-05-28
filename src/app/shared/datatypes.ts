@@ -26,7 +26,7 @@ export interface Phase {
 
 export interface Pot {
 	name: string; //Typically a number or 'N' for Newcomers
-	members;
+	members: string[]; //Users in the pot
 }
 
 export interface Song {
@@ -37,6 +37,7 @@ export interface Song {
 	dqreason?: string;
 	edition: string;
 	edval: number;
+	features?: string[]; //Featured artists
 	language?: string;
 	participant?: boolean; //Whether that user sent a song (true) or just voted (false)
 	phases: number;
