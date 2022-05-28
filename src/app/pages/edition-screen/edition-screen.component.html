@@ -18,11 +18,11 @@
 
       <div class="infoboxheader">Host</div>
       <div class="infoboxsection">
-        <div *ngIf="edition.hostcountries.length === 1"><b>Host country</b></div>
-        <div *ngIf="edition.hostcountries.length > 1"><b>Host countries</b></div>
+        <div *ngIf="edition.hostcities.length === 1"><b>Host city</b></div>
+        <div *ngIf="edition.hostcities.length > 1"><b>Host cities</b></div>
         <div>
-          <div *ngFor="let country of edition.hostcountries"><img class="flag" src="{{flagUrls[country]}}">
-            <a routerLink="/contest/{{id}}/country/{{country}}">{{country}}</a>
+          <div *ngFor="let country of edition.hostcountries; index as i"><img class="flag" src="{{flagUrls[country]}}">
+            <a routerLink="/contest/{{id}}/country/{{country}}">{{edition.hostcities[i]}}</a>
           </div>
         </div>
       </div>
@@ -52,7 +52,7 @@
         <div>
           <div *ngFor="let song of winningSongs">
             "{{song.song}}"
-            <br/>
+            <br />
             <img class="flag" src="{{flagUrls[song.country]}}">
             <a routerLink="/contest/{{id}}/country/{{song.country}}">{{song.country}}</a>
           </div>
@@ -164,7 +164,8 @@
           <ng-containter *ngIf="phase.cv">
             <table class="pointtotaltable">
               <tr>
-                <th colspan="5">{{phase.name}} <ng-container *ngIf="phase.num > 1">{{f + 1}}</ng-container></th>
+                <th colspan="5">{{phase.name}} <ng-container *ngIf="phase.num > 1">{{f + 1}}</ng-container>
+                </th>
               </tr>
               <tr>
                 <th>Place</th>
@@ -242,8 +243,13 @@
                     <img class="smallflag" src="{{flagUrls[voter.country]}}">
                   </a>
                 </th>
-                <th>Raw Total</th>
-                <th>Scaled Total</th>
+                <ng-container *ngIf="this.edition.phases[p].cvscaling; else nonScaledTitle">
+                  <th>Raw Total</th>
+                  <th>Scaled Total</th>
+                </ng-container>
+                <ng-template #nonScaledTitle>
+                  <th>Total</th>
+                </ng-template>
                 <th>Place</th>
               </tr>
               <tr *ngFor="let song of songsbyphase[p][f]" [ngStyle]="getPointStyle(song, p)">
@@ -253,8 +259,13 @@
                     [innerHTML]="getPoints(voter, song.country, p, f)"></td>
                 </ng-container>
                 <ng-container *ngIf="song.draws[p].place != -1; else emptyFScoreboard">
-                  <td>{{song.draws[p].rawextpoints}}</td>
-                  <td>{{song.draws[p].extpoints}}</td>
+                  <ng-container *ngIf="this.edition.phases[p].cvscaling; else nonScaledTotal">
+                    <td>{{song.draws[p].rawextpoints}}</td>
+                    <td>{{song.draws[p].extpoints}}</td>
+                  </ng-container>
+                  <ng-template #nonScaledTotal>
+                    <td>{{song.draws[p].extpoints}}</td>
+                  </ng-template>
                   <td>{{song.draws[p].place}}</td>
                 </ng-container>
                 <ng-template #emptyFScoreboard>

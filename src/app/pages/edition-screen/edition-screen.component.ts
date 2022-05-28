@@ -108,7 +108,20 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
     //gets the info on the edition
     getDoc(doc(this.db, 'contests', this.id, 'editions', this.num)).then(doc => {
       this.edition = doc.data() as Edition;
+      console.log(this.edition);
 
+      this.edition.hostcountries.forEach(country => {
+        if (!(country in this.flagUrls)) {
+          getDownloadURL(ref(this.storage, 'contests/' + this.id + '/flagicons/' + country + '.png'))
+            .then(url => {
+              this.flagUrls[country] = url;
+            }).catch(() => {
+              //Set it to a string so that it shows the image not found image
+              this.flagUrls[country] = "/"
+            })
+        }
+      })
+      
       getDownloadURL(ref(this.storage, 'contests/' + this.id + '/logos/' + this.edition.edition + '.png'))
         .then(url => {
           this.logourl = url;
@@ -137,7 +150,7 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
           docs.forEach((doc) => {
             songs.push(doc.data() as Song);
           });
-          this.entries = songs.length;
+          this.entries = songs.filter(song => "draws" in song).length;
 
           console.log(songs.filter(song => "winner" in song && song.winner));
           this.winningSongs = songs.filter(song => "winner" in song && song.winner);
@@ -155,6 +168,9 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
           })
 
           for (let i = 0; i < this.edition.phases.length; ++i) {
+            if(!("cvscaling" in this.edition.phases[i])){
+              this.edition.phases[i].cvscaling = true;
+            }
             this.songsbyphase.push(new Array(this.edition.phases[i].num));
             this.aqsbyphase.push(new Array(this.edition.phases[i].num));
             this.votersbyphase.push(new Array(this.edition.phases[i].num));
@@ -163,12 +179,12 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
             this.pointtablesbyphase.push(new Array(this.edition.phases[i].num));
             for (let j = 0; j < this.edition.phases[i].num; ++j) {
               this.songsbyphase[i][j] = songs.filter(x =>
-                x.draws.length > i &&
+                (!('participant' in x) || x.participant) && x.draws.length > i &&
                 (x.draws[i].num === j + 1 || (!('num' in x.draws[i]) && j === 0)) &&
                 (!('qualifier' in x.draws[i]) || x.draws[i].qualifier !== 'AQ')
               ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1);
               this.aqsbyphase[i][j] = songs.filter(x =>
-                x.draws.length > i && x.draws[i].num === j + 1 &&
+                (!('participant' in x) || x.participant) && x.draws.length > i && x.draws[i].num === j + 1 &&
                 'qualifier' in x.draws[i] && x.draws[i].qualifier === 'AQ')
                 .sort((a, b) => a.country > b.country ? 1 : -1);
               this.songtablesbyphase[i][j] = [...this.songsbyphase[i][j]]
@@ -176,11 +192,13 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
                 .filter(x => 'place' in x.draws[i])
                 .sort((a, b) => a.draws[i].place > b.draws[i].place ? 1 : -1)
               this.votersbyphase[i][j] = songs.filter(x =>
+                (!('participant' in x) || x.participant) && 
                 x.draws.length > i && 'ro' in x.draws[i] && x.draws[i].ro !== -1 &&
                 x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
                 && !x.pointsets[i][(j + 1).toString()].cv
               ).sort((a, b) => a.draws[i].ro > b.draws[i].ro ? 1 : -1).concat(
                 songs.filter(x =>
+                  (!('participant' in x) || x.participant) && 
                   (x.draws.length <= i || (!('ro' in x.draws[i]) || x.draws[i].ro === -1)) &&
                   x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
                   && !x.pointsets[i][(j + 1).toString()].cv
@@ -190,7 +208,7 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
                 this.crossvotersbyphase[i][j] = songs.filter(x =>
                   x.pointsets.length > i && (j + 1).toString() in x.pointsets[i]
                   && x.pointsets[i][(j + 1).toString()].cv
-                )
+                ).sort((a,b) => a.country > b.country ? 1 : -1)
               }
             }
           }
@@ -401,6 +419,9 @@ export class EditionScreenComponent implements OnInit, OnDestroy {
       }
       else if (song.draws[phase].place === 3) {
         return { 'background-color': '#cc9966' };
+      }
+      else if (song.draws[phase].qualifier === "FAQ") {
+        return { 'background-color': '#bae8ff' };
       }
     }
     else {

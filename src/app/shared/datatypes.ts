@@ -20,26 +20,29 @@ export interface Phase {
 	name: string; //Name in singular form
 	plural: string; //Name in plural form
 	cv: boolean; //Whether or not there's crossvoting in that phase
+	cvscaling?: boolean; //Whether or not the crossvotes are scaled
 	num: number; //Number of that phase (ex. 3 semi-finals, 1 grand final)
 }
 
 export interface Pot {
 	name: string; //Typically a number or 'N' for Newcomers
-	members;
+	members: string[]; //Users in the pot
 }
 
 export interface Song {
-	artist: string;
+	artist?: string;
 	country: string;
-	draws: Draw[];
-	dqphase: number;
+	draws?: Draw[];
+	dqphase?: number;
 	dqreason?: string;
 	edition: string;
 	edval: number;
-	language: string;
+	features?: string[]; //Featured artists
+	language?: string;
+	participant?: boolean; //Whether that user sent a song (true) or just voted (false)
 	phases: number;
 	pointsets: Pointsets[];
-	song: string;
+	song?: string;
 	user: string;
 	winner?: boolean;
 }
