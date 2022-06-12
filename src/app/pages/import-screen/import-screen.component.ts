@@ -8,7 +8,6 @@ import { getFirestore, collection, query, where, getDocs, Firestore, addDoc, del
 import { initializeApp, FirebaseApp } from "firebase/app"
 import { firebaseConfig } from '../../credentials';
 import { AuthService } from 'src/app/auth/auth.service';
-import { fix } from 'mathjs';
 // import * as countries from "i18n-iso-countries";
 
 // countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
@@ -119,8 +118,10 @@ export class ImportScreenComponent implements OnInit {
     "Antigua & Barbuda": "Antigua and Barbuda",
     "Bahamas": "The Bahamas",
     "Bosnia & Herzegovina": "Bosnia and Herzegovina",
+    "Cape Verde": "Cabo Verde",
     "CAR": "Central African Republic",
     "C.A.R.": "Central African Republic",
+    "Central African Rep.": "Central African Republic",
     "Cote d'Ivoire": "Côte d'Ivoire",
     "Cote D'Ivoire": "Côte d'Ivoire",
     "Côte D'Ivoire": "Côte d'Ivoire",
@@ -130,6 +131,7 @@ export class ImportScreenComponent implements OnInit {
     "Fr. Polynesia": "French Polynesia",
     "Guerensy": "Guernsey",
     "Isle Of Man": "Isle of Man",
+    "Ivory Coast": "Côte d'Ivoire",
     "Netherlands": "The Netherlands",
     "PNG": "Papua New Guinea",
     "Republic of The Congo": "Congo Republic",
@@ -328,7 +330,8 @@ export class ImportScreenComponent implements OnInit {
           }
           for (let j = 3; j < 80; ++j) {
             if ("C" + j in workBook.Sheets["Song submission"]) {
-              if (workBook.Sheets["Song submission"]["C" + j].v.trim() == country) {
+              if (workBook.Sheets["Song submission"]["C" + j].v.trim() == country ||
+                workBook.Sheets["Song submission"]["C" + j].v.trim() == fixedCountry) {
 
                 let pointsets: Pointsets = {}
                 pointsets[s + 1] = {
@@ -350,8 +353,8 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: place <= 8 ? "Q" : "NQ"
                   }],
                   dqphase: -1,
-                  edition: "51",
-                  edval: 56,
+                  edition: "40",
+                  edval: 43,
                   language: "",
                   phases: 2,
                   pointsets: [],
@@ -362,8 +365,9 @@ export class ImportScreenComponent implements OnInit {
                 if (pointsArray.some(s => s.length)) {
                   song.pointsets.push(pointsets);
                 }
+                console.log("Semi " + s)
                 this.semiSongs[s].push(song);
-                this.semiCountries.push(country);
+                this.semiCountries.push(fixedCountry);
                 this.allSongs.push(song);
                 console.log("Finished country: " + country)
                 break;
@@ -407,11 +411,15 @@ export class ImportScreenComponent implements OnInit {
     for (let n = 2; true; ++n) {
       if ("H" + n in workBook.Sheets["GF Scoreboard"]
         && workBook.Sheets["GF Scoreboard"]["H" + n].v.trim() !== "Total") {
-        let index = this.semiCountries.indexOf(workBook.Sheets["GF Scoreboard"]["H" + n].v.trim())
         let country = workBook.Sheets["GF Scoreboard"]["H" + n].v.trim();
         let fixedCountry = country;
         if (country in this.fixedCountryNames) {
           fixedCountry = this.fixedCountryNames[country];
+        }
+
+        let index = this.semiCountries.indexOf(country)
+        if (index === -1) {
+          index = this.semiCountries.indexOf(fixedCountry)
         }
 
         console.log("Finalist: " + fixedCountry);
@@ -502,7 +510,8 @@ export class ImportScreenComponent implements OnInit {
 
           for (let s = 3; s < 80; ++s) {
             if ("C" + s in workBook.Sheets["Song submission"]) {
-              if (workBook.Sheets["Song submission"]["C" + s].v.trim() == country) {
+              if (workBook.Sheets["Song submission"]["C" + s].v.trim() == country ||
+                workBook.Sheets["Song submission"]["C" + s].v.trim() == fixedCountry) {
                 let song: Song = {
                   artist: workBook.Sheets["Song submission"]["E" + s].w.trim(),
                   country: fixedCountry,
@@ -511,8 +520,8 @@ export class ImportScreenComponent implements OnInit {
                     qualifier: "AQ"
                   }],
                   dqphase: -1,
-                  edition: "51",
-                  edval: 56,
+                  edition: "40",
+                  edval: 43,
                   language: "",
                   phases: 2,
                   pointsets: [],
@@ -790,8 +799,8 @@ export class ImportScreenComponent implements OnInit {
       this.allSongs.push({
         country: country,
         user: user,
-        edition: "51",
-        edval: 56,
+        edition: "40",
+        edval: 43,
         participant: false,
         phases: 2,
         pointsets: [

@@ -103,7 +103,8 @@
 									<td class="dqrow" colspan="2 * (p + 1)">Did not qualify</td>
 								</ng-container>
 								<ng-container
-									*ngIf="song.draws.length < (song.phases - p) && p == 0 && song.draws[p].qualifier !== 'NQ'">
+									*ngIf="song.draws.length < (song.phases - p) && p == 0 && song.draws[p].qualifier !== 'NQ'
+										&& !(song.draws[0].qualifier == 'AQ' && song.dqphase < song.phases - 1)">
 									<td></td>
 									<td></td>
 								</ng-container>
