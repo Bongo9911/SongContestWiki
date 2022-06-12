@@ -166,12 +166,28 @@ export class PotGeneratorComponent implements OnInit {
 
       if (this.pots <= filteredUsers.length) {
 
-        for (let i = 0; i < this.pots; ++i) {
-          let rand = this.getRandomInt(filteredUsers.length);
-          if (potheads.indexOf(rand) === -1) {
-            potheads.push(rand);
+        let rand = this.getRandomInt(filteredUsers.length);
+        potheads.push(rand);
+
+        let potsim = [...similarities[rand]];
+        let removed = [];
+
+        for (let i = 0; i < this.pots - 1; ++i) {
+          let index = potsim.indexOf(Math.min(...potsim));
+          let fixedIndex = index;
+          for(let r = 0; r < removed.length; ++r) {
+            if(removed[r] >= index) {
+              fixedIndex++;
+            }
+          }
+          if (potheads.indexOf(fixedIndex) === -1) {
+            potheads.push(fixedIndex);
+            potsim = [...similarities[fixedIndex]];
+            removed = [];
           }
           else {
+            potsim.splice(index, 1);
+            removed.push(index);
             --i;
           }
         }
