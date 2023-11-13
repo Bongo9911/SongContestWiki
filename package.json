@@ -25,7 +25,7 @@
     "fuzzysort": "1.9.0",
     "i18n-iso-countries": "7.4.0",
     "mathjs": "10.6.4",
-    "rxjs": "7.5.6",
+    "rxjs": "7.8.1",
     "tslib": "2.4.0",
     "xlsx": "0.18.5",
     "zone.js": "0.11.5"
