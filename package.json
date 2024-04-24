@@ -24,7 +24,7 @@
     "firebase": "9.10.0",
     "fuzzysort": "1.9.0",
     "i18n-iso-countries": "7.4.0",
-    "mathjs": "10.6.4",
+    "mathjs": "12.4.2",
     "rxjs": "7.5.6",
     "tslib": "2.4.0",
     "xlsx": "0.18.5",
