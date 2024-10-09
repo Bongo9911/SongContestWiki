@@ -17,7 +17,7 @@
     "firebase-functions": "4.4.1"
   },
   "devDependencies": {
-    "typescript": "4.6.3",
+    "typescript": "5.6.3",
     "firebase-functions-test": "0.3.3"
   },
   "private": true
