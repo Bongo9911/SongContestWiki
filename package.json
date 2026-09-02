@@ -21,7 +21,7 @@
     "@angular/platform-browser": "14.0.1",
     "@angular/platform-browser-dynamic": "14.0.1",
     "@angular/router": "14.0.1",
-    "firebase": "9.10.0",
+    "firebase": "10.9.0",
     "fuzzysort": "1.9.0",
     "i18n-iso-countries": "7.4.0",
     "mathjs": "10.6.4",
